@@ -1,12 +1,8 @@
-torch
-torchvision
-torchaudio
-mamba-ssm
-causal-conv1d
-diffusers
-transformers
-accelerate
-numpy
-scipy
-soundfile
-datasets
+# Mamba Latent Forcing — Dependencies
+# Install with: pip install -r requirements.txt
+
+torch>=2.1.0
+transformers>=4.40.0
+mamba-ssm>=1.2.0        # Provides mamba_ssm.Mamba (Mamba1 Triton kernels)
+                         # Install: pip install mamba-ssm
+                         # Requires CUDA + compatible GPU (Ampere or newer recommended)
