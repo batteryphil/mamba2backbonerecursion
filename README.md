@@ -213,7 +213,9 @@ All targets are **pre-tokenized at load time** — no tokenizer calls in the tra
 | v25 | MIMO Phase Rotator (unit-circle BPTT, JIT CUDA) |
 | v26 | 130m fine-tune, THINK-token supervision |
 | v27 | 1.3B scale, bf16, LoRA on top 24 layers |
-| **v28** | **Latent Forcing** — per-loop supervision, Mamba1 scan block, 0.0pp val gap |
+| v28 | Latent Forcing — per-loop supervision, Mamba1 scan block, 0.0pp val gap |
+| v29 | `<HALT>` token — model learns its own stopping criterion (no Python heuristic) |
+| **v30** | **Mamba2 backbone** — `mamba2-130m` + Mamba2 loop engine (headdim=64, 12 heads) + HALT |
 
 ---
 
