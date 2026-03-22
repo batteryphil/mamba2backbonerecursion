@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiM-LLM | Training Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --accent: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.3);
+            --text-main: #f0f0f5;
+            --text-dim: #a0a0b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(0, 242, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(123, 0, 255, 0.05) 0%, transparent 40%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.05rem;
+            background: linear-gradient(90deg, #00f2ff, #7b00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge {
+            background: var(--accent-glow);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            border: 1px solid var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .chart-container {
+            height: 400px;
+            margin-top: 2rem;
+        }
+
+        .salad-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .salad-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .salad-header {
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .salad-content {
+            color: var(--text-dim);
+            white-space: pre-wrap;
+            border-left: 2px solid var(--border);
+            padding-left: 1rem;
+        }
+
+        .mode-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        .mode-fact {
+            background: #00f2ff;
+            color: #000;
+        }
+
+        .mode-reason {
+            background: #ffd700;
+            color: #000;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="logo">DiM-LLM MONITOR</div>
+        <div class="status-badge" id="live-status">Live Training</div>
+    </nav>
+
+    <div class="container">
+        <!-- Main Stats Panel -->
+        <main>
+            <div class="card">
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-label">Step</div>
+                        <div class="metric-value" id="val-step">--</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Epoch</div>
+                        <div class="metric-value" id="val-epoch">--</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Throughput (TPS)</div>
+                        <div class="metric-value" id="val-tps">--</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">Loss</div>
+                        <div class="metric-value" id="val-loss">--</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">VRAM (Used)</div>
+                        <div class="metric-value" id="val-vram" style="color: #7b00ff;">--</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">GPU Load</div>
+                        <div class="metric-value" id="val-gpu-load" style="color: #ff007f;">--</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">System RAM</div>
+                        <div class="metric-value" id="val-ram">--</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">GPU Temp</div>
+                        <div class="metric-value" id="val-gpu-temp" style="color: #ff9d00;">--</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">CPU Temp</div>
+                        <div class="metric-value" id="val-cpu-temp" style="color: #ff3300;">--</div>
+                    </div>
+                </div>
+
+                <h2>Training Dynamics</h2>
+                <div class="chart-container">
+                    <canvas id="lossChart"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <!-- Side Panel: Word Salad -->
+        <aside class="salad-section">
+            <div class="card">
+                <!-- Word Salad Section -->
+                <h2>Model Generations</h2>
+                <div id="salad-feed">
+                    <div class="salad-card">
+                        <div class="salad-content">Waiting for first generation...</div>
+                    </div>
+                </div>
+
+                <!-- Socratic Benchmark Section -->
+                <h2 style="margin-top: 2rem; color: #fff;">Socratic Benchmarks</h2>
+                <div id="socratic-feed">
+                    <div class="salad-card">
+                        <div class="salad-content">Waiting for benchmark telemetry...</div>
+                    </div>
+                </div>
+
+                <!-- 💎 NEW: Logic Snap Hub -->
+                <h2 style="margin-top: 2rem; color: var(--accent); border-top: 1px solid var(--border); padding-top: 2rem;">🧠 LOGIC SNAP HUB (N=3)</h2>
+                <div id="benchmark-hub">
+                    <div class="salad-card" style="border: 1px dashed var(--accent); opacity: 0.5;">
+                        <div class="salad-content">Benchmark will fire at N=3 elevation.</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        let lossChart;
+        const ctx = document.getElementById('lossChart').getContext('2d');
+
+        function initChart() {
+            lossChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Train Loss',
+                            data: [],
+                            borderColor: '#00f2ff',
+                            backgroundColor: 'rgba(0, 242, 255, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Val Loss',
+                            data: [],
+                            borderColor: '#7b00ff',
+                            backgroundColor: 'rgba(123, 0, 255, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, labels: { color: '#a0a0b0' } }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#a0a0b0' } },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#a0a0b0' }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function updateData() {
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+
+                if (data.error) throw new Error(data.error);
+
+                // Update Metric Values
+                document.getElementById('val-step').innerText = data.step || '--';
+                document.getElementById('val-epoch').innerText = data.epoch || '--';
+                document.getElementById('val-tps').innerText = data.tps ? data.tps.toFixed(1) : '--';
+
+                let currentLoss = '--';
+                if (data.train_loss && data.train_loss.length > 0) {
+                    currentLoss = data.train_loss[data.train_loss.length - 1].toFixed(4);
+                } else if (data.running_loss) {
+                    currentLoss = data.running_loss.toFixed(4) + ' (live)';
+                }
+                document.getElementById('val-loss').innerText = currentLoss;
+
+                // Update New Telemetry
+                if (data.gpu) {
+                    document.getElementById('val-vram').innerText = data.gpu.vram_used || '--';
+                    document.getElementById('val-gpu-load').innerText = data.gpu.load || '--';
+                    document.getElementById('val-gpu-temp').innerText = data.gpu.temp || '--';
+                }
+                if (data.sys_ram) {
+                    document.getElementById('val-ram').innerText = data.sys_ram.percent + '%';
+                }
+                if (data.cpu_temp) {
+                    document.getElementById('val-cpu-temp').innerText = data.cpu_temp || '--';
+                }
+
+                // Update Chart
+                const epochs = Array.from({ length: data.train_loss.length }, (_, i) => i + 1);
+                lossChart.data.labels = epochs;
+                lossChart.data.datasets[0].data = data.train_loss;
+                lossChart.data.datasets[1].data = data.val_loss;
+                lossChart.update('none'); // Update without animation for performance
+
+                // Update Word Salad Feed
+                if (data.salads && data.salads.length > 0) {
+                    const latestSaladGroup = data.salads[data.salads.length - 1];
+                    const feed = document.getElementById('salad-feed');
+                    feed.innerHTML = ''; // Clear and update with latest group
+
+                    latestSaladGroup.slice(0, 3).forEach((item, index) => {
+                        const div = document.createElement('div');
+                        div.className = 'salad-card';
+                        const modeClass = item.mode === 'FACT' ? 'mode-fact' : 'mode-reason';
+                        div.innerHTML = `
+                            <div class="salad-header">
+                                <div>
+                                    <span class="mode-tag ${modeClass}">${item.mode || 'REASON'}</span>
+                                    <span style="margin-left: 10px; opacity: 0.6;">SAMPLE ${index + 1}</span>
+                                </div>
+                                <span style="color: #fff;">${item.steps || '??'} STEPS</span>
+                            </div>
+                            <div style="font-size: 0.75rem; color: #00f2ff; margin-bottom: 0.8rem; opacity: 0.7; font-family: monospace;">
+                                > ${item.prompt}
+                            </div>
+                            <div class="salad-content">${item.response}</div>
+                        `;
+                        feed.appendChild(div);
+                    });
+                }
+
+                // Update Benchmark Hub
+                if (data.benchmarks && data.benchmarks.length > 0) {
+                    const benchHub = document.getElementById('benchmark-hub');
+                    benchHub.innerHTML = '';
+                    
+                    data.benchmarks.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'salad-card';
+                        div.style.borderLeft = "4px solid var(--accent)";
+                        div.style.background = "rgba(0, 242, 255, 0.05)";
+                        
+                        div.innerHTML = `
+                            <div class="salad-header">
+                                <span style="color: var(--accent); font-weight: 800;">${item.mode}</span>
+                                <span style="opacity: 0.6;">DEPTH: N=${item.steps}</span>
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem; font-family: monospace;">
+                                > ${item.prompt}
+                            </div>
+                            <div class="salad-content" style="color: #fff; font-weight: 600;">${item.response}</div>
+                        `;
+                        benchHub.appendChild(div);
+                    });
+                }
+
+                // Update Socratic Feed (RESTORED)
+                if (data.socratic_results && data.socratic_results.length > 0) {
+                    const socFeed = document.getElementById('socratic-feed');
+                    socFeed.innerHTML = '';
+                    
+                    // Show last 3 benchmarks
+                    [...data.socratic_results].reverse().slice(0, 3).forEach(res => {
+                        const div = document.createElement('div');
+                        div.className = 'salad-card';
+                        
+                        let color = "#00ff88"; // Assume GREEN/SUCCESS for standard probes
+                        let label = "🟢 PROBE STABLE";
+                        
+                        if (res.bias > 1.5) { 
+                            color = "#ffd700"; label = "🟡 NARRATIVE DRIFT"; 
+                        }
+                        if (res.bias > 3.0) {
+                            color = "#ff0055"; label = "🔴 HIGH BIAS";
+                        }
+                        
+                        div.style.borderLeft = `4px solid ${color}`;
+                        
+                        div.innerHTML = `
+                            <div class="salad-header">
+                                <span style="color: ${color}; font-weight: 800;">${label}</span>
+                                <span style="opacity: 0.6;">STEP ${res.step}</span>
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 0.5rem; font-style: italic;">
+                                Prompt: ${res.prompt}
+                            </div>
+                            <div class="salad-content" style="color: #fff;">${res.response || '[EMPTY]'}</div>
+                            <div style="margin-top: 0.8rem; font-size: 0.65rem; display: flex; gap: 10px;">
+                                <span style="color: ${color}">BIAS SCORE: ${res.bias ? res.bias.toFixed(2) : '0'}</span>
+                                <span style="color: #a0a0b0">DEPTH: N=${res.steps}</span>
+                            </div>
+                        `;
+                        socFeed.appendChild(div);
+                    });
+                }
+
+                if (data.diverged) {
+                    document.getElementById('live-status').innerText = "HALTED - DIVERGENCE DETECTED";
+                    document.getElementById('live-status').style.background = "#ff005533";
+                    document.getElementById('live-status').style.borderColor = "#ff0055";
+                    document.getElementById('live-status').style.animation = "pulse 1s infinite";
+                } else {
+                    document.getElementById('live-status').innerText = "Live Training";
+                    document.getElementById('live-status').style.background = "var(--accent-glow)";
+                    document.getElementById('live-status').style.borderColor = "var(--accent)";
+                    document.getElementById('live-status').style.animation = "pulse 2s infinite";
+                }
+
+            } catch (err) {
+                console.error("Fetch error:", err);
+                document.getElementById('live-status').innerText = "Disconnected";
+                document.getElementById('live-status').style.borderColor = "#ff0055";
+            }
+        }
+
+        initChart();
+        updateData();
+        setInterval(updateData, 5000); // Update every 5 seconds
+    </script>
+</body>
+
+</html>

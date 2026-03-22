@@ -6,25 +6,17 @@
 *.egg
 
 # ── Generated JSON Datasets (reproducible via generator scripts) ──
-logic_v3.json
-train_data.json
-val_data.json
-balanced_distillation.json
-gold_distillation.json
-benchmark_results.json
-deep_diagnostic_report.json
+*.json
+!package.json
+*.jsonl
 
 # ── Log Files ──────────────────────────────────────────────────────
 *.log
 training_stats.json
 
 # ── Bulk Text Dumps ───────────────────────────────────────────────
-all_code.txt
-all_code_and_data.txt
-dim_llm_v4_rbm_full_source.txt
-project_report_dim_llm_v3.txt
-test_out.txt
-new_code_segment.txt
+*.txt
+!requirements.txt
 
 # ── Build Artifacts ───────────────────────────────────────────────
 __pycache__/
@@ -32,9 +24,8 @@ build/
 dist/
 mamba_scan.egg-info/
 *.cpython-*.so
-get-docker.sh
 
-# ── Archive / Old Experiments ─────────────────────────────────────
+# ── Archive (tracked for history, not code review) ────────────────
 archive_v3/
 backup_checkpoints/
 
@@ -42,5 +33,3 @@ backup_checkpoints/
 .DS_Store
 .vscode/
 *.swp
-monitor_ui.log
-rbm_hybrid_epoch_1.pt

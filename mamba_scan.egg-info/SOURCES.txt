@@ -1,5 +1,6 @@
 README.md
 mamba_scan.cpp
+mamba_scan_kernel.cu
 setup.py
 mamba_scan.egg-info/PKG-INFO
 mamba_scan.egg-info/SOURCES.txt
