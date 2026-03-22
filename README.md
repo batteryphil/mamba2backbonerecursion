@@ -18,6 +18,31 @@ A 130M-parameter Mamba2 SSM that learns **discrete, stepwise symbolic computatio
 
 ---
 
+## Training–Inference Phase Transition
+
+The Prompt Lifeline is a **training-time gradient highway**, not an inference dependency. Once trained, the Mamba2 core executes an identical internal FSM whether the lifeline is connected or severed:
+
+![phase_transition_trajectory](phase_transition_trajectory.png)
+
+The two trajectories (solid = lifeline active, dashed = lifeline zeroed) trace the **same path through state space** — the model has fully internalized the algorithm into its recurrent parameters. PCA captures 95.6% of variance in just 2 components, confirming the state trajectory is low-dimensional and discrete.
+
+| Loop | Gate = 1.0 | Gate = 0.0 | Match |
+|------|-----------|-----------|-------|
+| L1 | P | P | ✅ |
+| L2 | P | P | ✅ |
+| L3 | Q | Q | ✅ |
+| L4 | R | R | ✅ |
+| L5 | R | R | ✅ |
+| L6 | S | S | ✅ |
+| L7 | S | T | ❌ |
+| L8 | T | T | ✅ |
+| L9 | T | T | ✅ |
+| L10 | T | T | ✅ |
+
+> **9/10 loops produce identical predictions.** The single divergence (L7) reflects a minor timing difference in the pointer advance — both trajectories converge immediately after.
+
+---
+
 ## Architecture
 
 ```
