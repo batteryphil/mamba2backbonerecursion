@@ -1,7 +1,8 @@
-torch>=2.0.0
+torch>=2.1.0
+transformers>=4.36.0
+mamba-ssm>=2.0.0
+causal-conv1d>=1.2.0
+triton>=2.1.0
+tokenizers>=0.15.0
 numpy
-librosa>=0.10.0
-soundfile
-g2p_en
 tqdm
-matplotlib
