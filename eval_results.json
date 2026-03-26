@@ -1,0 +1,110 @@
+{
+  "1_in_dist": {
+    "passed": 8,
+    "total": 8,
+    "details": [
+      "  \u2705 1-hop color               got='blue        ' want='blue      ' loops= 3 10799ms halt=Y",
+      "  \u2705 1-hop number              got='7           ' want='7         ' loops= 3   111ms halt=Y",
+      "  \u2705 2-hop assign              got='red         ' want='red       ' loops= 4   155ms halt=Y",
+      "  \u2705 2-hop named               got='pink        ' want='pink      ' loops= 3   188ms halt=Y",
+      "  \u2705 3-hop chain               got='green       ' want='green     ' loops= 5   184ms halt=Y",
+      "  \u2705 3-hop purple              got='purple      ' want='purple    ' loops= 5   170ms halt=Y",
+      "  \u2705 4-hop assign              got='orange      ' want='orange    ' loops= 5   174ms halt=Y",
+      "  \u2705 4-hop white               got='white       ' want='white     ' loops= 5   176ms halt=Y"
+    ]
+  },
+  "2_ood": {
+    "passed": 0,
+    "total": 5,
+    "details": [
+      "  \u274c 6-hop                     got='acerb       ' want='jazz      ' loops= 6   194ms halt=Y",
+      "  \u274c 8-hop                     got='acerb       ' want='rocket    ' loops= 7   221ms halt=Y",
+      "  \u274c 10-hop                    got='0           ' want='emerald   ' loops= 5   172ms halt=Y",
+      "  \u274c 12-hop                    got='red         ' want='crimson   ' loops= 5   174ms halt=Y",
+      "  \u274c 15-hop                    got='quisite     ' want='diamond   ' loops= 6   204ms halt=Y"
+    ]
+  },
+  "3_arith": {
+    "passed": 2,
+    "total": 6,
+    "details": [
+      "  \u2705 add simple                got='5           ' want='5         ' loops= 2    87ms halt=Y",
+      "  \u274c add large                 got='9           ' want='15        ' loops= 2   100ms halt=Y",
+      "  \u274c sub simple                got='3           ' want='6         ' loops= 2   100ms halt=Y",
+      "  \u2705 sub to zero               got='0           ' want='0         ' loops= 2    99ms halt=Y",
+      "  \u274c add person                got='5           ' want='7         ' loops= 2    99ms halt=Y",
+      "  \u274c multi-step add            got='9           ' want='7         ' loops= 2    99ms halt=Y"
+    ]
+  },
+  "4_counterfactual": {
+    "passed": 2,
+    "total": 4,
+    "details": [
+      "  \u274c overwrite 1               got='red         ' want='blue      ' loops= 4   151ms halt=Y",
+      "  \u2705 overwrite 2               got='5           ' want='5         ' loops= 4   154ms halt=Y",
+      "  \u2705 shadow var                got='green       ' want='green     ' loops= 5   169ms halt=Y",
+      "  \u274c chain update              got='red         ' want='blue      ' loops= 5   169ms halt=Y"
+    ]
+  },
+  "5_multi_var": {
+    "passed": 2,
+    "total": 4,
+    "details": [
+      "  \u274c 2 vars                    got='red         ' want='blue      ' loops= 5   172ms halt=Y",
+      "  \u2705 3 vars                    got='green       ' want='green     ' loops= 5   169ms halt=Y",
+      "  \u274c mix nums                  got='7           ' want='3         ' loops= 4   147ms halt=Y",
+      "  \u2705 long mix                  got='purple      ' want='purple    ' loops= 5   172ms halt=Y"
+    ]
+  },
+  "6_distractor": {
+    "passed": 3,
+    "total": 4,
+    "details": [
+      "  \u274c 1 distractor              got='othetical   ' want='blue      ' loops=16   470ms halt=N",
+      "  \u2705 2 distractors             got='red         ' want='red       ' loops= 5   172ms halt=Y",
+      "  \u2705 name distract             got='blue        ' want='blue      ' loops= 3   115ms halt=Y",
+      "  \u2705 mixed chain               got='green       ' want='green     ' loops= 5   177ms halt=Y"
+    ]
+  },
+  "7_containment": {
+    "passed": 2,
+    "total": 3,
+    "details": [
+      "  \u2705 2-hop spatial             got='closet      ' want='closet    ' loops= 5   169ms halt=Y",
+      "  \u274c 3-hop spatial             got='in          ' want='house     ' loops= 5   204ms halt=Y",
+      "  \u2705 property                  got='blue        ' want='blue      ' loops= 5   185ms halt=Y"
+    ]
+  },
+  "8_memory": {
+    "vram_per_depth": {
+      "2": 283.791872,
+      "4": 285.824512,
+      "8": 288.444928,
+      "12": 292.004352,
+      "16": 295.128064
+    },
+    "delta_mb": 11.336191999999983,
+    "constant": true
+  },
+  "9_throughput": {
+    "2-hop": {
+      "avg_ms": 136.65018554311246,
+      "qps": 7.317955669255238
+    },
+    "4-hop": {
+      "avg_ms": 196.38138266745955,
+      "qps": 5.092132392678689
+    },
+    "8-hop": {
+      "avg_ms": 158.20831954479218,
+      "qps": 6.320780113696097
+    }
+  },
+  "10_ablation": {
+    "gate_mean": 0.9916993975639343,
+    "gate_std": 0.029781652614474297,
+    "on_score": 3,
+    "off_score": 0,
+    "critical": true
+  }
+}

@@ -1,0 +1,29 @@
+# Model weights (too large for GitHub)
+*.pt
+*.pth
+*.bin
+*.safetensors
+saved_weights/
+
+# Logs
+*.log
+training_*.log
+
+# Python
+__pycache__/
+*.pyc
+.eggs/
+*.egg-info/
+
+# Audio outputs
+*.wav
+*.mp3
+*.ogg
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

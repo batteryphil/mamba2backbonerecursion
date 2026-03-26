@@ -1,0 +1,7 @@
+torch>=2.0.0
+numpy
+librosa>=0.10.0
+soundfile
+g2p_en
+tqdm
+matplotlib

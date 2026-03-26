@@ -1,0 +1,134 @@
+{
+  "1_in_dist": {
+    "passed": 8,
+    "total": 8,
+    "details": [
+      "  \u2705 1-hop color               got='blue        ' want='blue      ' loops= 3 18800ms halt=Y",
+      "  \u2705 1-hop number              got='7           ' want='7         ' loops= 2   139ms halt=Y",
+      "  \u2705 2-hop assign              got='red         ' want='red       ' loops= 4   229ms halt=Y",
+      "  \u2705 2-hop named               got='pink        ' want='pink      ' loops= 3   229ms halt=Y",
+      "  \u2705 3-hop chain               got='green       ' want='green     ' loops= 5   231ms halt=Y",
+      "  \u2705 3-hop purple              got='purple      ' want='purple    ' loops= 5   223ms halt=Y",
+      "  \u2705 4-hop assign              got='orange      ' want='orange    ' loops= 6   235ms halt=Y",
+      "  \u2705 4-hop white               got='white       ' want='white     ' loops= 5   209ms halt=Y"
+    ]
+  },
+  "2_curriculum": {
+    "passed": 5,
+    "total": 5,
+    "details": [
+      "  \u2705 6-hop curriculum          got='gold        ' want='gold      ' loops= 7   259ms halt=Y",
+      "  \u2705 7-hop curriculum          got='silver      ' want='silver    ' loops= 8   283ms halt=Y",
+      "  \u2705 8-hop curriculum          got='iron        ' want='iron      ' loops= 7   263ms halt=Y",
+      "  \u2705 9-hop curriculum          got='grape       ' want='grape     ' loops= 9   306ms halt=Y",
+      "  \u2705 10-hop curriculum         got='lemon       ' want='lemon     ' loops=10   333ms halt=Y"
+    ]
+  },
+  "3_ood": {
+    "passed": 0,
+    "total": 2,
+    "details": [
+      "  \u274c 12-hop OOD                got='black       ' want='crimson   ' loops=10   334ms halt=Y",
+      "  \u274c 15-hop OOD                got='green       ' want='diamond   ' loops= 8   289ms halt=Y"
+    ]
+  },
+  "4_arith": {
+    "passed": 5,
+    "total": 6,
+    "details": [
+      "  \u2705 add simple                got='5           ' want='5         ' loops= 2   139ms halt=Y",
+      "  \u274c add large                 got='5           ' want='15        ' loops= 2   137ms halt=Y",
+      "  \u2705 sub simple                got='6           ' want='6         ' loops= 2   140ms halt=Y",
+      "  \u2705 sub to zero               got='0           ' want='0         ' loops= 2   140ms halt=Y",
+      "  \u2705 add person                got='7           ' want='7         ' loops= 2   142ms halt=Y",
+      "  \u2705 multi-step add            got='7           ' want='7         ' loops= 2   145ms halt=Y"
+    ]
+  },
+  "5_counterfactual": {
+    "passed": 3,
+    "total": 4,
+    "details": [
+      "  \u274c overwrite 1               got='red         ' want='blue      ' loops= 4   187ms halt=Y",
+      "  \u2705 overwrite 2               got='5           ' want='5         ' loops= 3   164ms halt=Y",
+      "  \u2705 shadow var                got='green       ' want='green     ' loops= 5   212ms halt=Y",
+      "  \u2705 chain update              got='blue        ' want='blue      ' loops= 5   209ms halt=Y"
+    ]
+  },
+  "6_multi_var": {
+    "passed": 2,
+    "total": 4,
+    "details": [
+      "  \u274c 2 vars                    got='red         ' want='blue      ' loops= 5   215ms halt=Y",
+      "  \u2705 3 vars                    got='green       ' want='green     ' loops= 5   222ms halt=Y",
+      "  \u274c mix nums                  got='7           ' want='3         ' loops= 3   168ms halt=Y",
+      "  \u2705 long mix                  got='purple      ' want='purple    ' loops= 6   265ms halt=N"
+    ]
+  },
+  "7_distractor": {
+    "passed": 4,
+    "total": 4,
+    "details": [
+      "  \u2705 1 distractor              got='blue        ' want='blue      ' loops= 5   220ms halt=Y",
+      "  \u2705 2 distractors             got='red         ' want='red       ' loops= 5   273ms halt=Y",
+      "  \u2705 name distract             got='blue        ' want='blue      ' loops= 3   165ms halt=Y",
+      "  \u2705 mixed chain               got='green       ' want='green     ' loops= 4   193ms halt=Y"
+    ]
+  },
+  "8_containment": {
+    "passed": 2,
+    "total": 3,
+    "details": [
+      "  \u2705 2-hop spatial             got='closet      ' want='closet    ' loops= 5   217ms halt=Y",
+      "  \u274c 3-hop spatial             got='in          ' want='house     ' loops= 5   236ms halt=Y",
+      "  \u2705 property                  got='blue        ' want='blue      ' loops= 5   224ms halt=Y"
+    ]
+  },
+  "9_knowledge": {
+    "passed": 2,
+    "total": 10,
+    "details": [
+      "  \u274c capital france            got='\u0099           ' want='Paris     ' loops= 4   189ms halt=N",
+      "  \u274c capital japan             got='\ufffd           ' want='Tokyo     ' loops= 4   183ms halt=N",
+      "  \u274c planet 3rd                got='the         ' want='Earth     ' loops= 4   182ms halt=Y",
+      "  \u274c water formula             got='\ufffd           ' want='H2O       ' loops= 4   186ms halt=N",
+      "  \u2705 largest ocean             got='Pacific     ' want='Pacific   ' loops= 4   182ms halt=N",
+      "  \u274c sun star type             got='the         ' want='star      ' loops= 3   164ms halt=Y",
+      "  \u274c dog animal                got='dog         ' want='animal    ' loops= 2   179ms halt=Y",
+      "  \u2705 1+1                       got='2           ' want='2         ' loops= 2   165ms halt=Y",
+      "  \u274c shakespeare               got='the         ' want='Shakespeare' loops= 4   197ms halt=N",
+      "  \u274c boiling point             got='0           ' want='Celsius   ' loops= 2   143ms halt=Y"
+    ]
+  },
+  "10_memory": {
+    "vram_per_depth": {
+      "2": 5556.017152,
+      "4": 5556.857344,
+      "8": 5559.84896,
+      "12": 5562.90304,
+      "16": 5564.843008
+    },
+    "delta_mb": 8.825855999999476,
+    "constant": true
+  },
+  "11_throughput": {
+    "2-hop": {
+      "avg_ms": 183.26171271813413,
+      "qps": 5.456677148587229
+    },
+    "4-hop": {
+      "avg_ms": 210.4492210627844,
+      "qps": 4.751740086990699
+    },
+    "8-hop": {
+      "avg_ms": 227.59603772622845,
+      "qps": 4.393749601224973
+    }
+  },
+  "12_ablation": {
+    "gate_mean": 0.9972853660583496,
+    "gate_std": 0.03182773292064667,
+    "on_score": 3,
+    "off_score": 3,
+    "critical": false
+  }
+}
