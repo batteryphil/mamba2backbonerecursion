@@ -214,7 +214,7 @@ def main() -> None:
     # ── Phase 3 Dark Inference: Hard Suite ────────────────────────────
     # Load the Phase 3 sparse reward checkpoint and run the hardest eval suite
     # with n_dark_inference=3, exactly mirroring the Phase 3 training environment.
-    P3_CKPT = "saved_weights/mamba130m_v3_phase3_best.pt"
+    P3_CKPT = "saved_weights/mamba130m_v5_phase5_best.pt"
     if os.path.exists(P3_CKPT):
         print()
         print("═" * 65)

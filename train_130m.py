@@ -114,6 +114,7 @@ PHASE2B = dict(
 # it to realise the prefix scratchpad is its only source of truth.
 # The optimizer builds the "connective tissue" to hold latent state without
 # the 3-loop void that caused Phase 3 to drown in v3.
+# loss_weights: [dark_0=0.1, dark_1=0.2, reward_ans=1.0, reward_halt=1.0]
 PHASE3 = dict(
     steps        = 4000,
     batch        = 4,
@@ -123,34 +124,58 @@ PHASE3 = dict(
     adversarial  = True,
     mixed_vocab  = True,
     sparse_reward = True,
-    n_dark_loops  = 2,      # Primer: 2 dark loops
-    stop_acc     = 0.75,    # lower bar — scratchpad hold takes time
-    stop_after   = 800,     # must sustain for 800 steps
+    n_dark_loops  = 2,
+    loss_weights  = [0.1, 0.2, 1.0, 1.0],  # progressive: 2 dark + 2 reward
+    stop_acc     = 0.75,
+    stop_after   = 800,
     log_every    = 50,
     ckpt_every   = 300,
-    ckpt_name    = "mamba130m_v4_phase3",
+    ckpt_name    = "mamba130m_v5_phase3",
 )
 
 # Phase 4 — The Crucible: n_dark=3, full stack pressure
 # Once the 2-loop hold is locked in, pull the floor out one more sweep.
-# The model already knows HOW to use the scratchpad in the dark;
-# the optimizer only has to stretch memory retention for one additional
-# temporal sweep rather than inventing dark memory from scratch.
+# loss_weights: [dark_0=0.05, dark_1=0.1, dark_2=0.2, reward_ans=1.0, halt=1.0]
 PHASE4 = dict(
     steps        = 4000,
     batch        = 4,
-    lr           = 5e-5,    # lower LR — fine tuning the scratchpad depth
+    lr           = 5e-5,
     data_size    = 6000,
-    hop_min      = 2, hop_max = 10,  # push chain length too
+    hop_min      = 2, hop_max = 10,
     adversarial  = True,
     mixed_vocab  = True,
     sparse_reward = True,
-    n_dark_loops  = 3,      # Crucible: 3 dark loops
-    stop_acc     = 0.70,    # even more patience — hardest task
+    n_dark_loops  = 3,
+    loss_weights  = [0.1, 0.2, 0.4, 1.0, 1.0],   # progressive: 3 dark + 2 reward
+    stop_acc     = 0.70,
     stop_after   = 800,
     log_every    = 50,
     ckpt_every   = 300,
-    ckpt_name    = "mamba130m_v4_phase4",
+    ckpt_name    = "mamba130m_v5_phase4",
+)
+
+# Phase 5 — Post-Training Annealing (Dense Cleanup)
+# The forge (Phase 4) taught novel-vocab routing but dulled numeric precision.
+# 1000 steps of dense reward with Lifeline ON acts as a cooling/annealing pass:
+#   - Restores clean numeric routing (recovering the 11%→3% drop)
+#   - Doesn't erase novel-vocab LoRA weights — just sharpens them
+#   - Low LR (1e-5) to avoid catastrophic forgetting of Phase 4 gains
+PHASE5 = dict(
+    steps        = 1000,
+    batch        = 8,
+    lr           = 1e-5,        # recovery LR — fine annealing, not overwrite
+    data_size    = 4000,
+    hop_min      = 2, hop_max = 10,
+    adversarial  = True,        # keep adversarial ON — sharpen distractor filter
+    mixed_vocab  = True,        # keep novel vocab ON — don't regress
+    sparse_reward = False,      # dense: Lifeline ON, no dark loops
+    n_dark_loops  = 0,
+    loss_weights  = None,
+    stop_acc     = 0.90,
+    stop_after   = 400,
+    log_every    = 50,
+    ckpt_every   = 200,
+    ckpt_name    = "mamba130m_v5_phase5",
 )
 
 # Chameleon distractor variable names — look like real chain variables
@@ -382,6 +407,7 @@ def run_phase(
                     inp, chain_targets=tgt, ans_starts=ans,
                     sparse_reward=cfg.get("sparse_reward", False),
                     n_dark_loops=cfg.get("n_dark_loops", 0),
+                    loss_weights=cfg.get("loss_weights", None),
                 )
                 if torch.isnan(loss):
                     step += 1
@@ -442,7 +468,7 @@ def run_phase(
 def main() -> None:
     """Run the full training pipeline from Phase 1 through Phase 3."""
     parser = argparse.ArgumentParser(description="Mamba-130M Automated Training Pipeline")
-    parser.add_argument("--phase", type=int, default=1, choices=[1, 2, 3, 4],
+    parser.add_argument("--phase", type=int, default=1, choices=[1, 2, 3, 4, 5],
                         help="Start from this phase (default: 1)")
     args = parser.parse_args()
 
@@ -511,10 +537,21 @@ def main() -> None:
             print(f"[SKIP] Loaded Phase 3 checkpoint: {p3_ckpt}")
 
         # ── Phase 4 (Crucible: n_dark=3) ───────────────────────────────────────
-        model = run_phase(model, PHASE4, 4, log)
+        if args.phase <= 4:
+            model = run_phase(model, PHASE4, 4, log)
+        else:
+            p4_ckpt = f"{SAVE_DIR}/mamba130m_v5_phase4_best.pt"
+            if not os.path.exists(p4_ckpt):
+                print(f"[ERROR] Phase 4 checkpoint not found: {p4_ckpt}")
+                sys.exit(1)
+            model.load_state_dict(torch.load(p4_ckpt, map_location=DEVICE))
+            print(f"[SKIP] Loaded Phase 4 checkpoint: {p4_ckpt}")
+
+        # Phase 5 — Dense Cleanup Annealing
+        model = run_phase(model, PHASE5, 2, log)  # phase_num=2: dense optimizer
 
         # ── Final save ────────────────────────────────────────────────────────
-        final_path = f"{SAVE_DIR}/mamba130m_v4_best.pt"
+        final_path = f"{SAVE_DIR}/mamba130m_v5_best.pt"
         torch.save(model.state_dict(), final_path)
         msg = f"\n🏁 PIPELINE COMPLETE → {final_path}\n"
         print(msg)

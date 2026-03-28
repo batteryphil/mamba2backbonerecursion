@@ -342,6 +342,7 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
         sparse_reward: bool = False,
         n_dark_loops: int = 2,
         n_dark_inference: int = 0,
+        loss_weights: list[float] | None = None,
     ) -> tuple:
         """Forward: embed → base → prepend memory → RLF loop → bridge → slice → predict.
 
@@ -444,25 +445,40 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
                 return None, None, halt_hits
 
             if sparse_reward:
-                # ── SPARSE REWARD: The Executioner ────────────────────────────
-                # Run n_dark_loops thinking loops with NO Lifeline injection.
-                # The prefix scratchpad must evolve and HOLD the variable.
-                # Loss fires only on the final answer + HALT loops, with Lifeline
-                # re-injection so the answer position is correctly anchored.
-                reward_losses: list[torch.Tensor] = []
-                reward_accs:   list[torch.Tensor] = []
+                # ── SPARSE / PROGRESSIVE REWARD: The Executioner ──────────────
+                # progressive=True (loss_weights provided):
+                #   Dark loops run WITH gradient at decaying weight on the answer
+                #   token. Prevents scratchpad gradient starvation across passes.
+                #   loss_weights layout: [dark_0, dark_1, ..., reward_ans, halt]
+                #   e.g. [0.1, 0.2, 1.0, 1.0] for n_dark=2
+                # progressive=False (loss_weights=None): classic no_grad behaviour.
+                progressive = loss_weights is not None and len(loss_weights) > 0
+
+                reward_losses:   list[torch.Tensor] = []
+                reward_accs:     list[torch.Tensor] = []
                 ans_accs_sparse: list[torch.Tensor] = []
-                halt_accs:     list[float]         = []
+                halt_accs:       list[float]        = []
 
                 for loop_i in range(n_dark_loops):
-                    with torch.no_grad():
-                        # inject_lifeline=False: scratchpad evolves freely
-                        x_extended, residual, _ = run_one_loop(
+                    if progressive:
+                        x_extended, residual, logits = run_one_loop(
                             x_extended, residual, loop_i,
                             inject_lifeline=False,
                         )
+                        w = (float(loss_weights[loop_i])
+                             if loop_i < len(loss_weights) else 0.05)
+                        loss, acc, _ = score_loop(logits, 0)  # answer tok
+                        if loss is not None:
+                            reward_losses.append(loss * w)
+                            reward_accs.append(acc)
+                    else:
+                        with torch.no_grad():
+                            x_extended, residual, _ = run_one_loop(
+                                x_extended, residual, loop_i,
+                                inject_lifeline=False,
+                            )
 
-                # Reward loops: Lifeline ON so answer-position context is fresh
+                # Reward loops: Lifeline ON — full weight (or from loss_weights)
                 for tgt_offset, loop_i in enumerate(
                     range(n_dark_loops, n_dark_loops + n_loops)
                 ):
@@ -470,11 +486,14 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
                         x_extended, residual, loop_i,
                         inject_lifeline=True,
                     )
+                    w_idx = n_dark_loops + tgt_offset
+                    w = (float(loss_weights[w_idx])
+                         if progressive and w_idx < len(loss_weights) else 1.0)
                     loss, acc, hits = score_loop(logits, tgt_offset)
                     if loss is not None:
-                        reward_losses.append(loss)
+                        reward_losses.append(loss * w)
                         reward_accs.append(acc)
-                        if tgt_offset == 0:          # first reward loop = answer
+                        if tgt_offset == 0:      # first reward loop = answer
                             ans_accs_sparse.append(acc)
                     halt_accs.extend(hits)
 
