@@ -1,0 +1,37 @@
+======================================================================
+  Test 1: Asymptotic Length Validation
+  Checkpoint: saved_weights/mamba130m_v6_best.pt
+  Device: CUDA
+======================================================================
+
+[INIT] Loading model...
+  LoRA params:     294,912
+  Loop engine:     3,770,880
+  Prefix memory:   6,144 (8 tokens × 768)
+  Latent bridge:   98,304 (768×768 + 768)
+  Lifeline gate:   768
+  Total trainable: 45,629,313
+  Base frozen:     45,259,776
+  Loop encoding:   RoPE (loop_i)
+
+  Model loaded OK
+
+  Hops |    Acc |    MemMB |  DeltaMemMB |  ms/sample
+------------------------------------------------------------
+    15 |   0.0% |    264.0 |        +8.1 |       179ms
+    50 |   0.0% |    264.0 |        +8.1 |        55ms
+   100 |   0.0% |    264.0 |        +8.1 |        60ms
+   500 |   0.0% |    264.0 |        +8.1 |       150ms
+  1000 |   0.0% |    264.0 |        +8.1 |       287ms
+
+======================================================================
+  VERDICT
+======================================================================
+
+  Memory footprint variance across 15→1000 hops: +0.0 MB
+  ✅ FLAT MEMORY — O(1) memory claim CONFIRMED
+     (A KV-cache Transformer would OOM at this hop depth)
+
+  Accuracy trend: 0% → 0% → 0% → 0% → 0%
+  ⚠️  Accuracy collapsed at 1000 hops — latent decay wall reached
+

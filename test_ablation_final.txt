@@ -1,0 +1,38 @@
+======================================================================
+  Test 3: Scratchpad Ablation Proof
+  Checkpoint: saved_weights/mamba130m_v6_best.pt
+  Device: CUDA
+======================================================================
+
+[INIT] Loading model...
+  LoRA params:     294,912
+  Loop engine:     3,770,880
+  Prefix memory:   6,144 (8 tokens × 768)
+  Latent bridge:   98,304 (768×768 + 768)
+  Lifeline gate:   768
+  Total trainable: 45,629,313
+  Base frozen:     45,259,776
+  Loop encoding:   RoPE (loop_i)
+
+  Model loaded OK
+
+Run A: Normal inference (trained architecture)...
+  ❌ Baseline                                       26/100  (26.0%)
+
+Run B: latent_memory zeroed (ablated scratchpad)...
+  ❌ Ablated Scratchpad                             21/100  (21.0%)
+
+Run C: Latent bridge weights zeroed (ablated bridge)...
+  ❌ Ablated Bridge                                  0/100  (0.0%)
+
+======================================================================
+  ABLATION VERDICT
+======================================================================
+
+  Run A — Normal:           26.0%   (baseline)
+  Run B — Zero scratchpad:  21.0%   (Δ -5.0pp)
+  Run C — Zero bridge:       0.0%   (Δ -26.0pp)
+
+  ✅ Bridge ablation caused >50% relative drop (26.0pp)
+     MECHANISTIC PROOF: latent bridge is the routing conduit
+

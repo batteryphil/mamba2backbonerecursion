@@ -178,6 +178,28 @@ PHASE5 = dict(
     ckpt_name    = "mamba130m_v5_phase5",
 )
 
+# Phase 6 — Syntactic Expansion (The bAbI Fix)
+# Train the Phase 5 weights on a dataset where the routing logic is identical,
+# but the grammatical syntax is highly randomized.
+PHASE6 = dict(
+    steps        = 2000,
+    batch        = 8,
+    lr           = 1e-4,
+    data_size    = 8000,
+    hop_min      = 2, hop_max = 6,
+    adversarial  = False,
+    mixed_vocab  = True,
+    sparse_reward = False,
+    n_dark_loops  = 0,
+    syntax_var    = True,
+    loss_weights  = None,
+    stop_acc     = 0.90,
+    stop_after   = 400,
+    log_every    = 50,
+    ckpt_every   = 200,
+    ckpt_name    = "mamba130m_v6_phase6",
+)
+
 # Chameleon distractor variable names — look like real chain variables
 # but are lowercase/short to visually blend with numeric payloads
 _DISTRACTOR_KEYS = [
@@ -227,6 +249,7 @@ class Chain130MDataset(Dataset):
         hop_max: int,
         adversarial: bool = False,
         mixed_vocab: bool = False,
+        syntax_var: bool = False,
         seed: int = 42,
     ) -> None:
         """Initialize dataset with given configuration.
@@ -234,12 +257,14 @@ class Chain130MDataset(Dataset):
         Args:
             mixed_vocab: If True, 20% of samples use word payloads from WORD_VALS
                 instead of numeric payloads. Forces vocab-agnostic scratchpad routing.
+            syntax_var: If True, use semantic grammar templates instead of V1=val.
         """
         self.size        = size
         self.hop_min     = hop_min
         self.hop_max     = hop_max
         self.adv         = adversarial
         self.mixed_vocab = mixed_vocab
+        self.syntax_var  = syntax_var
         self.seed        = seed
 
     def __len__(self) -> int:
@@ -258,10 +283,30 @@ class Chain130MDataset(Dataset):
             val = _rand_num(rng)  # e.g. "48291"
 
         # Core chain: V1=<num>. V2=V1. ... Vn=Vn-1. What is Vn? Answer:
-        chain_parts = [f"V1={val}."]
-        for i in range(2, hops + 1):
-            chain_parts.append(f"V{i}=V{i-1}.")
-        chain_parts.append(f"What is V{hops}? Answer:")
+        if self.syntax_var:
+            init_tmpls = [
+                "V1={}.",
+                "Let V1 be {}.",
+                "V1 is assigned {}.",
+                "The value of V1 is {}.",
+                "V1 equals {}."
+            ]
+            hop_tmpls = [
+                "V{}=V{}.",
+                "V{} holds the value of V{}.",
+                "Let V{} equal V{}.",
+                "V{} equals V{}.",
+                "The value of V{} is given to V{}."
+            ]
+            chain_parts = [rng.choice(init_tmpls).format(val)]
+            for i in range(2, hops + 1):
+                chain_parts.append(rng.choice(hop_tmpls).format(i, i-1))
+            chain_parts.append(f"What is V{hops}? Answer:")
+        else:
+            chain_parts = [f"V1={val}."]
+            for i in range(2, hops + 1):
+                chain_parts.append(f"V{i}=V{i-1}.")
+            chain_parts.append(f"What is V{hops}? Answer:")
 
         if self.adv:
             # Chameleon distractors: fake numeric assignments.
@@ -355,6 +400,7 @@ def run_phase(
         hop_max     = cfg["hop_max"],
         adversarial = cfg.get("adversarial", False),
         mixed_vocab = cfg.get("mixed_vocab", False),
+        syntax_var  = cfg.get("syntax_var", False),
         seed        = phase_num * 999,
     )
     loader = DataLoader(
@@ -468,7 +514,7 @@ def run_phase(
 def main() -> None:
     """Run the full training pipeline from Phase 1 through Phase 3."""
     parser = argparse.ArgumentParser(description="Mamba-130M Automated Training Pipeline")
-    parser.add_argument("--phase", type=int, default=1, choices=[1, 2, 3, 4, 5],
+    parser.add_argument("--phase", type=int, default=1, choices=[1, 2, 3, 4, 5, 6, 7],
                         help="Start from this phase (default: 1)")
     args = parser.parse_args()
 
@@ -548,10 +594,29 @@ def main() -> None:
             print(f"[SKIP] Loaded Phase 4 checkpoint: {p4_ckpt}")
 
         # Phase 5 — Dense Cleanup Annealing
-        model = run_phase(model, PHASE5, 2, log)  # phase_num=2: dense optimizer
+        if args.phase <= 5:
+            model = run_phase(model, PHASE5, 2, log)  # phase_num=2: dense avg optimizer
+        else:
+            p5_ckpt = f"{SAVE_DIR}/mamba130m_v5_phase5_best.pt"
+            if not os.path.exists(p5_ckpt):
+                print(f"[ERROR] Phase 5 checkpoint not found: {p5_ckpt}")
+                sys.exit(1)
+            model.load_state_dict(torch.load(p5_ckpt, map_location=DEVICE))
+            print(f"[SKIP] Loaded Phase 5 checkpoint: {p5_ckpt}")
+
+        # Phase 6 — Syntactic Expansion (The bAbI Fix)
+        if args.phase <= 6:
+            model = run_phase(model, PHASE6, 2, log)  # phase_num=2: dense avg optimizer
+        else:
+            p6_ckpt = f"{SAVE_DIR}/mamba130m_v6_phase6_best.pt"
+            if not os.path.exists(p6_ckpt):
+                print(f"[ERROR] Phase 6 checkpoint not found: {p6_ckpt}")
+                sys.exit(1)
+            model.load_state_dict(torch.load(p6_ckpt, map_location=DEVICE))
+            print(f"[SKIP] Loaded Phase 6 checkpoint: {p6_ckpt}")
 
         # ── Final save ────────────────────────────────────────────────────────
-        final_path = f"{SAVE_DIR}/mamba130m_v5_best.pt"
+        final_path = f"{SAVE_DIR}/mamba130m_v6_best.pt"
         torch.save(model.state_dict(), final_path)
         msg = f"\n🏁 PIPELINE COMPLETE → {final_path}\n"
         print(msg)

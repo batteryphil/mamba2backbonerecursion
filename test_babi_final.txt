@@ -1,0 +1,33 @@
+======================================================================
+  Test 2: Semantic Syntax Shift (bAbI Adaptation)
+  Checkpoint: saved_weights/mamba130m_v6_best.pt
+  Device: CUDA | Samples: 50
+======================================================================
+\n[INIT] Loading model...
+  LoRA params:     294,912
+  Loop engine:     3,770,880
+  Prefix memory:   6,144 (8 tokens × 768)
+  Latent bridge:   98,304 (768×768 + 768)
+  Lifeline gate:   768
+  Total trainable: 45,629,313
+  Base frozen:     45,259,776
+  Loop encoding:   RoPE (loop_i)
+
+  Model loaded OK\n
+Running zero-shot semantic shift test...
+  Sample 1:
+    P: The red bag contains what the white cup contains. The black pot contains what the red bag contains. The white cup contains the frost. What is in the black pot?
+    A: frost | Pred: �
+  Sample 2:
+    P: The white bag contains the apple. The red jar contains what the white bag contains. The black cup contains what the red jar contains. What is in the black cup?
+    A: apple | Pred: s
+  Sample 3:
+    P: The green jar contains what the black box contains. The black box contains the ember. The blue bag contains what the green jar contains. What is in the blue bag?
+    A: ember | Pred: photograp
+\n======================================================================
+  SYNTAX SHIFT VERDICT
+======================================================================
+\n  Zero-shot accuracy: 0.0%
+  ⚠️  Model failed zero-shot semantic shift. Latent routing may be
+     overfitted to the causal syntax arrangement seen during training.
+
