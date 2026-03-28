@@ -14,7 +14,7 @@ import gc
 from mamba1_engine import RecursiveMamba1_PrefixScratchpad, tokenizer, HALT_ID
 
 DEVICE     = "cuda" if torch.cuda.is_available() else "cpu"
-CKPT       = "saved_weights/mamba130m_v5_phase5_best.pt"
+CKPT       = "saved_weights/mamba130m_v6_best.pt"
 N_SAMPLES  = 20   # samples per hop level
 HOP_LEVELS = [15, 50, 100, 500, 1000]
 VOCAB_SIZE = 50_000  # numeric range for payload

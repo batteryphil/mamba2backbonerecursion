@@ -17,7 +17,7 @@ from mamba_ssm.models.mixer_seq_simple import MambaLMHeadModel
 from mamba1_engine import RecursiveMamba1_PrefixScratchpad, tokenizer, HALT_ID
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-CKPT = "saved_weights/mamba130m_v5_phase5_best.pt"
+CKPT = "saved_weights/mamba130m_v6_best.pt"
 N_SAMPLES = 50
 
 # Words to use for bAbI objects to ensure they are single BPE tokens

@@ -12,7 +12,7 @@ from ood_eval import eval_suite
 import re
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-CKPT = "saved_weights/mamba130m_v5_phase5_best.pt"
+CKPT = "saved_weights/mamba130m_v6_best.pt"
 
 TRAIN_VALS = [str(i) for i in range(1, 999_999 + 1, 137)]
 with open("train_130m.py") as f: src = f.read()
