@@ -141,34 +141,55 @@ def list_sessions():
 
 
 def latent_turn(prompt: str, cache: MambaCache, tok, mdl, head) -> tuple:
-    """Run one conversation turn through the latent engine with live cache."""
-    domain = detect_domain(prompt)
-    m      = DOMAIN_MAX.get(domain, 5)
-    p      = 0.0
-    lp     = 0
+    """Run one conversation turn through the latent engine with live cache.
+
+    Uses O(1) stateful iteration: prefill once, then single-token recurrent
+    steps via MambaCache. Each loop iteration feeds one spacer token while
+    passing the cache state forward — no re-tokenization, no sequence growth.
+    """
+    domain   = detect_domain(prompt)
+    m        = DOMAIN_MAX.get(domain, 5)
+    p        = 0.0
+    lp       = 0
+    spacer_id = tok.convert_tokens_to_ids("=")
 
     with torch.no_grad():
+        # Prefill: process prompt through model, building SSM state
+        toks     = tok(prompt, return_tensors="pt",
+                       truncation=True, max_length=512).to("cuda")
+        seq_len  = toks["input_ids"].shape[1]
+        out      = mdl(
+            **toks,
+            cache_params=cache,
+            use_cache=True,
+            output_hidden_states=True
+        )
+        h = out.hidden_states[-1][0, -1, :].float()
+
+        # O(1) loop: single-token recurrent steps
+        spacer = torch.tensor([[spacer_id]], device="cuda")
         for lp in range(MAX_LOOPS):
-            text  = prompt + "=" * lp
-            toks  = tok(text, return_tensors="pt",
-                        truncation=True, max_length=512).to("cuda")
-            # Pass cache_params so the SSM state is updated in-place
-            out   = mdl(
-                **toks,
-                cache_params=cache,
-                use_cache=True,
-                output_hidden_states=True
-            )
-            h  = out.hidden_states[-1][0, -1, :].float()
             ln = torch.tensor([lp / m], dtype=torch.float32, device="cuda")
             p  = head(torch.cat([h, ln]).unsqueeze(0)).item()
             if p >= HALT_THRESH:
                 break
 
-        # Autoregressive surface generation from updated cache state
+            cache_pos = torch.tensor([seq_len + lp], device="cuda")
+            step_out  = mdl(
+                input_ids=spacer,
+                cache_params=cache,
+                cache_position=cache_pos,
+                use_cache=True,
+                output_hidden_states=True
+            )
+            h = step_out.hidden_states[-1][0, -1, :].float()
+
+        # Autoregressive surface generation from accumulated cache state
+        gen_cache_pos = torch.tensor([seq_len + lp + 1], device="cuda")
         gen_out = mdl.generate(
-            toks["input_ids"],
+            spacer,
             cache_params=cache,
+            cache_position=gen_cache_pos,
             max_new_tokens=120,
             do_sample=False,
             repetition_penalty=1.1,
@@ -176,7 +197,7 @@ def latent_turn(prompt: str, cache: MambaCache, tok, mdl, head) -> tuple:
         )
 
     surface = tok.decode(
-        gen_out[0][toks["input_ids"].shape[1]:],
+        gen_out[0][1:],
         skip_special_tokens=True
     ).strip()
     return surface, lp + 1, round(p, 3)
