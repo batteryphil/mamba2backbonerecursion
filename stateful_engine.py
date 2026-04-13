@@ -69,7 +69,8 @@ class StatefulLoopEngine:
             self.tok.pad_token = self.tok.eos_token
 
         self.model = AutoModelForCausalLM.from_pretrained(
-            engine_dir, dtype=torch.bfloat16,
+            engine_dir,
+            torch_dtype=torch.bfloat16 if self.device == "cuda" else torch.float32,
             device_map="auto" if self.device == "cuda" else None,
             trust_remote_code=True
         )
@@ -120,8 +121,18 @@ class StatefulLoopEngine:
             input_ids = toks.input_ids.to(self.device)
             seq_len = input_ids.shape[1]
 
+            # --- Prefill: build SSM state from prompt ---
+            # cache_position shape must == conv_kernel_size for prefill mode.
+            conv_kernel = getattr(self.model.config, 'conv_kernel', 4)
+            prefill_start = max(seq_len - conv_kernel, 0)
+            prefill_cache_pos = torch.arange(
+                prefill_start, prefill_start + conv_kernel, device=self.device
+            )
+            cache = self._new_cache()
             out = self.model(
                 input_ids=input_ids,
+                cache_params=cache,
+                cache_position=prefill_cache_pos,
                 use_cache=True,
                 output_hidden_states=True
             )
@@ -163,15 +174,24 @@ class StatefulLoopEngine:
 
                 loop_latencies.append((time.perf_counter() - t0) * 1000)
 
-            # --- Generate answer from final state ---
-            # Pass the accumulated cache to generate. The cache already holds
-            # the full context (prompt + all spacer iterations).
+            # --- Generate answer from final accumulated state ---
+            # Use the original prompt ids + spacers as generation seed so that
+            # the decode context exactly matches the number of loops executed.
+            # This fixes the off-by-one desync where feeding `spacer` to
+            # generate() would add an extra '=' beyond the halting boundary.
+            loops_executed = lp + 1
             try:
+                final_ids = torch.cat(
+                    [input_ids,
+                     torch.full((1, loops_executed), self.spacer_id,
+                                device=self.device, dtype=torch.long)],
+                    dim=1
+                )
                 gen_cache_pos = torch.tensor(
-                    [seq_len + lp + 1], device=self.device
+                    [seq_len + loops_executed], device=self.device
                 )
                 out_ids = self.model.generate(
-                    input_ids=spacer,
+                    input_ids=final_ids,
                     cache_params=cache,
                     cache_position=gen_cache_pos,
                     max_new_tokens=max_new,
@@ -179,18 +199,14 @@ class StatefulLoopEngine:
                     repetition_penalty=1.1,
                     use_cache=True
                 )
-                # Decode only the generated tokens (skip the spacer input)
                 answer = self.tok.decode(
-                    out_ids[0][1:],
+                    out_ids[0][final_ids.shape[1]:],
                     skip_special_tokens=True
                 )
             except Exception as e:
-                # KILL SWITCH: generate() may not accept pre-built cache.
-                # Fall back to stateless generate from the original prompt.
                 if verbose:
                     print(f"  [FALLBACK] generate with cache failed: {e}")
-                    print(f"  [FALLBACK] Falling back to stateless generate")
-                final_prompt = prompt + "=" * (lp + 1)
+                final_prompt = prompt + "=" * loops_executed
                 final_toks = self.tok(final_prompt, return_tensors="pt",
                                       truncation=True, max_length=512)
                 final_ids = final_toks.input_ids.to(self.device)
@@ -205,7 +221,7 @@ class StatefulLoopEngine:
                     skip_special_tokens=True
                 )
 
-        return answer, lp, p_halt, loop_latencies
+        return answer, loops_executed, p_halt, loop_latencies
 
     def get_cache(self) -> MambaCache:
         """Get a fresh cache for manual use (e.g. session memory)."""

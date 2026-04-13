@@ -70,7 +70,8 @@ def load_engine():
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
     mdl = AutoModelForCausalLM.from_pretrained(
-        ENGINE_DIR, torch_dtype=torch.bfloat16,
+        ENGINE_DIR,
+        torch_dtype=torch.bfloat16,
         device_map="auto", trust_remote_code=True
     )
     mdl.eval()
@@ -154,13 +155,20 @@ def latent_turn(prompt: str, cache: MambaCache, tok, mdl, head) -> tuple:
     spacer_id = tok.convert_tokens_to_ids("=")
 
     with torch.no_grad():
-        # Prefill: process prompt through model, building SSM state
+        # Prefill: process prompt through model, building SSM state.
+        # cache_position shape must == conv_kernel_size (Copilot fix).
         toks     = tok(prompt, return_tensors="pt",
                        truncation=True, max_length=512).to("cuda")
         seq_len  = toks["input_ids"].shape[1]
+        conv_kernel = getattr(mdl.config, 'conv_kernel', 4)
+        prefill_start = max(seq_len - conv_kernel, 0)
+        prefill_cache_pos = torch.arange(
+            prefill_start, prefill_start + conv_kernel, device="cuda"
+        )
         out      = mdl(
             **toks,
             cache_params=cache,
+            cache_position=prefill_cache_pos,
             use_cache=True,
             output_hidden_states=True
         )
@@ -184,10 +192,18 @@ def latent_turn(prompt: str, cache: MambaCache, tok, mdl, head) -> tuple:
             )
             h = step_out.hidden_states[-1][0, -1, :].float()
 
-        # Autoregressive surface generation from accumulated cache state
-        gen_cache_pos = torch.tensor([seq_len + lp + 1], device="cuda")
+        # Generation fix: reconstruct exact prompt+spacers tensor so
+        # the generation context matches state (off-by-one Copilot fix).
+        loops_executed = lp + 1
+        input_ids = toks["input_ids"]
+        final_ids = torch.cat(
+            [input_ids,
+             torch.full((1, loops_executed), spacer_id, device="cuda", dtype=torch.long)],
+            dim=1
+        )
+        gen_cache_pos = torch.tensor([seq_len + loops_executed], device="cuda")
         gen_out = mdl.generate(
-            spacer,
+            final_ids,
             cache_params=cache,
             cache_position=gen_cache_pos,
             max_new_tokens=120,
@@ -197,10 +213,10 @@ def latent_turn(prompt: str, cache: MambaCache, tok, mdl, head) -> tuple:
         )
 
     surface = tok.decode(
-        gen_out[0][1:],
+        gen_out[0][final_ids.shape[1]:],
         skip_special_tokens=True
     ).strip()
-    return surface, lp + 1, round(p, 3)
+    return surface, loops_executed, round(p, 3)
 
 
 def chat_loop(session_name: str, tok, mdl, head) -> None:
