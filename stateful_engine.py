@@ -172,6 +172,22 @@ class StatefulLoopEngine:
                 # cache is mutated in-place; step_out.cache_params is the same object
                 h = step_out.hidden_states[-1][0, -1, :].float()
 
+                # ── SSM State Shape Guard (ONNX #7689 / MLX #980) ───────────
+                # Per the state interface contract: S ∈ R^[B × H × dk × dv]
+                # must remain fixed after every recurrent step.
+                # Any shape change indicates silent state corruption.
+                if __debug__ and hasattr(cache, 'ssm_states'):
+                    expected_shapes = [s.shape for s in cache.ssm_states]
+                    for i, s in enumerate(step_out.cache_params.ssm_states):
+                        if s.shape != expected_shapes[i]:
+                            raise RuntimeError(
+                                f"[GUARD] SSM state shape corrupted at step {lp}, "
+                                f"layer {i}: expected {expected_shapes[i]}, got {s.shape}. "
+                                f"Do NOT slice or trim MambaCache tensors (MLX #980)."
+                            )
+                # ─────────────────────────────────────────────────────────────
+
+
                 loop_latencies.append((time.perf_counter() - t0) * 1000)
 
             # --- Generate answer from final accumulated state ---

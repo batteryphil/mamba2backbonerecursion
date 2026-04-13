@@ -310,8 +310,36 @@ void mamba2_block_forward(
         }
     }
 
-    /* 7. Per-head SSM scan */
-    /* State layout: [n_layers, nheads, headdim, d_state] */
+    /* 7. Per-head SSM scan — single token (T=1), O(1) per step
+     *
+     * ONNX #7689 State Interface Contract (gated SSM / "gated" update_rule):
+     *
+     *   State:   S ∈ R^[B × H × d_k × d_v]  — FIXED shape, never grows
+     *   Per-token update (recurrent decode, T=1):
+     *
+     *     S_t  = exp(g_t)  ·  S_{t-1}  +  B_bar_t ⊗ x_t
+     *     o_t  = scale  ·  q_t^T  S_t
+     *
+     *   where:
+     *     g_t     = dt_h * A_val   (log-space decay, pre-exponentiated below as r)
+     *     B_bar_t = dt_h * B_vec   (discretised input projection)
+     *     x_t     = x_h[d]         (head input scalar)
+     *     o_t     = y_h (accumulated across d_state)
+     *
+     *   This maps directly to the code below:
+     *     r       = expf(dt_h * A_val)      ← exp(g_t)
+     *     h[n]    = r * h[n] + b_bar * x_t  ← S_t update
+     *     y_t    += h[n] * C_vec[n]          ← output read
+     *
+     *   Per MLX #980: state shape [n_layers × nheads × headdim × d_state]
+     *   is IMMUTABLE — never trim, never slice at an arbitrary token boundary.
+     *   Only mamba_state_reset() (full wipe) is a safe rollback operation.
+     *
+     * State layout: ssm_state[layer, head, d, n]
+     *   flattened as: layer_idx * nheads * headdim * d_state
+     *                 + head * headdim * d_state
+     *                 + d * d_state + n
+     */
     float *layer_h = state->ssm_state +
         (size_t)layer_idx * nheads * headdim * d_state;
 

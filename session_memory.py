@@ -125,6 +125,57 @@ def load_session(mdl, name: str):
     return cache, hist
 
 
+def snapshot_cache(cache: MambaCache) -> dict:
+    """Create a safe in-memory snapshot of the Mamba recurrent state.
+
+    Per the MLX #980 finding, SSM state is NOT trimmable — this performs
+    a full tensor copy (the only safe operation besides full wipe).
+    The snapshot is CPU-resident to avoid tying up VRAM.
+    """
+    return {
+        "conv_states": [s.detach().cpu().clone() for s in cache.conv_states],
+        "ssm_states":  [s.detach().cpu().clone() for s in cache.ssm_states],
+    }
+
+
+def fork_cache(mdl, snapshot: dict) -> MambaCache:
+    """Restore a fresh MambaCache from a snapshot, leaving the source untouched.
+
+    Enables multi-agent prefill sharing: prefill once, fork N times.
+    Each forked cache is fully independent — mutations do not affect siblings.
+
+    WARNING (MLX #980): Never slice or trim SSM state tensors directly.
+    Only full-copy (this function) and full-wipe (new_cache) are valid.
+    """
+    cache = new_cache(mdl)
+    for i, s in enumerate(snapshot["conv_states"]):
+        cache.conv_states[i][:] = s.cuda()
+    for i, s in enumerate(snapshot["ssm_states"]):
+        cache.ssm_states[i][:] = s.cuda()
+    return cache
+
+
+def fork_session(mdl, name: str, fork_name: str) -> str:
+    """Fork a saved session to a new name, preserving full SSM state.
+
+    Usage:
+        fork_session(mdl, 'phil', 'phil_agent2')
+        # phil_agent2 starts from the same state as phil but diverges independently.
+    """
+    path_src = os.path.join(SESSION_DIR, f"{name}.pt")
+    path_dst = os.path.join(SESSION_DIR, f"{fork_name}.pt")
+    if not os.path.exists(path_src):
+        return f"[SESSION] Source session not found: {path_src}"
+    state = torch.load(path_src, weights_only=True)
+    # Stamp the fork metadata
+    state["forked_from"] = name
+    state["saved_at"]    = time.time()
+    torch.save(state, path_dst)
+    kb = os.path.getsize(path_dst) / 1024
+    return f"[SESSION] Forked '{name}' → '{fork_name}' ({kb:.0f} KB)"
+
+
+
 def list_sessions():
     """Print all saved sessions."""
     files = sorted(glob.glob(os.path.join(SESSION_DIR, "*.pt")))
@@ -239,6 +290,18 @@ def chat_loop(session_name: str, tok, mdl, head) -> None:
             continue
 
         # Commands
+        if user_input == "/fork":
+            fork_name = f"{session_name}_fork_{int(time.time())}"
+            snap = snapshot_cache(cache)
+            path = save_session(fork_cache(mdl, snap), fork_name, list(history))
+            print(f"[SESSION] Forked → '{fork_name}' — full SSM state copied, parent unaffected.")
+            print(f"[SESSION] Resume fork with: python session_memory.py --resume {fork_name}")
+            continue
+        if user_input.startswith("/fork "):
+            fork_name = user_input[6:].strip()
+            snap = snapshot_cache(cache)
+            print(fork_session(mdl, session_name, fork_name))
+            continue
         if user_input == "/quit":
             break
         if user_input == "/save":
