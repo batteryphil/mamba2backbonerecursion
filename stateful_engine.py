@@ -45,7 +45,6 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, MambaCache
 #   repetition_penalty float — penalise already-emitted tokens (1.0 = off)
 #   do_sample        bool   — pass to model.generate(); False = greedy
 #   ngram_stop       int|None — stop on n-gram repeat (None = off)
-#   max_loops        int    — override StatefulLoopEngine.DOMAIN_MAX when set
 #
 INFERENCE_MODES: dict = {
     # General-purpose chat: greedy, light repetition guard
@@ -89,17 +88,18 @@ _OO_PREFIXES = ("[oo]", "[self]", "[swarm", "[warden", "[repl]",
                 "/gate_status", "/shutdown", "/halt")
 
 
-
-
 class HaltingHead(nn.Module):
     """Position-conditioned P(halt) probe. Copied from mamba_engine.py."""
+
     def __init__(self, d_input: int = 2561):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(d_input, 512), nn.GELU(), nn.Dropout(0.1),
             nn.Linear(512, 64), nn.GELU(), nn.Linear(64, 1), nn.Sigmoid()
         )
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass, returns scalar halt probability."""
         return self.net(x).squeeze(-1)
 
 
@@ -119,6 +119,7 @@ class StatefulLoopEngine:
     DOMAIN_MAX = {"chat": 5, "math": 25, "code": 45, "tool": 10}
 
     def __init__(self, engine_dir: str):
+        """Load model, tokenizer, and optional halting head from engine_dir."""
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
         self.tok = AutoTokenizer.from_pretrained(engine_dir, trust_remote_code=True)
@@ -179,18 +180,18 @@ class StatefulLoopEngine:
 
         Returns: (answer_text, loop_count, p_halt, loop_latencies_ms)
         """
-    max_loops = self.DOMAIN_MAX.get(domain, 10)
-    spacer = torch.tensor([[self.spacer_id]], device=self.device)
-    loop_latencies = []
+        max_loops = self.DOMAIN_MAX.get(domain, 10)
+        spacer = torch.tensor([[self.spacer_id]], device=self.device)
+        loop_latencies = []
 
-    # ── Resolve inference mode ──
-    inf_mode_key = detect_inference_mode(prompt, override=kwargs.get("inference_mode"))
-    inf_mode = INFERENCE_MODES[inf_mode_key]
-    if verbose:
-        print(f"  [MODE] {inf_mode_key} — "
-              f"T={inf_mode['temperature']} top_p={inf_mode['top_p']} "
-              f"rep={inf_mode['repetition_penalty']} "
-              f"ngram_stop={inf_mode['ngram_stop']}")
+        # ── Resolve inference mode ──
+        inf_mode_key = detect_inference_mode(prompt, override=kwargs.get("inference_mode"))
+        inf_mode = INFERENCE_MODES[inf_mode_key]
+        if verbose:
+            print(f"  [MODE] {inf_mode_key} — "
+                  f"T={inf_mode['temperature']} top_p={inf_mode['top_p']} "
+                  f"rep={inf_mode['repetition_penalty']} "
+                  f"ngram_stop={inf_mode['ngram_stop']}")
 
         with torch.no_grad():
             # --- Build initial SSM state from prompt (prefill) ---
@@ -264,7 +265,6 @@ class StatefulLoopEngine:
                                 f"Do NOT slice or trim MambaCache tensors (MLX #980)."
                             )
                 # ─────────────────────────────────────────────────────────────
-
 
                 loop_latencies.append((time.perf_counter() - t0) * 1000)
 
@@ -363,7 +363,6 @@ def detect_inference_mode(text: str, override: str | None = None) -> str:
                                "your architecture", "jarvis"]):
         return "identity"
     return "default"
-
 
 
 # ── CLI entry point ──────────────────────────────────────────────────────────
