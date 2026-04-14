@@ -192,7 +192,30 @@ def list_sessions():
         print(f"  {name:<20} {turns:>3} turns  {age_h:>5.1f}h ago  {kb:.0f} KB")
 
 
-def latent_turn(prompt: str, cache: MambaCache, tok, mdl, head) -> tuple:
+def pad_to_block_boundary(input_ids: torch.Tensor, pad_token_id: int,
+                           block_size: int = 64) -> torch.Tensor:
+    """Pad input_ids to the nearest multiple of block_size.
+
+    Per ONNX #7689 / CUDA kernel analysis: the Mamba2 Triton SSM kernel is
+    optimized for seq_len = multiple of 64 (one warp/thread-block-aligned
+    sequence). Sequences like 261 drop out of the fast path to ~1617 tok/s
+    vs 3492 tok/s at seq=256. Always pad before firing the forward pass.
+
+    Safe: pad tokens are masked by the SSM recurrence (they shift state but
+    the last meaningful hidden state is extracted before the pad region).
+    """
+    seq_len = input_ids.shape[1]
+    remainder = seq_len % block_size
+    if remainder == 0:
+        return input_ids
+    pad_len = block_size - remainder
+    pad = torch.full((input_ids.shape[0], pad_len), pad_token_id,
+                     dtype=input_ids.dtype, device=input_ids.device)
+    return torch.cat([input_ids, pad], dim=1)
+
+
+def latent_turn(prompt: str, cache, tok, mdl, head) -> tuple:
+
     """Run one conversation turn through the latent engine with live cache.
 
     Uses O(1) stateful iteration: prefill once, then single-token recurrent
