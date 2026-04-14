@@ -66,7 +66,7 @@ def write_header(f, **kw) -> None:
         kw['has_rlf'], kw['quant_type'],
         kw['prefix_m'], kw['bridge_rank'],
         kw['loop_nheads'], kw['loop_headdim'], kw['loop_d_state'],
-        0, 0,  # reserved
+        kw.get('has_proprio_gate', 0), kw.get('has_post_lora', 0),
         kw['total_bytes'],
     )
     f.write(header)
@@ -364,6 +364,41 @@ def export_checkpoint(ckpt_path: str, output_path: str, quant_type: int = QUANT_
             if bu is not None:
                 written += write_tensor(f, bu, f"bridge_up [{d_model}×{bridge_rank}]", quant=q)
 
+        # ── Phase 10: Proprioception Gate, LoRA, and Halting Head ─────────
+        has_proprio = 'W_g' in sd or os.path.exists('proprio_gate_2.8b.pt')
+        has_lora = any('lora_A' in k for k in sd) or os.path.exists('lora_oo_r16_final.pt')
+        
+        if has_proprio:
+            print("\n  Writing Proprioception Gate:")
+            wg = sd.get('W_g') 
+            if wg is None:
+                try: wg = torch.load('proprio_gate_2.8b.pt', map_location='cpu', weights_only=True)
+                except: wg = torch.zeros(3, d_model)
+            written += write_tensor(f, wg, "proprio_gate [3×2560]")
+
+        if has_lora:
+            print("\n  Writing Post-Backbone LoRA (OO Domain):")
+            # Fallback to reading the discrete adapter if not baked into the main state_dict
+            lora_sd = sd
+            if not any('lora_A' in k for k in lora_sd):
+                try: lora_sd = torch.load('lora_oo_r16_final.pt', map_location='cpu', weights_only=True)
+                except: pass
+            
+            for l in range(6): # Default n_layers=6
+                la = lora_sd.get(f'layers.{l}.lora_A.weight', torch.zeros(16, d_model))
+                lb = lora_sd.get(f'layers.{l}.lora_B.weight', torch.zeros(d_model, 16))
+                written += write_tensor(f, la, f"post_lora_A[{l}]")
+                written += write_tensor(f, lb, f"post_lora_B[{l}]")
+
+        print("\n  Writing HaltingHead v2 (OO-Semantic Classifier):")
+        try:
+            hh = torch.load('halting_head_v2.pt', map_location='cpu', weights_only=True)
+            for i in range(1, 5):
+                written += write_tensor(f, hh.get(f'mlp.{i*2-2}.weight', torch.zeros(1)), f"halt_head_w{i}")
+                written += write_tensor(f, hh.get(f'mlp.{i*2-2}.bias', torch.zeros(1)), f"halt_head_b{i}")
+        except:
+            print("  [SKIP] halting_head_v2.pt not found")
+
         # ── Write real header ─────────────────────────────────────────────
         total_bytes = written
         f.seek(0)
@@ -379,6 +414,8 @@ def export_checkpoint(ckpt_path: str, output_path: str, quant_type: int = QUANT_
             bridge_rank=bridge_rank,
             loop_nheads=loop_nheads, loop_headdim=loop_headdim,
             loop_d_state=loop_d_state,
+            has_proprio_gate=1 if has_proprio else 0,
+            has_post_lora=1 if has_lora else 0,
             total_bytes=total_bytes,
         )
 

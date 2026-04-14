@@ -112,6 +112,13 @@ typedef struct {
     float *bridge_down;         /* [bridge_rank, d_model]             */
     float *bridge_up;           /* [d_model, bridge_rank]             */
 
+    /* Phase 10: OO-SomaMind Custom Hardware Plugs */
+    float *proprio_gate;        /* Proprioception Gate W_g [3, d_model] */
+    float **post_lora_A;        /* Post-backbone LoRA matrices [L_layers] */
+    float **post_lora_B;        /* Post-backbone LoRA matrices [L_layers] */
+    float *halt_head_w[4];      /* HaltingHead v2 MLPs */
+    float *halt_head_b[4];      
+
     /* Weight blob */
     float *_blob;
     uint64_t _blob_bytes;
