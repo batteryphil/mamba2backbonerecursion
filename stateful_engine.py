@@ -31,7 +31,13 @@ import torch
 import torch.nn as nn
 import time
 import os
-from transformers import AutoTokenizer, AutoModelForCausalLM, MambaCache
+from transformers import AutoTokenizer, AutoModelForCausalLM
+try:
+    from transformers import MambaCache
+except ImportError:
+    # HuggingFace hasn't hoisted MambaCache to the root __init__ in all versions.
+    # Per Mick's PR notes: use the explicit submodule path.
+    from transformers.models.mamba.modeling_mamba import MambaCache
 
 
 # ── Inference Modes ──────────────────────────────────────────────────────────
