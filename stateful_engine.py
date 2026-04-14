@@ -34,6 +34,63 @@ import os
 from transformers import AutoTokenizer, AutoModelForCausalLM, MambaCache
 
 
+# ── Inference Modes ──────────────────────────────────────────────────────────
+#
+# Named sampling presets. Choose based on the query's intent.
+# The engine auto-routes via detect_inference_mode(); caller can override.
+#
+# Fields:
+#   temperature      float  — logit scaling before softmax (lower = sharper)
+#   top_p            float  — nucleus sampling cutoff (1.0 = off, use greedy)
+#   repetition_penalty float — penalise already-emitted tokens (1.0 = off)
+#   do_sample        bool   — pass to model.generate(); False = greedy
+#   ngram_stop       int|None — stop on n-gram repeat (None = off)
+#   max_loops        int    — override StatefulLoopEngine.DOMAIN_MAX when set
+#
+INFERENCE_MODES: dict = {
+    # General-purpose chat: greedy, light repetition guard
+    "default": {
+        "temperature": 1.0,
+        "top_p": 1.0,
+        "repetition_penalty": 1.1,
+        "do_sample": False,
+        "ngram_stop": None,
+    },
+    # OO domain queries ([OO]/[SELF]/[SWARM:/[WARDEN]/[REPL])
+    # Validated 2026-04-13: 12/12 zero-rep on OO ontology v2 dataset.
+    "oo_domain": {
+        "temperature": 0.4,
+        "top_p": 0.90,
+        "repetition_penalty": 1.4,
+        "do_sample": True,
+        "ngram_stop": 4,
+    },
+    # Code generation: low temperature, minimal repetition suppression
+    "code": {
+        "temperature": 0.3,
+        "top_p": 0.95,
+        "repetition_penalty": 1.05,
+        "do_sample": True,
+        "ngram_stop": None,
+    },
+    # Identity / factual — fully deterministic, per Jarvis spec T<=0.1
+    "identity": {
+        "temperature": 0.05,
+        "top_p": 1.0,
+        "repetition_penalty": 1.0,
+        "do_sample": False,
+        "ngram_stop": None,
+    },
+}
+
+# OO-tag prefixes that auto-route to oo_domain mode
+_OO_PREFIXES = ("[oo]", "[self]", "[swarm", "[warden", "[repl]",
+                "/oo_status", "/zones", "/fork", "/dna_check",
+                "/gate_status", "/shutdown", "/halt")
+
+
+
+
 class HaltingHead(nn.Module):
     """Position-conditioned P(halt) probe. Copied from mamba_engine.py."""
     def __init__(self, d_input: int = 2561):
@@ -104,15 +161,36 @@ class StatefulLoopEngine:
 
     def generate(self, prompt: str, domain: str = "chat",
                  halt_threshold: float = 0.70, max_new: int = 100,
-                 verbose: bool = False):
+                 verbose: bool = False, **kwargs):
         """
         Run latent loops then generate.
 
+        Args:
+            prompt:          Input text.
+            domain:          Reasoning domain for max_loops budgeting
+                             ('chat', 'math', 'code', 'tool').
+            halt_threshold:  P(halt) threshold for early stopping.
+            max_new:         Max tokens to generate in the answer phase.
+            verbose:         Print loop diagnostics.
+            inference_mode:  (kwarg) Override the auto-detected INFERENCE_MODES
+                             key. Valid keys: 'default', 'oo_domain', 'code',
+                             'identity'. If not supplied, detect_inference_mode()
+                             auto-routes based on prompt prefix.
+
         Returns: (answer_text, loop_count, p_halt, loop_latencies_ms)
         """
-        max_loops = self.DOMAIN_MAX.get(domain, 10)
-        spacer = torch.tensor([[self.spacer_id]], device=self.device)
-        loop_latencies = []
+    max_loops = self.DOMAIN_MAX.get(domain, 10)
+    spacer = torch.tensor([[self.spacer_id]], device=self.device)
+    loop_latencies = []
+
+    # ── Resolve inference mode ──
+    inf_mode_key = detect_inference_mode(prompt, override=kwargs.get("inference_mode"))
+    inf_mode = INFERENCE_MODES[inf_mode_key]
+    if verbose:
+        print(f"  [MODE] {inf_mode_key} — "
+              f"T={inf_mode['temperature']} top_p={inf_mode['top_p']} "
+              f"rep={inf_mode['repetition_penalty']} "
+              f"ngram_stop={inf_mode['ngram_stop']}")
 
         with torch.no_grad():
             # --- Build initial SSM state from prompt (prefill) ---
@@ -211,8 +289,10 @@ class StatefulLoopEngine:
                     cache_params=cache,
                     cache_position=gen_cache_pos,
                     max_new_tokens=max_new,
-                    do_sample=False,
-                    repetition_penalty=1.1,
+                    do_sample=inf_mode["do_sample"],
+                    temperature=inf_mode["temperature"] if inf_mode["do_sample"] else None,
+                    top_p=inf_mode["top_p"] if inf_mode["do_sample"] else None,
+                    repetition_penalty=inf_mode["repetition_penalty"],
                     use_cache=True
                 )
                 answer = self.tok.decode(
@@ -229,8 +309,10 @@ class StatefulLoopEngine:
                 out_ids = self.model.generate(
                     input_ids=final_ids,
                     max_new_tokens=max_new,
-                    do_sample=False,
-                    repetition_penalty=1.1
+                    do_sample=inf_mode["do_sample"],
+                    temperature=inf_mode["temperature"] if inf_mode["do_sample"] else None,
+                    top_p=inf_mode["top_p"] if inf_mode["do_sample"] else None,
+                    repetition_penalty=inf_mode["repetition_penalty"],
                 )
                 answer = self.tok.decode(
                     out_ids[0][final_ids.shape[1]:],
@@ -255,6 +337,33 @@ def detect_domain(text: str) -> str:
     if any(w in t for w in ["bash", "terminal", "command", "disk", "file", "process"]):
         return "tool"
     return "chat"
+
+
+def detect_inference_mode(text: str, override: str | None = None) -> str:
+    """Return the best INFERENCE_MODES key for this prompt.
+
+    Priority order:
+      1. Explicit override (caller-supplied string)
+      2. OO-tag prefix detection -> 'oo_domain'
+      3. Code keyword detection  -> 'code'
+      4. Identity keyword        -> 'identity'
+      5. Fallback                -> 'default'
+
+    The selected mode is always validated against INFERENCE_MODES so
+    an unknown override falls back gracefully to 'default'.
+    """
+    if override is not None:
+        return override if override in INFERENCE_MODES else "default"
+    t = text.lower().strip()
+    if t.startswith(_OO_PREFIXES):
+        return "oo_domain"
+    if any(w in t for w in ["def ", "class ", "```python", "function", "import"]):
+        return "code"
+    if any(kw in t for kw in ["who are you", "what are you", "your name",
+                               "your architecture", "jarvis"]):
+        return "identity"
+    return "default"
+
 
 
 # ── CLI entry point ──────────────────────────────────────────────────────────
