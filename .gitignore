@@ -20,8 +20,7 @@ __pycache__/
 venv/
 grpo_env/
 
-# Logs
-*.log
+# Logs (training logs committed explicitly when needed)
 wandb/
 monitor.log
 daemon_watch.log
@@ -33,5 +32,17 @@ daemon_watch.log
 latent_diagnostics.jsonl
 training_report.json
 
+# Large binary artifacts
+checkpoints/gguf/
+checkpoints/mamba-tiny-refinement-BF16-MASTER.bak/
+checkpoints/mamba-tiny-refinement-BF16-MASTER/
+checkpoints/lora-step*/
+
+# Training data (large generative files — keep in jsonl but not bin)
+combined_training_data.jsonl
+training_data.jsonl
+targeted_samples.jsonl
+
 # OS
 .DS_Store
+nohup.out
