@@ -189,15 +189,15 @@ def load_rlf_final(ckpt_dir: Path) -> RecursiveMamba1_PrefixScratchpad:
 @torch.no_grad()
 def run_chain(
     model: RecursiveMamba1_PrefixScratchpad, prompt: str
-) -> tuple[list[str], float]:
-    """Run RLF inference, return (output_chain, elapsed_s)."""
+) -> tuple[list[str], float, list]:
+    """Run RLF inference, return (output_chain, elapsed_s, raw_trace)."""
     ids     = tokenizer.encode(prompt)
     inp     = torch.tensor([ids], dtype=torch.long, device=DEVICE)
     t0      = time.perf_counter()
     _, trace, _ = model(inp)
     elapsed = time.perf_counter() - t0
     chain   = [tok for (_, tok, _) in trace if tok != "<HALT>"]
-    return chain, elapsed
+    return chain, elapsed, trace
 
 
 def score_chain(output: list[str], expected: list[str]) -> tuple[bool, str]:
@@ -211,27 +211,60 @@ def score_chain(output: list[str], expected: list[str]) -> tuple[bool, str]:
     return False, f"got {output!r}, expected final={expected[-1]!r}"
 
 
+def diagnose_collapse(trace: list) -> tuple[bool, float]:
+    """Detect loop collapse: all loops predict same token at similar confidence.
+
+    ChatGPT concern #2: if Loop 1 already has the answer and Loops 2-6 are
+    minor corrections, you have iterative denoising, not multi-hop computation.
+
+    Returns (is_collapsed, variance_of_confidences)
+    """
+    non_halt = [(tok, conf) for (_, tok, conf) in trace if tok != "<HALT>"]
+    if len(non_halt) < 2:
+        return False, 0.0
+    tokens = [t for t, _ in non_halt]
+    confs  = [c for _, c in non_halt]
+    all_same_token = len(set(tokens)) == 1
+    import statistics
+    conf_stdev = statistics.stdev(confs) if len(confs) > 1 else 0.0
+    # Collapsed: same token every loop AND confidence barely changes
+    is_collapsed = all_same_token and conf_stdev < 0.05
+    return is_collapsed, conf_stdev
+
+
 # ── Test suites ───────────────────────────────────────────────────────────────
 
 def run_chain_suite(model: RecursiveMamba1_PrefixScratchpad) -> float:
-    """Test 1: Chain accuracy across 20 held-out problems. Returns pass rate."""
+    """Test 1: Chain accuracy + loop collapse detection."""
     print("\n" + "=" * 65)
-    print("  TEST 1: CHAIN ACCURACY (20 problems)")
+    print("  TEST 1: CHAIN ACCURACY + LOOP COLLAPSE DETECTION (20 problems)")
     print("=" * 65)
 
     by_cat: dict[str, list[bool]] = {}
-    total = 0
+    total       = 0
+    collapsed   = 0
+    conf_stdevs = []
 
     for t in CHAIN_TESTS:
-        out, elapsed = run_chain(model, t["prompt"])
-        passed, reason = score_chain(out, t["expected_chain"])
+        out, elapsed, trace = run_chain(model, t["prompt"])
+        passed, reason      = score_chain(out, t["expected_chain"])
+        is_col, stdev       = diagnose_collapse(trace)
         by_cat.setdefault(t["cat"], []).append(passed)
-        total += int(passed)
+        total     += int(passed)
+        collapsed += int(is_col)
+        conf_stdevs.append(stdev)
         status = "✅" if passed else "❌"
-        print(f"\n  [{t['id']}] {t['cat']}")
+        col_flag = " [COLLAPSE]" if is_col else ""
+        print(f"\n  [{t['id']}] {t['cat']}{col_flag}")
         print(f"    Prompt:   {t['prompt']}")
         print(f"    Expected: {t['expected_chain']}")
         print(f"    Got:      {out} ({elapsed:.1f}s)  {status} {reason}")
+        # Show per-loop trace: (label, token, confidence)
+        loop_str = "  ".join(
+            f"{lbl}={'§ HALT' if tok == '<HALT>' else repr(tok)}({conf:.3f})"
+            for lbl, tok, conf in trace
+        )
+        print(f"    Loops:    {loop_str}")
 
     print(f"\n  {'Category':<22} {'Pass':>4} {'Tot':>4} {'Rate':>7}")
     print(f"  {'-'*40}")
@@ -242,6 +275,20 @@ def run_chain_suite(model: RecursiveMamba1_PrefixScratchpad) -> float:
     pct = total / len(CHAIN_TESTS) * 100
     print(f"  {'TOTAL':<22} {total:>4} {len(CHAIN_TESTS):>4} {pct:>6.0f}%")
 
+    import statistics
+    avg_stdev = statistics.mean(conf_stdevs) if conf_stdevs else 0.0
+    col_pct   = collapsed / len(CHAIN_TESTS) * 100
+    print(f"\n  COLLAPSE ANALYSIS (ChatGPT concern #2):")
+    print(f"  Collapsed loops: {collapsed}/{len(CHAIN_TESTS)} = {col_pct:.0f}%")
+    print(f"  Avg conf stdev:  {avg_stdev:.4f}")
+    if col_pct >= 70:
+        print("  ❌ HIGH COLLAPSE — iterative denoising, not multi-hop computation")
+        print("     Fix: LoopRoPE strength ↑, or separate per-loop loss targets")
+    elif col_pct >= 30:
+        print("  ⚠️  PARTIAL COLLAPSE — some loops non-redundant, improve step supervision")
+    else:
+        print("  ✅ LOW COLLAPSE — loops are doing different things")
+
     if pct >= 70:
         print("\n  ✅ RLF IS WORKING — scratchpad retaining variables")
     elif pct >= 40:
@@ -249,6 +296,7 @@ def run_chain_suite(model: RecursiveMamba1_PrefixScratchpad) -> float:
     else:
         print("\n  ❌ RLF NOT WORKING — chain following failed")
     return pct
+
 
 
 def run_ablation(model: RecursiveMamba1_PrefixScratchpad) -> int:
@@ -269,7 +317,7 @@ def run_ablation(model: RecursiveMamba1_PrefixScratchpad) -> int:
             model.latent_memory.data.zero_()
         correct = 0
         for prompt, expected in ABLATION_PROMPTS:
-            out, _ = run_chain(model, prompt)
+            out, _, _trace = run_chain(model, prompt)
             if out and expected.lower() in out[-1].lower():
                 correct += 1
         if mem_zeroed:
@@ -310,7 +358,7 @@ def run_semantic_shift(model: RecursiveMamba1_PrefixScratchpad) -> float:
 
     correct = 0
     for t in SEMANTIC_SHIFT:
-        out, elapsed = run_chain(model, t["prompt"])
+        out, elapsed, _trace = run_chain(model, t["prompt"])
         last   = out[-1].lower() if out else ""
         passed = t["expected"].lower() in last or last in t["expected"].lower()
         correct += int(passed)
