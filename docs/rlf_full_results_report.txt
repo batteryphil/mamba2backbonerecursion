@@ -1,0 +1,447 @@
+================================================================================
+  MAMBA-1.4B RLF — FULL POST-TRAINING RESULTS REPORT
+  Generated: 2026-04-28 17:55 CDT
+  Checkpoint: /hdd_data/rlf-1.4b-checkpoints/final
+  Report covers: Training runs, auto-eval, ablation, benchmark, comparison
+================================================================================
+
+
+================================================================================
+  SECTION 1: MODEL ARCHITECTURE
+================================================================================
+
+  Backbone:         state-spaces/mamba-1.4b
+  d_model:          2048
+  n_layers:         48 (bottom 24 frozen, top 24 LoRA-adapted)
+  HALT token:       7803 (§)
+  PREFIX_M:         8 latent scratchpad tokens
+  MAX_LOOPS:        6
+  LORA_RANK:        8
+  BRIDGE_RANK:      64 (2048 → 64 → 2048)
+
+  Parameter counts:
+    LoRA params:        3,145,728
+    Loop engine:       13,219,840
+    Prefix memory:         16,384  (8 × 2048)
+    Latent bridge:        262,144
+    Total trainable:  150,245,376
+    Base frozen:      634,601,472
+
+  VRAM:  ~3.06–3.78 GB used during training (RTX 3060, 12 GB total)
+
+
+================================================================================
+  SECTION 2: TRAINING TIMELINE
+================================================================================
+
+  Two full training runs were executed. Run 2 (the final checkpoint) is the
+  authoritative result. Run 1 was aborted mid-Phase-3c due to HALT collapse.
+
+  ── RUN 1 (Aborted) ──────────────────────────────────────────────────────────
+
+  Phase 3a  — Scratchpad Warmup
+    Started:   2026-04-27 20:07:51
+    Completed: 2026-04-27 ~20:27  (~19 min)
+    Steps:     2000  |  Trainable params: 278,528 (bridge + memory only)
+    Batch=1, accum=8
+
+    Milestone losses:
+      S00025:  13.0612  Acc=0.000  AnsAcc=0.000  HaltAcc=0.000
+      S00050:  11.7214  Acc=0.000  AnsAcc=0.000  HaltAcc=0.000
+      S00100:  10.6979  Acc=0.000  AnsAcc=0.000  HaltAcc=0.000
+      S00200:  10.0816  Acc=0.333  AnsAcc=0.500  HaltAcc=0.000
+      S00350:   5.7823  Acc=0.750  AnsAcc=1.000  HaltAcc=0.000
+      S00500:   3.1814  Acc=0.333  AnsAcc=0.000  HaltAcc=1.000   ← HaltAcc first fires
+      S01000:   2.2369  Acc=0.500  AnsAcc=1.000  HaltAcc=0.000
+      S02000:   2.3743  Acc=0.500  AnsAcc=1.000  HaltAcc=0.000
+
+    Summary: Loss dropped 13.0 → 2.3.  AnsAcc unstable (~50%).
+             HaltAcc oscillating 0–1 — HALT token not yet stable.
+
+  Phase 3b  — RLF Joint Training
+    Started:   2026-04-27 ~20:27
+    Steps:     8000
+    VRAM:      ~3.47–3.78 GB
+
+    Milestone losses:
+      S00500:   1.0964  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S01000:   0.8968  Acc=0.500  AnsAcc=0.000  HaltAcc=1.000
+      S02000:   0.7486  Acc=0.250  AnsAcc=0.000  HaltAcc=1.000
+      S03000:   0.3623  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S04000:   0.5884  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S05000:   0.5802  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S06000:   0.1580  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S08000:   0.8421  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+
+    Summary: Loss converged ~0.15–0.85.  HaltAcc=1.000 locked in at S00500.
+             AnsAcc collapsed to 0 at S02000 (HALT gaming onset).
+             Apparent Acc=1.000 is misleading — model learning to HALT only.
+
+  Phase 3c  — SFT Recovery
+    Started:   2026-04-27 ~22:44
+    Steps:     1000
+    VRAM:      ~3.27–3.47 GB
+
+    Milestone losses:
+      S00500:  36.2200  (catastrophic — SFT recovery failing)
+      S00800:  35.5175
+      S01000:  34.2550  ← Phase 3c complete
+
+    ABORTED: Phase 3c Loss ~34 indicates catastrophic forgetting.
+    Final checkpoint (Run 1): 2026-04-27 22:48:49
+    Auto-eval triggered immediately. Run 1 chain test: 0/20 = 0%.
+
+  ── RUN 2 (Final — authoritative) ─────────────────────────────────────────────
+
+  Phase 3a  — Scratchpad Warmup (re-run with HW weight)
+    Started:   2026-04-27 23:10 (approx)
+    Completed: 2026-04-27 23:31
+    Steps:     2000  |  HW=0.30 (HALT weight reduced)
+
+    Milestone losses:
+      S00500:  2.4731  Acc=0.667  AnsAcc=0.500  HaltAcc=1.000
+      S01000:  1.8637  Acc=0.667  AnsAcc=1.000  HaltAcc=0.000
+      S02000:  1.6957  Acc=0.000  AnsAcc=0.000  HaltAcc=0.000
+
+    Summary: Lower starting loss vs Run 1 (warm restart from Run 1 weights).
+             Phase 3a complete 23:31.
+
+  Phase 3b-i  — RLF Joint Training (first segment, HW=1.0)
+    Started:   2026-04-27 23:31
+    Completed: 2026-04-27 23:58
+    Steps:     2000  |  HW=1.00
+
+    Milestone losses:
+      S00500:  0.8755  Acc=0.200  AnsAcc=0.000  HaltAcc=1.000
+      S01000:  1.0629  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S02000:  0.9037  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+
+  Phase 3b-ii  — RLF Joint Training (second segment, continued HW=1.0)
+    Started:   2026-04-28 00:04
+    Completed: 2026-04-28 01:14
+    Steps:     6000  |  HW=1.00
+
+    Milestone losses:
+      S00500:  0.8700  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S01000:  0.4889  Acc=0.667  AnsAcc=0.600  HaltAcc=1.000
+      S02000:  0.8230  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S03000:  0.5351  Acc=0.000  AnsAcc=0.000  HaltAcc=0.000
+      S04000: (see log)
+      S04600:  0.4839  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S04800:  0.9295  Acc=0.200  AnsAcc=0.000  HaltAcc=1.000
+      S05000:  0.3567  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000
+      S05500: (checkpoint saved)
+      S06000:  0.3629  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  ← COMPLETE
+
+    Phase 3b-ii complete: 2026-04-28 01:14:55
+    All phases complete:  2026-04-28 01:14:55
+    Final checkpoint:     /hdd_data/rlf-1.4b-checkpoints/final
+                          2026-04-28 01:14:57
+
+  Total training time (Run 2):  ~5h 07m  (23:07 → 01:14 CDT)
+  Total checkpoints saved:      35+ (every 500 steps per phase)
+
+
+================================================================================
+  SECTION 3: AUTO-EVAL RESULTS — RUN 1 (Aborted checkpoint)
+================================================================================
+
+  Triggered automatically at: 2026-04-27 22:48 (immediately after Phase 3c)
+  Eval log: /home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_eval.log
+
+  PHASE 1: RLF Chain Test (20 problems)
+  ──────────────────────────────────────
+  All 20 tests: FAIL (0/20 = 0%)
+
+  Failure mode: Model producing garbage tokens across all 6 loops
+  Example outputs:
+    "A=42. What is A?"      → ['', '', 'and', 'sime', 'teasp', '??']
+    "X=Moon. Y=X. What is Y?" → ['', '', 'and', 'sime', 'questionna', 'questionna']
+    "op=minus. fix=plus..."  → ['', '', 'and', 'maha', 'sime', 'firm']
+
+  Category breakdown:
+    1-hop             0/3    0%
+    2-hop             0/3    0%
+    3-hop             0/2    0%
+    3-hop-adversarial 0/2    0%
+    bug-fix           0/2    0%
+    math-1step        0/3    0%
+    math-2step        0/1    0%
+    sequence          0/4    0%
+    TOTAL             0/20   0%
+
+  Diagnosis: Phase 3c SFT recovery (Loss ~34) caused catastrophic forgetting.
+             Model outputs are incoherent garbage — not HALT gaming, total collapse.
+
+  PHASE 2: Extended Benchmark (54 tests)
+  ───────────────────────────────────────
+  All 54 tests: FAIL (0/54 = 0%)
+  All outputs: '' (empty — 0 tokens generated)
+
+  Category breakdown:
+    Algorithm             0/4    0%
+    Bug Fix               0/5    0%
+    Code Gen              0/8    0%
+    Code Gen (Complex)    0/6    0%
+    Completion            0/3    0%
+    Data Structures       0/4    0%
+    Logic                 0/4    0%
+    Math                  0/8    0%
+    Strings               0/4    0%
+    Unit Tests            0/2    0%
+    Word Problem          0/6    0%
+    TOTAL                 0/54   0%
+
+  Avg throughput:  0.0 tok/s
+  Avg bigram rep:  0.000
+
+  vs R5 SFT Baseline:
+    Algorithm        R5=75%   RLF=0%   Δ= -75%
+    Bug Fix          R5=20%   RLF=0%   Δ= -20%
+    Code Gen         R5=75%   RLF=0%   Δ= -75%
+    Code Gen (Cplx)  R5=33%   RLF=0%   Δ= -33%
+    Completion       R5=67%   RLF=0%   Δ= -67%
+    Data Structures  R5=100%  RLF=0%   Δ=-100%
+    Logic            R5=0%    RLF=0%   Δ=   0%
+    Math             R5=88%   RLF=0%   Δ= -88%
+    Strings          R5=100%  RLF=0%   Δ=-100%
+    Unit Tests       R5=0%    RLF=0%   Δ=   0%
+    Word Problem     R5=17%   RLF=0%   Δ= -17%
+
+  Auto-eval completed: Tue Apr 28 01:16:08 AM CDT 2026
+
+
+================================================================================
+  SECTION 4: ABLATION TEST — RUN 2 (Final checkpoint)
+================================================================================
+
+  Executed: 2026-04-28 17:51 CDT (manually via rlf_chain_test.py)
+  Checkpoint: /hdd_data/rlf-1.4b-checkpoints/final
+  Script: mamba2backbonerecursion/mamba14b/rlf_chain_test.py
+
+  TEST 1: Chain Accuracy + Loop Collapse (20 problems)
+  ──────────────────────────────────────────────────────
+  Category            Pass  Total   Rate
+  1-hop                  1      3    33%
+  2-hop                  0      3     0%
+  3-hop                  0      2     0%
+  3-hop-adversarial      2      2   100%
+  bug-fix                2      2   100%
+  math-1step             0      3     0%
+  math-2step             0      1     0%
+  sequence               1      4    25%
+  TOTAL                  6     20    30%
+
+  Per-test trace excerpts:
+    [1h_01] "A=42. What is A?"        → [] in 3.6s  L1=§HALT(1.000)
+    [1h_02] "color=Blue. What is color?" → []       L1=§HALT(0.996)
+    [1h_03] "x=99. What is x?"        → ['']        L1=''(0.512) L2=§HALT(1.000)
+    [2h_01] "A=42. B=A. What is B?"   → []          L1=§HALT(1.000)
+    [3h_01] "A=Star. B=A. C=B..."     → []          L1=§HALT(1.000)
+    [3h_adv_01] (with distractors)    → ['Fire'] ✅  L1='Fire'(0.691) L2=§HALT
+    [3h_adv_02] (with distractors)    → ['Gold'] ✅  L1='Gold'(0.877) L2=§HALT
+    [ma_01] "qty=6. price=0.50..."    → []          L1=§HALT(0.911)
+    [sq_02] "x1=1. x2=x1*2..."       → ['16']  ✅   L1='16'(0.342)  L2=§HALT
+    [bf_01] "op=minus. fix=plus..."   → ['a']   ✅   L1='a'(0.799)   L2=§HALT
+    [bf_02] "bug=return b..."         → ['a']   ✅   L1='a'(0.374)   L2=§HALT
+    [ma_04] 2-step math               → ['18']  ❌   wrong answer
+
+  Loop Collapse Analysis:
+    Collapsed loops: 0/20 = 0%   ← LOW (good — not iterative denoising)
+    Avg conf stdev:  0.0000
+    Verdict: ✅ LOW COLLAPSE — when tokens fire, each loop differs
+
+  Overall: ❌ RLF NOT WORKING — 30% below the 70% threshold
+
+  TEST 2: Scratchpad Ablation (5 problems)
+  ─────────────────────────────────────────
+  Condition              Correct   Total   Rate
+  Normal (latent_memory loaded)    1       5    20%
+  Zeroed (latent_memory.zero_())   1       5    20%
+  Δ scratchpad contribution:      +0
+
+  Verdict: ❌ SCRATCHPAD UNUSED — matches 130M failure pattern exactly
+  The latent_memory checkpoint is loaded but contributes zero differential
+  accuracy. bridge_down/bridge_up path either has dead gradients or the
+  memory is not being used in the forward pass in a meaningful way.
+
+  TEST 3: Semantic Shift / bAbI-style (5 problems)
+  ─────────────────────────────────────────────────
+  Reported score: 5/5 = 100%  ← THIS IS A FALSE POSITIVE
+  All 5 outputs were [] (empty — L1 HALT fired before any token)
+  Scorer printed ✅ without checking for empty output.
+  Real score: 0/5 = 0%
+
+  OVERALL VERDICT (Run 2 final checkpoint):
+    Chain accuracy:  30%  ❌  (need ≥70%)
+    Scratchpad Δ:    +0   ❌  (need >1)
+    Semantic shift:   0%  ❌  (scorer bug masked this)
+
+
+================================================================================
+  SECTION 5: HISTORICAL COMPARISON — 2.8B PROPRIOCEPTION GATE BENCHMARK
+================================================================================
+
+  Date: 2026-04-13 19:18:20
+  File: /hdd_data/RM3_Project/benchmark_results.txt
+  Note: This is the OLDER 2.8B model with proprioception gate, not the RLF
+        1.4B model. Included for context/comparison only.
+
+  Token Throughput:
+    seq=16:   306.5 tok/s  (52.20ms fwd)
+    seq=64:  1153.7 tok/s
+    seq=128: 1960.1 tok/s
+    seq=256: 3491.7 tok/s
+    seq=261: 1616.0 tok/s
+
+  Latent Loop Speed (LLPS):
+    5  loops:  16.9 LLPS  (59.2ms/loop)
+    10 loops:  16.7 LLPS
+    25 loops:  17.0 LLPS
+    50 loops:  18.0 LLPS
+
+  Halt Discrimination (p_halt by prompt type):
+    trivial_math:     0.9484  (expected LOW — wrong)
+    simple_chat:      0.4381  (expected LOW — ok)
+    deep_reasoning:   0.7567  (expected HIGH — ok)
+    math_hard:        0.7801  (expected HIGH — ok)
+    swarm_coord:      0.4461  (expected HIGH — wrong)
+    loop_detect:      0.4391  (expected HIGH — wrong)
+
+    Low-complexity avg:   0.6801
+    High-complexity avg:  0.6710
+    Separation gap:      -0.0091  ✗ POOR (<0.15) — needs calibration
+
+  Gate Impact (gated vs ungated divergence):
+    clean_oo:     Raw_L2=393.88  Gate_diff=59.33   Cosine=0.9886
+    degenerate:   Raw_L2=1114.96 Gate_diff=226.48  Cosine=0.9793
+    code:         Raw_L2=691.20  Gate_diff=107.86  Cosine=0.9878
+
+  Free Generation Quality:
+    Avg repetition rate: 17.3%  (< 20% threshold — GOOD)
+    Avg unique word %:   58.6%  (> 50% threshold — GOOD)
+
+  VRAM at seq=256: 5400.7 MB (~5.4 GB for 2.8B model)
+
+  Comparison note: The 2.8B gate model had coherent generation with 17.3%
+  rep rate. The 1.4B RLF model (Run 1 final) had 0 tok/s — total silence.
+  The 1.4B RLF (Run 2 final) had partial generation (30% chain acc) but
+  remains far below SFT baseline on all structured tasks.
+
+
+================================================================================
+  SECTION 6: ROOT CAUSE ANALYSIS
+================================================================================
+
+  FAILURE MODE A — HALT Token Gaming (Primary, both runs)
+  ─────────────────────────────────────────────────────────
+  Symptom:  HaltAcc=1.000 locked in by Phase 3b S00500 (~first 500 steps).
+            At inference: L1=§HALT(0.9–1.0) fires before any content token.
+  Evidence: 
+    - 17 of 20 chain tests return [] (empty) with L1=§HALT(1.000)
+    - Run 1: All 54 benchmark tests return '' (0 tok/s) after Phase 3c
+    - Run 2: Same 0-output pattern on benchmark; partial chain test only
+             works when model fires a real token before halting
+  Root cause: The §HALT token was legal at Loop 1 position during training.
+              Model discovered HALT-at-L1 as a zero-loss shortcut — it satisfies
+              the HaltAcc component while avoiding AnsAcc penalty on those samples.
+              HW=1.0 (HALT weight) reinforces this shortcut aggressively.
+
+  FAILURE MODE B — Scratchpad Non-Utilization (Secondary, Δ=0)
+  ─────────────────────────────────────────────────────────────
+  Symptom:  Zeroing latent_memory has zero effect on output (Δ=+0).
+  Evidence: Run 2 ablation — 1/5 correct with memory, 1/5 without.
+  Root cause: The bridge_down → 8-token prefix → bridge_up path may have
+              vanishing gradients (bridge rank 64, but if the loop engine
+              doesn't backprop meaningfully through the scratchpad on
+              hallucinated-halt samples, the memory never gets a useful signal).
+              This is the exact same failure mode as the 130M experiments.
+
+  FAILURE MODE C — Phase 3c Catastrophic Forgetting (Run 1 only)
+  ─────────────────────────────────────────────────────────────────
+  Symptom:  Phase 3c SFT recovery loss exploded to ~34 and stayed there.
+  Evidence: Run 1 Phase 3c: S00500=36.2, S01000=34.3 — no convergence.
+  Root cause: After Phase 3b HALT gaming, the model's lm_head distribution
+              was so distorted that SFT recovery required a much lower LR
+              and longer warmup. Run 2 avoided Phase 3c entirely (ended at 3b-ii).
+
+  NOTE ON FALSE POSITIVE — Semantic Shift Scorer Bug
+  ────────────────────────────────────────────────────
+  The rlf_chain_test.py scorer at line ~363 does fuzzy match without first
+  checking `if not out: continue`. Empty outputs pass through and are
+  misclassified as ✅ when the expected string happens not to appear in [].
+  Fix: add `if not out: correct = False; continue` before the match logic.
+
+
+================================================================================
+  SECTION 7: CHECKPOINT INVENTORY
+================================================================================
+
+  Location: /hdd_data/rlf-1.4b-checkpoints/
+
+  SFT Baseline (input to RLF training):
+    /hdd_data/latent-spacer-checkpoints/best/
+      adapter.pt, gate.pt, lm_head.pt
+
+  Run 1 Checkpoints:
+    phase3a_step000500   phase3a_step001000   phase3a_step001500
+    phase3a_step002000
+    phase3b_step000500 → phase3b_step008000  (500-step intervals)
+    phase3c_step000500   phase3c_step001000
+    phasefinal_step099999  (Run 1 — overwritten by Run 2)
+
+  Run 2 Checkpoints:
+    phase3b-i_step000500  phase3b-i_step001000  phase3b-i_step001500
+    phase3b-i_step002000
+    phase3b-ii_step000500 → phase3b-ii_step006000  (500-step intervals)
+    phasefinal_step099999  (Run 2 final)
+
+  Final weights directory: /hdd_data/rlf-1.4b-checkpoints/final/
+    bridge_down.pt    bridge_up.pt     latent_memory.pt
+    lifeline_gate.pt  lm_head.pt       loop_norm.pt
+    lora.pt           mamba1_loop.pt
+
+
+================================================================================
+  SECTION 8: RECOMMENDED NEXT STEPS
+================================================================================
+
+  Priority 1 — Fix HALT Suppression in Training
+    Mask §HALT (token 7803) from the valid output set for loop positions
+    L1 and L2 during training. This forces the model to emit at least 2
+    real content tokens before it is allowed to halt, preventing the
+    zero-cost shortcut. Implementation: add a `halt_suppress_loops=2`
+    parameter to the trainer's loss function that sets HALT logit to -inf
+    for the first N loop positions.
+
+  Priority 2 — Audit Scratchpad Gradient Flow
+    Add a diagnostic hook after a single training forward pass to confirm
+    that `model.latent_memory.grad` is non-zero and `model.bridge_down.weight.grad`
+    is non-zero. If either is zero, the bridge path has a gradient disconnect.
+    Likely fix: ensure the bridge output is added (not concatenated) to the
+    loop hidden state so it participates in the loss computation.
+
+  Priority 3 — Fix Semantic Shift Scorer
+    In rlf_chain_test.py at the run_semantic_shift() function, add:
+      if not out:
+          print(f"  ❌ (empty output — L1 HALT)")
+          continue
+    before the fuzzy match to prevent false positives.
+
+  Priority 4 — Resume from best Phase 3b checkpoint
+    Best candidate for continuation: phase3b_step006000 (Loss=0.158, all
+    metrics 1.000 in Run 1) or phase3b-ii_step005000 (Run 2).
+    Apply HALT suppression fix before resuming.
+
+  Priority 5 — Reduce HALT weight during early training
+    HW=1.0 is too aggressive. The HALT gaming starts by S00500.
+    Recommend: HW schedule — 0.1 for first 2000 steps, 0.3 for 2001–4000,
+    1.0 only after 4000 steps. This gives AnsAcc time to establish before
+    HALT competition begins.
+
+
+================================================================================
+  END OF REPORT
+  Mamba-1.4B RLF | Final checkpoint: 2026-04-28 01:14:57 CDT
+  Ablation run:                       2026-04-28 17:51 CDT
+================================================================================

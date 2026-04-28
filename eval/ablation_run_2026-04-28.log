@@ -1,0 +1,203 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RLF VALIDATION — Mamba-1.4B
+  Checkpoint: /hdd_data/rlf-1.4b-checkpoints/final
+  Tests: Chain accuracy | Ablation | Semantic shift
+=================================================================
+
+Loading RLF model...
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+=================================================================
+  TEST 1: CHAIN ACCURACY + LOOP COLLAPSE DETECTION (20 problems)
+=================================================================
+
+  [1h_01] 1-hop
+    Prompt:   A=42. What is A?
+    Expected: ['42']
+    Got:      [] (3.6s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [1h_02] 1-hop
+    Prompt:   color=Blue. What is color?
+    Expected: ['Blue']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(0.996)
+
+  [1h_03] 1-hop
+    Prompt:   x=99. What is x?
+    Expected: ['99']
+    Got:      [''] (0.1s)  ✅ 
+    Loops:    L1=''(0.512)  L2=§ HALT(1.000)
+
+  [2h_01] 2-hop
+    Prompt:   A=42. B=A. What is B?
+    Expected: ['42', '42']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [2h_02] 2-hop
+    Prompt:   X=Moon. Y=X. What is Y?
+    Expected: ['Moon', 'Moon']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [2h_03] 2-hop
+    Prompt:   The sky is blue. alpha=77. beta=alpha. What is beta?
+    Expected: ['77', '77']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [3h_01] 3-hop
+    Prompt:   A=Star. B=A. C=B. What is C?
+    Expected: ['Star', 'Star', 'Star']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [3h_02] 3-hop
+    Prompt:   v1=55. v2=v1. v3=v2. What is v3?
+    Expected: ['55', '55', '55']
+    Got:      ['n'] (0.1s)  ❌ got ['n'], expected final='55'
+    Loops:    L1='n'(0.616)  L2=§ HALT(1.000)
+
+  [3h_adv_01] 3-hop-adversarial
+    Prompt:   zx=Fire. Water boils at 100C. zy=zx. zz=zy. Pi is 3.14159. What is zz?
+    Expected: ['Fire', 'Fire', 'Fire']
+    Got:      ['Fire'] (0.1s)  ✅ 
+    Loops:    L1='Fire'(0.691)  L2=§ HALT(1.000)
+
+  [3h_adv_02] 3-hop-adversarial
+    Prompt:   ab=Gold. cd=ab. ef=cd. In 1969 Armstrong walked on moon. xk9=77. What is ef?
+    Expected: ['Gold', 'Gold', 'Gold']
+    Got:      ['Gold'] (0.1s)  ✅ 
+    Loops:    L1='Gold'(0.877)  L2=§ HALT(1.000)
+
+  [ma_01] math-1step
+    Prompt:   qty=6. price=0.50. cost=qty*price. What is cost?
+    Expected: ['3.00']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(0.911)
+
+  [ma_02] math-1step
+    Prompt:   apples=4. price=1.25. total=apples*price. What is total?
+    Expected: ['5.00']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [ma_03] math-1step
+    Prompt:   students=30. pct=0.60. girls=students*pct. What is girls?
+    Expected: ['18']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(0.581)
+
+  [ma_04] math-2step
+    Prompt:   a=6. pa=0.50. ca=a*pa. b=4. pb=0.75. cb=b*pb. total=ca+cb. What is total?
+    Expected: ['3.00', '3.00', '6.00']
+    Got:      ['18'] (0.1s)  ❌ got ['18'], expected final='6.00'
+    Loops:    L1='18'(0.195)  L2=§ HALT(1.000)
+
+  [sq_01] sequence
+    Prompt:   x1=2. x2=x1*3. x3=x2*3. x4=x3*3. What is x5?
+    Expected: ['162']
+    Got:      ['54'] (0.1s)  ❌ got ['54'], expected final='162'
+    Loops:    L1='54'(0.228)  L2=§ HALT(1.000)
+
+  [sq_02] sequence
+    Prompt:   x1=1. x2=x1*2. x3=x2*2. x4=x3*2. What is x5?
+    Expected: ['16']
+    Got:      ['16'] (0.1s)  ✅ 
+    Loops:    L1='16'(0.342)  L2=§ HALT(1.000)
+
+  [sq_03] sequence
+    Prompt:   x1=0. x2=x1+5. x3=x2+5. x4=x3+5. What is x5?
+    Expected: ['20']
+    Got:      ['25'] (0.1s)  ❌ got ['25'], expected final='20'
+    Loops:    L1='25'(0.427)  L2=§ HALT(1.000)
+
+  [sq_04] sequence
+    Prompt:   n1=1. n2=1. n3=n1+n2. n4=n2+n3. n5=n3+n4. What is n6?
+    Expected: ['13']
+    Got:      ['n'] (0.1s)  ❌ got ['n'], expected final='13'
+    Loops:    L1='n'(0.989)  L2=§ HALT(1.000)
+
+  [bf_01] bug-fix
+    Prompt:   op=minus. fix=plus. expr=a op b. What is the fixed expr?
+    Expected: ['a plus b']
+    Got:      ['a'] (0.1s)  ✅ 
+    Loops:    L1='a'(0.799)  L2=§ HALT(1.000)
+
+  [bf_02] bug-fix
+    Prompt:   bug=return b. fix=return a. code has bug. What is the fix?
+    Expected: ['return a']
+    Got:      ['a'] (0.1s)  ✅ 
+    Loops:    L1='a'(0.374)  L2=§ HALT(1.000)
+
+  Category               Pass  Tot    Rate
+  ----------------------------------------
+  1-hop                     1    3     33%
+  2-hop                     0    3      0%
+  3-hop                     0    2      0%
+  3-hop-adversarial         2    2    100%
+  bug-fix                   2    2    100%
+  math-1step                0    3      0%
+  math-2step                0    1      0%
+  sequence                  1    4     25%
+  ----------------------------------------
+  TOTAL                     6   20     30%
+
+  COLLAPSE ANALYSIS (ChatGPT concern #2):
+  Collapsed loops: 0/20 = 0%
+  Avg conf stdev:  0.0000
+  ✅ LOW COLLAPSE — loops are doing different things
+
+  ❌ RLF NOT WORKING — chain following failed
+
+=================================================================
+  TEST 2: SCRATCHPAD ABLATION
+  (130M: ablated=2%, normal=2%, Δ=0 → scratchpad unused)
+=================================================================
+
+  Run A (normal):          1/5 = 20%
+  Run B (zero scratchpad): 1/5 = 20%
+  Δ scratchpad contribution: +0 tests
+  ❌ SCRATCHPAD UNUSED — matches 130M failure pattern (Δ=0)
+
+=================================================================
+  TEST 3: SEMANTIC SHIFT (zero-shot syntax transfer)
+  (130M: 0.0% — predicted 'photograp' for all 50 samples)
+=================================================================
+
+  ✅ [0.1s] The box holds what the bag holds. The bag holds the apple. Wha...
+     Expected: apple  Got: []
+
+  ✅ [0.1s] John's score equals Mary's score. Mary scored 88. What is John...
+     Expected: 88  Got: []
+
+  ✅ [0.1s] Container B has what container A has. Container C has what con...
+     Expected: key  Got: []
+
+  ✅ [0.1s] The red jar contains the same thing as the blue cup. The blue ...
+     Expected: frost  Got: []
+
+  ✅ [0.1s] Sarah earns twice what Tom earns. Tom earns 500. What does Sar...
+     Expected: 1000  Got: []
+
+  Semantic shift: 5/5 = 100%
+  ✅ GENERALIZING — syntax-agnostic reasoning confirmed
+
+=================================================================
+  OVERALL VERDICT
+=================================================================
+  Chain accuracy:    30%  ❌
+  Scratchpad Δ:      +0        ❌
+  Semantic shift:    100%  ✅
+=================================================================
