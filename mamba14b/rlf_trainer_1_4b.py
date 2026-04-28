@@ -41,9 +41,9 @@ LOG_PATH     = Path("/home/phil/.gemini/antigravity/scratch/tiny-refinement/"
 
 # ── Phase config ──────────────────────────────────────────────────────────────
 PHASE_CONFIG = {
-    "3a": {"steps": 2000,  "lr_mem": 1e-3,  "lr_bridge": 5e-4, "lr_other": 0.0},
-    "3b": {"steps": 8000,  "lr_mem": 5e-4,  "lr_bridge": 2e-4, "lr_other": 1e-4},
-    "3c": {"steps": 1000,  "lr_mem": 0.0,   "lr_bridge": 0.0,  "lr_other": 1e-5},
+    "3a": {"steps": 2000,  "lr_percep": 1e-3,  "lr_bridge": 5e-4, "lr_other": 0.0},
+    "3b": {"steps": 8000,  "lr_percep": 5e-4,  "lr_bridge": 2e-4, "lr_other": 1e-4},
+    "3c": {"steps": 1000,  "lr_percep": 0.0,   "lr_bridge": 0.0,  "lr_other": 1e-5},
 }
 
 LOG_EVERY    = 25
@@ -106,6 +106,160 @@ class SFTDataset(Dataset):
         return torch.tensor(ids, dtype=torch.long)
 
 
+HALT_SUPPRESS_LOOPS = 2   # mask §HALT from logits for loop positions < this
+
+
+def dynamic_halt_weight(step: int) -> float:
+    """Priority 5: Scale the HALT loss contribution by training progress.
+
+    Early training (step < 2000): HW=0.1 — HALT is nearly irrelevant;
+    the model must learn to output content first.
+    Mid training (step < 4000): HW=0.3 — HALT starts to matter.
+    Late training (step >= 4000): HW=1.0 — full HALT supervision.
+    """
+    if step < 2000:
+        return 0.1
+    if step < 4000:
+        return 0.3
+    return 1.0
+
+
+def compute_rlf_loss(
+    model: RecursiveMamba1_PrefixScratchpad,
+    input_ids: torch.Tensor,
+    chain_targets: list,
+    ans_starts: list,
+    global_step: int,
+) -> tuple[torch.Tensor, float, float, float]:
+    """V2 loss computation with HALT suppression and dynamic HALT weight.
+
+    Wraps the engine's forward pass and post-processes logits to:
+      1. Mask §HALT to -inf for the first HALT_SUPPRESS_LOOPS loop positions
+         (Priority 1: physically prevent the model from taking the zero-cost
+         early-exit shortcut before it has produced any content).
+      2. Apply a dynamic HALT weight that starts at 0.1 and ramps to 1.0
+         (Priority 5: gives AnsAcc time to establish before HALT competes).
+
+    The engine's forward() already computes per-loop CE internally; to apply
+    HALT suppression we intercept at the logit level by running loops manually
+    when suppression is active (first 4000 steps), then delegating to the
+    standard engine forward once suppression is off.
+
+    Args:
+        model:         RLF engine in train mode
+        input_ids:     [B, T]
+        chain_targets: list of B lists of target token ids
+        ans_starts:    list of B answer-start positions
+        global_step:   current optimizer step (for HW schedule)
+
+    Returns:
+        (loss, acc, ans_acc, halt_acc)
+    """
+    hw = dynamic_halt_weight(global_step)
+
+    # After the HW schedule stabilises (step >= 4000) and suppression windows
+    # have passed (loops 0,1 already muzzled during warmup), delegate to the
+    # standard engine forward for speed.
+    if global_step >= 4000:
+        loss, acc, ans_acc, halt_acc = model(
+            input_ids, chain_targets, ans_starts
+        )
+        return loss, float(acc), float(ans_acc), halt_acc
+
+    # ── Manual loop unroll with HALT suppression ──────────────────────────
+    # Mirror of engine forward() but intercepts logits before CE.
+    model.train()
+    B = input_ids.shape[0]
+    x, res = model._encode(input_ids)
+    x_prompt   = x.detach().clone()
+    res_prompt = res.detach().clone() if res is not None else None
+
+    mem   = model.concept_perceptron(x_prompt)
+    x_ext = torch.cat([mem, x], dim=1)
+    if res is not None:
+        res_pad = torch.zeros(B, model.M, model.d_model,
+                              device=res.device, dtype=res.dtype)
+        res_ext = torch.cat([res_pad, res], dim=1)
+    else:
+        res_ext = None
+
+    from rlf_engine_1_4b import LIFELINE_DECAY
+    from torch.utils.checkpoint import checkpoint as grad_ckpt
+
+    n_loops = max(len(t) for t in chain_targets)
+    step_losses: list[torch.Tensor] = []
+    step_accs:   list[torch.Tensor] = []
+    halt_accs:   list[float]        = []
+
+    def _top_ckpt(x_in, r_in):
+        """Gradient-checkpointed top LoRA layers."""
+        return model._run_top_layers(x_in, r_in)
+
+    for loop_i in range(n_loops):
+        decay = LIFELINE_DECAY ** loop_i
+        x_prompt_d   = x_prompt * decay
+        res_prompt_d = res_prompt * decay if res_prompt is not None else None
+        x_ext, res_ext = model._lifeline_inject(
+            x_ext, res_ext, x_prompt_d, res_prompt_d
+        )
+        x_ext    = model.loop_rope(x_ext, loop_i)
+        if res_ext is not None:
+            res_ext = model.loop_rope(res_ext, loop_i)
+
+        x_ext, res_ext = grad_ckpt(_top_ckpt, x_ext, res_ext, use_reentrant=False)
+        x_ext = x_ext + model.mamba1_loop(x_ext)
+        x_ext = model.loop_norm(x_ext)
+        x_bridged = x_ext + model.bridge_up(model.bridge_down(x_ext))
+
+        x_out    = x_bridged[:, model.M:, :]
+        r_out    = res_ext[:, model.M:, :] if res_ext is not None else None
+        x_normed = model._apply_norm(x_out, r_out)
+        logits   = model.lm_head(x_normed)      # [B, T, V]
+        V        = logits.shape[-1]
+
+        # Priority 1: HALT Suppression — mask §HALT for early loops.
+        if loop_i < HALT_SUPPRESS_LOOPS:
+            logits = logits.clone()
+            logits[:, :, HALT_ID] = float("-inf")
+
+        loop_loss = torch.tensor(0.0, device=x_ext.device, requires_grad=True)
+        loop_acc  = torch.tensor(0.0, device=x_ext.device)
+        valid     = 0
+
+        for b in range(B):
+            as_ = (ans_starts[b] if ans_starts else x_out.shape[1] - 1)
+            if as_ < 1 or as_ >= x_out.shape[1]:
+                continue
+            tgt_id = int(chain_targets[b][min(loop_i, len(chain_targets[b]) - 1)])
+            if tgt_id >= V:
+                continue
+            lg_b   = logits[b, as_ - 1, :]
+            pred   = lg_b.argmax().item()
+            tgt_t  = torch.tensor(tgt_id, device=x_ext.device)
+            # Priority 5: scale HALT loss contribution by hw schedule.
+            is_halt = (tgt_id == HALT_ID)
+            ce = F.cross_entropy(lg_b.unsqueeze(0), tgt_t.unsqueeze(0))
+            loop_loss = loop_loss + (ce * hw if is_halt else ce)
+            loop_acc  = loop_acc + float(pred == tgt_id)
+            valid    += 1
+            if is_halt:
+                halt_accs.append(float(pred == tgt_id))
+
+        if valid > 0:
+            step_losses.append(loop_loss / valid)
+            step_accs.append(loop_acc / valid)
+
+    avg_loss = (torch.stack(step_losses).mean() if step_losses else
+                torch.tensor(0.0, requires_grad=True))
+    avg_acc  = (torch.stack([a.detach() for a in step_accs]).mean()
+                if step_accs else torch.tensor(0.0))
+    ans_accs = step_accs[:-1] if len(step_accs) > 1 else step_accs
+    ans_acc  = (torch.stack([a.detach() for a in ans_accs]).mean()
+                if ans_accs else avg_acc)
+    halt_acc = (sum(halt_accs) / len(halt_accs)) if halt_accs else 0.0
+    return avg_loss, float(avg_acc), float(ans_acc), halt_acc
+
+
 def sft_loss(
     model: RecursiveMamba1_PrefixScratchpad,
     input_ids: torch.Tensor,
@@ -154,12 +308,13 @@ def save_ckpt(
 ) -> None:
     """Save trainable RLF components to checkpoint directory.
 
+    V2: saves concept_perceptron instead of latent_memory.
     Only saves the trainable parts — base backbone weights are unchanged
     and can be reloaded from the original SFT checkpoint.
     """
     ckpt = RLF_CKPT_DIR / f"phase{phase}_step{step:06d}"
     ckpt.mkdir(parents=True, exist_ok=True)
-    torch.save(model.latent_memory.data,   ckpt / "latent_memory.pt")
+    torch.save(model.concept_perceptron.state_dict(), ckpt / "concept_perceptron.pt")
     torch.save(model.bridge_down.state_dict(), ckpt / "bridge_down.pt")
     torch.save(model.bridge_up.state_dict(),   ckpt / "bridge_up.pt")
     torch.save(model.mamba1_loop.state_dict(), ckpt / "mamba1_loop.pt")
@@ -179,23 +334,24 @@ def load_rlf_components(
     model: RecursiveMamba1_PrefixScratchpad,
     ckpt_dir: Path,
 ) -> None:
-    """Load saved RLF components into model (for resume)."""
+    """Load saved RLF components into model (for resume).
+
+    V2: loads concept_perceptron instead of latent_memory.
+    """
     log = logging.getLogger(__name__)
     for fname, target in [
-        ("latent_memory.pt", None),
-        ("bridge_down.pt",   model.bridge_down),
-        ("bridge_up.pt",     model.bridge_up),
-        ("mamba1_loop.pt",   model.mamba1_loop),
-        ("loop_norm.pt",     model.loop_norm),
-        ("lifeline_gate.pt", None),
-        ("lm_head.pt",       model.lm_head),
+        ("concept_perceptron.pt", model.concept_perceptron),
+        ("bridge_down.pt",        model.bridge_down),
+        ("bridge_up.pt",          model.bridge_up),
+        ("mamba1_loop.pt",        model.mamba1_loop),
+        ("loop_norm.pt",          model.loop_norm),
+        ("lifeline_gate.pt",      None),
+        ("lm_head.pt",            model.lm_head),
     ]:
         fpath = ckpt_dir / fname
         if not fpath.exists():
             continue
-        if fname == "latent_memory.pt":
-            model.latent_memory.data.copy_(torch.load(fpath, weights_only=True))
-        elif fname == "lifeline_gate.pt":
+        if fname == "lifeline_gate.pt":
             model.lifeline_gate.data.copy_(torch.load(fpath, weights_only=True))
         else:
             target.load_state_dict(
@@ -240,8 +396,9 @@ def run_phase(
 
     # Build optimizer with per-group LRs
     param_groups = []
-    if cfg["lr_mem"] > 0:
-        param_groups.append({"params": [model.latent_memory], "lr": cfg["lr_mem"],
+    percep_params = list(model.concept_perceptron.parameters())
+    if cfg["lr_percep"] > 0:
+        param_groups.append({"params": percep_params, "lr": cfg["lr_percep"],
                               "weight_decay": 0.0})
     bridge_params = (list(model.bridge_down.parameters()) +
                      list(model.bridge_up.parameters()))
@@ -250,7 +407,7 @@ def run_phase(
                               "weight_decay": 0.01})
     other_params = [p for p in model.parameters()
                     if p.requires_grad
-                    and p is not model.latent_memory
+                    and not any(p is pp for pp in percep_params)
                     and not any(p is bp for bp in bridge_params)]
     if cfg["lr_other"] > 0 and other_params:
         param_groups.append({"params": other_params, "lr": cfg["lr_other"],
@@ -299,8 +456,9 @@ def run_phase(
         else:
             input_ids, chain_targets, ans_starts = batch
             input_ids = input_ids.to(DEVICE)
-            loss, acc, ans_acc, halt_acc = model(
-                input_ids, chain_targets, ans_starts
+            # V2: use compute_rlf_loss for HALT suppression + dynamic HW
+            loss, acc, ans_acc, halt_acc = compute_rlf_loss(
+                model, input_ids, chain_targets, ans_starts, step
             )
             loss = loss / GRAD_ACCUM
 
@@ -320,13 +478,14 @@ def run_phase(
             avg = total_loss / LOG_EVERY
             total_loss = 0.0
             vram = torch.cuda.memory_allocated() / 1e9 if DEVICE == "cuda" else 0.0
+            hw   = dynamic_halt_weight(step)
             if phase == "3c":
                 log.info(f"[Phase{phase}][S{step:05d}] Loss={avg:.4f} | "
                          f"VRAM={vram:.2f}GB")
             else:
                 log.info(f"[Phase{phase}][S{step:05d}] Loss={avg:.4f} | "
                          f"Acc={float(acc):.3f} | AnsAcc={float(ans_acc):.3f} | "
-                         f"HaltAcc={halt_acc:.3f} | VRAM={vram:.2f}GB")
+                         f"HaltAcc={halt_acc:.3f} | HW={hw:.2f} | VRAM={vram:.2f}GB")
 
         if step % CKPT_EVERY == 0 or step == cfg["steps"]:
             save_ckpt(model, step, phase, avg if step % LOG_EVERY != 0

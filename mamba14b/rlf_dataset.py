@@ -86,6 +86,62 @@ def make_var_chain(
     return prompt, chain
 
 
+def make_math_chain_v2(
+    rng: random.Random,
+) -> tuple[str, list[str]]:
+    """V2 Step-Aligned math chain: forces explicit intermediate node prediction.
+
+    Unlike V1 which only requires the final answer, V2 assigns a *distinct*
+    target token to *each loop*:
+      - Simple (1-hop): Loop 1 must predict the single product → HALT
+      - Complex (3-hop): Loop 1 must predict node c, Loop 2 node f,
+        Loop 3 the total → HALT
+
+    This physically prevents HALT gaming: predicting §HALT at Loop 1 on a
+    complex sample incurs full CrossEntropy loss against node c's value.
+    The model has no cheap escape.
+
+    Returns:
+        (prompt, targets) where targets is a list of strings ending with "§".
+    """
+    is_complex = rng.random() > 0.5
+
+    if not is_complex:
+        # 1-hop: apples * price → cost
+        apples = rng.randint(2, 20)
+        price  = rng.choice([0.25, 0.50, 0.75, 1.25, 1.50])
+        cost   = round(apples * price, 2)
+        a_var  = rand_var(rng, 3)
+        p_var  = rand_var(rng, 3)
+        c_var  = rand_var(rng, 3)
+        prompt  = (f"{a_var}={apples}. {p_var}={price:.2f}. "
+                   f"{c_var}={a_var}*{p_var}. What is {c_var}?")
+        targets = [f"{cost:.2f}", "§"]
+    else:
+        # 3-hop: two products then their sum.
+        # Loop 1 MUST predict node c, Loop 2 node f, Loop 3 total.
+        a = rng.randint(2, 10)
+        b = rng.choice([0.50, 1.00, 1.50, 2.00])
+        c = round(a * b, 2)
+        d = rng.randint(2, 10)
+        e = rng.choice([0.25, 0.50, 0.75, 1.25])
+        f = round(d * e, 2)
+        total = round(c + f, 2)
+        a_v, b_v, c_v = rand_var(rng, 3), rand_var(rng, 3), rand_var(rng, 3)
+        d_v, e_v, f_v = rand_var(rng, 3), rand_var(rng, 3), rand_var(rng, 3)
+        t_v           = rand_var(rng, 3)
+        facts = [
+            f"{a_v}={a}.", f"{b_v}={b:.2f}.", f"{c_v}={a_v}*{b_v}.",
+            f"{d_v}={d}.", f"{e_v}={e:.2f}.", f"{f_v}={d_v}*{e_v}.",
+            f"{t_v}={c_v}+{f_v}.",
+        ]
+        rng.shuffle(facts)
+        prompt  = " ".join(facts) + f" What is {t_v}?"
+        targets = [f"{c:.2f}", f"{f:.2f}", f"{total:.2f}", "§"]
+
+    return prompt, targets
+
+
 def make_math_chain(
     rng: random.Random, n_steps: int = 2
 ) -> tuple[str, list[str]]:
@@ -258,9 +314,8 @@ class RLFDataset(Dataset):
             mode = "adversarial" if self.rng.random() < self.adv_prob else "clean"
             prompt, chain = make_var_chain(self.rng, hops, mode)
         elif roll < 0.80:
-            # Math chain
-            n_steps = self.rng.choice([1, 2, 3])
-            prompt, chain = make_math_chain(self.rng, n_steps)
+            # V2 Step-Aligned math chain (forces intermediate loop predictions)
+            prompt, chain = make_math_chain_v2(self.rng)
         elif roll < 0.95:
             # Sequence chain
             prompt, chain = make_sequence_chain(self.rng)

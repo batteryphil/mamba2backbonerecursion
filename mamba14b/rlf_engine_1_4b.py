@@ -38,7 +38,7 @@ N_LAYERS     = 48       # total backbone layers
 BASE_SPLIT   = 24       # freeze bottom half of layers
 LORA_RANK    = 8
 PREFIX_M     = 8        # latent scratchpad tokens
-BRIDGE_RANK  = 64       # low-rank bridge bottleneck
+BRIDGE_RANK  = 128      # low-rank bridge bottleneck (widened from 64 for V2)
 MAX_LOOPS    = 6        # max RLF iterations per token
 
 # Mamba1 loop engine params
@@ -54,6 +54,54 @@ tokenizer.pad_token = tokenizer.eos_token
 # Low frequency in code/math data → safe to repurpose as HALT signal.
 # No embedding resize needed — preserves SFT checkpoint compatibility.
 HALT_ID = tokenizer.encode("§")[0]   # = 7803
+
+
+# ── Lifeline Decay schedule ──────────────────────────────────────────────────
+LIFELINE_DECAY = 0.7   # per-loop multiplier; by loop 3, prompt is at 0.7^3 ≈ 0.34
+                        # forcing the model to rely on the ConceptPerceptron map.
+
+
+# ── ConceptPerceptron ─────────────────────────────────────────────────────────
+class ConceptPerceptron(nn.Module):
+    """Generates Korpela's 'Conceptual Model' map from the raw prompt.
+
+    Pools the full backbone output into a global context vector, then projects
+    it into the M-token scratchpad prefix.  Unlike the old static
+    `latent_memory` parameter (which received zero gradient because the model
+    halted before backprop reached it), the Perceptron is conditioned on the
+    *input* so it always participates in the graph — HALT or not.
+    """
+
+    def __init__(self, d_model: int, prefix_m: int) -> None:
+        """Build a two-layer MLP: d_model → d_model//2 → prefix_m*d_model."""
+        super().__init__()
+        self.prefix_m = prefix_m
+        self.mapper = nn.Sequential(
+            nn.Linear(d_model, d_model // 2, bias=True),
+            nn.GELU(),
+            nn.Linear(d_model // 2, prefix_m * d_model, bias=True),
+        ).to(torch.bfloat16)
+        # Small init so the perceptron starts near-zero, allowing the backbone
+        # residual to dominate early training (same philosophy as bridge_up=zeros).
+        for layer in self.mapper:
+            if isinstance(layer, nn.Linear):
+                nn.init.normal_(layer.weight, std=0.02)
+                nn.init.zeros_(layer.bias)
+
+    def forward(self, x_prompt: torch.Tensor) -> torch.Tensor:
+        """Map backbone output → conceptual scratchpad prefix.
+
+        Args:
+            x_prompt: [B, T, D] full backbone hidden states
+
+        Returns:
+            [B, prefix_m, D] conceptual map tokens
+        """
+        # Mean-pool over sequence → global context vector [B, D]
+        context_vector = x_prompt.mean(dim=1)
+        # Project → [B, prefix_m * D]
+        latent_map = self.mapper(context_vector)
+        return latent_map.view(-1, self.prefix_m, x_prompt.size(-1))
 
 
 # ── 1D RoPE for Loop Index ────────────────────────────────────────────────────
@@ -218,13 +266,13 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
             torch.ones(d_model, dtype=torch.bfloat16)
         )
 
-        # Prefix scratchpad: small-normal init to ensure gradient flow.
-        # Zeros → dead gradients in first steps.
-        self.latent_memory = nn.Parameter(
-            torch.randn(1, self.M, d_model, dtype=torch.bfloat16) * 0.02
-        )
+        # V2: ConceptPerceptron replaces the static latent_memory parameter.
+        # The perceptron derives the scratchpad prefix from the prompt itself,
+        # guaranteeing gradient flow regardless of when HALT fires.
+        self.concept_perceptron = ConceptPerceptron(d_model, PREFIX_M)
 
-        # Low-rank bridge: starts as near-identity (bridge_up zeros init)
+        # Low-rank bridge: widened to rank 128 for V2 (was 64).
+        # Starts as near-identity (bridge_up zeros init).
         self.bridge_down = nn.Linear(d_model, BRIDGE_RANK, bias=False,
                                      dtype=torch.bfloat16)
         self.bridge_up   = nn.Linear(BRIDGE_RANK, d_model, bias=False,
@@ -240,18 +288,19 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
         n_lora   = sum(p.numel() for n, p in self.named_parameters()
                        if p.requires_grad and "lora" in n.lower())
         n_loop   = sum(p.numel() for p in self.mamba1_loop.parameters())
-        n_mem    = self.latent_memory.numel()
+        n_percep = sum(p.numel() for p in self.concept_perceptron.parameters())
         n_bridge = (sum(p.numel() for p in self.bridge_down.parameters()) +
                     sum(p.numel() for p in self.bridge_up.parameters()))
         n_tr     = sum(p.numel() for p in self.parameters() if p.requires_grad)
         n_fr     = sum(p.numel() for p in self.parameters() if not p.requires_grad)
-        print(f"  LoRA params:     {n_lora:,}")
-        print(f"  Loop engine:     {n_loop:,}")
-        print(f"  Prefix memory:   {n_mem:,} ({self.M} × {self.d_model})")
-        print(f"  Latent bridge:   {n_bridge:,} ({self.d_model}→{BRIDGE_RANK}→{self.d_model})")
-        print(f"  Total trainable: {n_tr:,}")
-        print(f"  Base frozen:     {n_fr:,}")
-        print(f"  HALT token:      {HALT_ID} (§)")
+        print(f"  LoRA params:       {n_lora:,}")
+        print(f"  Loop engine:       {n_loop:,}")
+        print(f"  ConceptPerceptron: {n_percep:,} (prompt→{self.M}×{self.d_model} map)")
+        print(f"  Latent bridge:     {n_bridge:,} ({self.d_model}→{BRIDGE_RANK}→{self.d_model})")
+        print(f"  Total trainable:   {n_tr:,}")
+        print(f"  Base frozen:       {n_fr:,}")
+        print(f"  HALT token:        {HALT_ID} (§)")
+        print(f"  Lifeline decay:    {LIFELINE_DECAY}^loop_idx (text fades each loop)")
 
     # ── Internal helpers ──────────────────────────────────────────────────────
 
@@ -337,8 +386,11 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
         x_prompt   = x.detach().clone()
         res_prompt = res.detach().clone() if res is not None else None
 
-        # ── Prepend latent scratchpad ─────────────────────────────────────────
-        mem     = self.latent_memory.expand(B, -1, -1)        # [B, M, D]
+        # ── V2: Initialise scratchpad from ConceptPerceptron ─────────────────
+        # The perceptron maps the full backbone output → M conceptual tokens.
+        # This runs even if the model halts at Loop 1, so gradients always
+        # flow back through the perceptron regardless of HALT position.
+        mem     = self.concept_perceptron(x_prompt)            # [B, M, D]
         x_ext   = torch.cat([mem, x], dim=1)                  # [B, M+T, D]
         # Zero-pad residual for the M new prefix positions
         if res is not None:
@@ -361,9 +413,16 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
             halt_accs:   list[float]        = []
 
             for loop_i in range(n_loops):
-                # Lifeline re-injection
+                # V2 Lifeline Decay: raw prompt fades by LIFELINE_DECAY^loop_i.
+                # By loop 3 the signal is at ~34% of original strength.
+                # The model must use the ConceptPerceptron map — it cannot
+                # coast on re-reading the full prompt every iteration.
+                decay = LIFELINE_DECAY ** loop_i
+                x_prompt_decayed   = x_prompt * decay
+                res_prompt_decayed = (res_prompt * decay
+                                      if res_prompt is not None else None)
                 x_ext, res_ext = self._lifeline_inject(
-                    x_ext, res_ext, x_prompt, res_prompt
+                    x_ext, res_ext, x_prompt_decayed, res_prompt_decayed
                 )
                 # Loop RoPE
                 x_ext    = self.loop_rope(x_ext, loop_i)
@@ -430,8 +489,13 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
         last  = ""
         with torch.no_grad():
             for loop_i in range(self.MAX_LOOPS):
+                # Apply lifeline decay at inference too for consistency.
+                decay = LIFELINE_DECAY ** loop_i
+                x_prompt_decayed   = x_prompt * decay
+                res_prompt_decayed = (res_prompt * decay
+                                      if res_prompt is not None else None)
                 x_ext, res_ext = self._lifeline_inject(
-                    x_ext, res_ext, x_prompt, res_prompt
+                    x_ext, res_ext, x_prompt_decayed, res_prompt_decayed
                 )
                 x_ext = self.loop_rope(x_ext, loop_i)
                 if res_ext is not None:
@@ -465,22 +529,31 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def freeze_for_phase3a(model: RecursiveMamba1_PrefixScratchpad) -> None:
-    """Phase 3a: train ONLY latent_memory + bridge. Freeze everything else."""
+    """Phase 3a: train ConceptPerceptron + bridge ONLY. Freeze everything else.
+
+    V2 change: replaces latent_memory (now removed) with concept_perceptron.
+    This warms up the dynamic prompt→scratchpad mapping and the bridge before
+    the full LoRA/loop-engine is unleashed in Phase 3b.
+    """
     for p in model.parameters():
         p.requires_grad = False
-    model.latent_memory.requires_grad = True
+    for p in model.concept_perceptron.parameters():
+        p.requires_grad = True
     for p in model.bridge_down.parameters():
         p.requires_grad = True
     for p in model.bridge_up.parameters():
         p.requires_grad = True
     tr = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"\n{'='*60}")
-    print(f"  PHASE 3a — Scratchpad Warmup | trainable: {tr:,}")
+    print(f"  PHASE 3a — ConceptPerceptron + Bridge Warmup | trainable: {tr:,}")
     print(f"{'='*60}\n")
 
 
 def freeze_for_phase3b(model: RecursiveMamba1_PrefixScratchpad) -> None:
-    """Phase 3b: unfreeze top LoRA + loop engine + lifeline + memory + bridge."""
+    """Phase 3b: unfreeze top LoRA + loop engine + lifeline + perceptron + bridge.
+
+    V2 change: concept_perceptron replaces latent_memory in the trainable set.
+    """
     for layer in model.layers[BASE_SPLIT:]:
         for p in layer.parameters():
             p.requires_grad = True
@@ -489,7 +562,8 @@ def freeze_for_phase3b(model: RecursiveMamba1_PrefixScratchpad) -> None:
     for p in model.loop_norm.parameters():
         p.requires_grad = True
     model.lifeline_gate.requires_grad = True
-    model.latent_memory.requires_grad = True
+    for p in model.concept_perceptron.parameters():
+        p.requires_grad = True
     for p in model.bridge_down.parameters():
         p.requires_grad = True
     for p in model.bridge_up.parameters():

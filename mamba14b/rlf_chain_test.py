@@ -359,7 +359,17 @@ def run_semantic_shift(model: RecursiveMamba1_PrefixScratchpad) -> float:
     correct = 0
     for t in SEMANTIC_SHIFT:
         out, elapsed, _trace = run_chain(model, t["prompt"])
-        last   = out[-1].lower() if out else ""
+
+        # PRIORITY 3 FIX: Catch empty outputs explicitly.
+        # Previously, out=[] or out=[''] passed through to fuzzy match and
+        # registered as ✅ because "" is trivially "in" the expected string.
+        # Real score for a halted-before-output result is always 0.
+        if not out or all(tok.strip() == "" for tok in out):
+            print(f"\n  ❌ [{elapsed:.1f}s] {t['prompt'][:62]}...")
+            print(f"     Expected: {t['expected']}  Got: {out}  (L1 HALT — empty)")
+            continue
+
+        last   = out[-1].lower().strip()
         passed = t["expected"].lower() in last or last in t["expected"].lower()
         correct += int(passed)
         status = "✅" if passed else "❌"
