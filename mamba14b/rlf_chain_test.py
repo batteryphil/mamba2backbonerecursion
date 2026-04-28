@@ -2,14 +2,13 @@
 """
 rlf_chain_test.py — Validates RLF loop reasoning on held-out chain problems.
 
-Tests the core assumption: does the prefix scratchpad + loop engine actually
-enable multi-hop reasoning that the plain SFT model fails at?
+Three test suites based on historical failure analysis:
+  1. Chain accuracy (20 tests: 1-hop, 2-hop, 3-hop, math, sequences, bugs)
+  2. Scratchpad ablation (were the prefix memory tokens actually used?)
+  3. Semantic shift (does it transfer beyond training syntax to natural language?)
 
-Covers:
-  - Variable pointer chains (1-hop, 2-hop, 3-hop, adversarial)
-  - Math chains (1-step, 2-step arithmetic)
-  - Sequence patterns (×2, ×3, +5)
-  - Bug fix chains
+The 130M experiments proved that scratchpad ablation Δ=0 and bAbI accuracy 0%
+are the two real failure modes. This suite directly tests both.
 """
 
 import sys
@@ -110,15 +109,46 @@ CHAIN_TESTS = [
      "expected_chain": ["return a"]},
 ]
 
+# ── Ablation prompts (same as easy chain tests — measures scratchpad delta) ───
+ABLATION_PROMPTS = [
+    ("A=42. B=A. C=B. What is C?",                       "42"),
+    ("V1=99. V2=V1. V3=V2. What is V3?",                 "99"),
+    ("x=7. y=x. z=y. What is z?",                        "7"),
+    ("qty=6. price=0.50. cost=qty*price. What is cost?",  "3.00"),
+    ("x1=3. x2=x1*2. x3=x2*2. What is x4?",              "24"),
+]
 
-# ── Load RLF components ───────────────────────────────────────────────────────
+# ── Semantic shift prompts (same logic, completely different syntax) ───────────
+# Training syntax: "A=42. B=A. What is B?"
+# Shifted syntax:  "The box holds what the bag holds. The bag holds 42."
+# 130M scored 0% on this because it overfitted to causal token syntax.
+SEMANTIC_SHIFT = [
+    {"prompt": ("The box holds what the bag holds. "
+                "The bag holds the apple. What does the box hold?"),
+     "expected": "apple"},
+    {"prompt": ("John's score equals Mary's score. "
+                "Mary scored 88. What is John's score?"),
+     "expected": "88"},
+    {"prompt": ("Container B has what container A has. "
+                "Container C has what container B has. "
+                "Container A has the key. What does container C have?"),
+     "expected": "key"},
+    {"prompt": ("The red jar contains the same thing as the blue cup. "
+                "The blue cup contains frost. What is in the red jar?"),
+     "expected": "frost"},
+    {"prompt": ("Sarah earns twice what Tom earns. Tom earns 500. "
+                "What does Sarah earn?"),
+     "expected": "1000"},
+]
+
+
+# ── Load RLF model ────────────────────────────────────────────────────────────
 
 def load_rlf_final(ckpt_dir: Path) -> RecursiveMamba1_PrefixScratchpad:
     """Load the trained RLF model for evaluation."""
     model = load_from_sft_checkpoint(str(SFT_CKPT_DIR), DEVICE)
 
-    # Load trained RLF components
-    component_map = [
+    for fname, target in [
         ("latent_memory.pt", None),
         ("bridge_down.pt",   model.bridge_down),
         ("bridge_up.pt",     model.bridge_up),
@@ -126,8 +156,7 @@ def load_rlf_final(ckpt_dir: Path) -> RecursiveMamba1_PrefixScratchpad:
         ("loop_norm.pt",     model.loop_norm),
         ("lifeline_gate.pt", None),
         ("lm_head.pt",       model.lm_head),
-    ]
-    for fname, target in component_map:
+    ]:
         fpath = ckpt_dir / fname
         if not fpath.exists():
             continue
@@ -155,98 +184,187 @@ def load_rlf_final(ckpt_dir: Path) -> RecursiveMamba1_PrefixScratchpad:
     return model
 
 
-# ── Chain evaluation ──────────────────────────────────────────────────────────
+# ── Inference helpers ─────────────────────────────────────────────────────────
 
 @torch.no_grad()
 def run_chain(
-    model: RecursiveMamba1_PrefixScratchpad,
-    prompt: str,
+    model: RecursiveMamba1_PrefixScratchpad, prompt: str
 ) -> tuple[list[str], float]:
-    """Run RLF inference on a prompt, return (output_chain, elapsed_s)."""
-    ids  = tokenizer.encode(prompt)
-    inp  = torch.tensor([ids], dtype=torch.long, device=DEVICE)
-    t0   = time.perf_counter()
-    n_loops, trace, last = model(inp)
+    """Run RLF inference, return (output_chain, elapsed_s)."""
+    ids     = tokenizer.encode(prompt)
+    inp     = torch.tensor([ids], dtype=torch.long, device=DEVICE)
+    t0      = time.perf_counter()
+    _, trace, _ = model(inp)
     elapsed = time.perf_counter() - t0
-
-    # Extract non-HALT tokens from trace
-    chain = [tok for (_, tok, _) in trace if tok != "<HALT>"]
+    chain   = [tok for (_, tok, _) in trace if tok != "<HALT>"]
     return chain, elapsed
 
 
 def score_chain(output: list[str], expected: list[str]) -> tuple[bool, str]:
-    """Check if the last non-HALT output matches the expected final answer."""
+    """Fuzzy-match final output against expected[-1]."""
     if not output:
         return False, "empty output"
-    # Fuzzy match: check if expected[-1] appears in last output token
     exp_last = expected[-1].lower().strip()
-    out_last = output[-1].lower().strip() if output else ""
+    out_last = output[-1].lower().strip()
     if exp_last in out_last or out_last in exp_last:
         return True, ""
     return False, f"got {output!r}, expected final={expected[-1]!r}"
 
 
+# ── Test suites ───────────────────────────────────────────────────────────────
+
+def run_chain_suite(model: RecursiveMamba1_PrefixScratchpad) -> float:
+    """Test 1: Chain accuracy across 20 held-out problems. Returns pass rate."""
+    print("\n" + "=" * 65)
+    print("  TEST 1: CHAIN ACCURACY (20 problems)")
+    print("=" * 65)
+
+    by_cat: dict[str, list[bool]] = {}
+    total = 0
+
+    for t in CHAIN_TESTS:
+        out, elapsed = run_chain(model, t["prompt"])
+        passed, reason = score_chain(out, t["expected_chain"])
+        by_cat.setdefault(t["cat"], []).append(passed)
+        total += int(passed)
+        status = "✅" if passed else "❌"
+        print(f"\n  [{t['id']}] {t['cat']}")
+        print(f"    Prompt:   {t['prompt']}")
+        print(f"    Expected: {t['expected_chain']}")
+        print(f"    Got:      {out} ({elapsed:.1f}s)  {status} {reason}")
+
+    print(f"\n  {'Category':<22} {'Pass':>4} {'Tot':>4} {'Rate':>7}")
+    print(f"  {'-'*40}")
+    for cat, vals in sorted(by_cat.items()):
+        p, n = sum(vals), len(vals)
+        print(f"  {cat:<22} {p:>4} {n:>4} {p/n*100:>6.0f}%")
+    print(f"  {'-'*40}")
+    pct = total / len(CHAIN_TESTS) * 100
+    print(f"  {'TOTAL':<22} {total:>4} {len(CHAIN_TESTS):>4} {pct:>6.0f}%")
+
+    if pct >= 70:
+        print("\n  ✅ RLF IS WORKING — scratchpad retaining variables")
+    elif pct >= 40:
+        print("\n  ⚠️  PARTIAL — needs more Phase 3b training")
+    else:
+        print("\n  ❌ RLF NOT WORKING — chain following failed")
+    return pct
+
+
+def run_ablation(model: RecursiveMamba1_PrefixScratchpad) -> int:
+    """Test 2: Does zeroing the scratchpad hurt accuracy?
+
+    130M baseline: Δ=0 (scratchpad contributed NOTHING).
+    We need Δ > 0 to prove the prefix memory is actually being used.
+    """
+    print("\n" + "=" * 65)
+    print("  TEST 2: SCRATCHPAD ABLATION")
+    print("  (130M: ablated=2%, normal=2%, Δ=0 → scratchpad unused)")
+    print("=" * 65)
+
+    def count_correct(mem_zeroed: bool) -> int:
+        """Count correct answers with or without scratchpad."""
+        if mem_zeroed:
+            saved = model.latent_memory.data.clone()
+            model.latent_memory.data.zero_()
+        correct = 0
+        for prompt, expected in ABLATION_PROMPTS:
+            out, _ = run_chain(model, prompt)
+            if out and expected.lower() in out[-1].lower():
+                correct += 1
+        if mem_zeroed:
+            model.latent_memory.data.copy_(saved)
+        return correct
+
+    n = len(ABLATION_PROMPTS)
+    run_a = count_correct(False)
+    run_b = count_correct(True)
+    delta = run_a - run_b
+
+    print(f"\n  Run A (normal):          {run_a}/{n} = {run_a/n*100:.0f}%")
+    print(f"  Run B (zero scratchpad): {run_b}/{n} = {run_b/n*100:.0f}%")
+    print(f"  Δ scratchpad contribution: {delta:+d} tests")
+
+    if delta > 1:
+        print("  ✅ SCRATCHPAD IS CONTRIBUTING — zeroing hurts accuracy")
+    elif delta == 0 and run_a > 2:
+        print("  ⚠️  INCONCLUSIVE — tasks may be too easy to need scratchpad")
+    elif delta == 0:
+        print("  ❌ SCRATCHPAD UNUSED — matches 130M failure pattern (Δ=0)")
+    else:
+        print("  ⚠️  MARGINAL — minimal contribution, more training needed")
+    return delta
+
+
+def run_semantic_shift(model: RecursiveMamba1_PrefixScratchpad) -> float:
+    """Test 3: Same logical operation, different English syntax.
+
+    130M baseline: 0.0% — predicted 'photograp' for every sample.
+    The model overfitted to 'A=X. B=A. What is B?' causal token syntax.
+    Extended benchmark word problems will use natural language syntax.
+    """
+    print("\n" + "=" * 65)
+    print("  TEST 3: SEMANTIC SHIFT (zero-shot syntax transfer)")
+    print("  (130M: 0.0% — predicted 'photograp' for all 50 samples)")
+    print("=" * 65)
+
+    correct = 0
+    for t in SEMANTIC_SHIFT:
+        out, elapsed = run_chain(model, t["prompt"])
+        last   = out[-1].lower() if out else ""
+        passed = t["expected"].lower() in last or last in t["expected"].lower()
+        correct += int(passed)
+        status = "✅" if passed else "❌"
+        print(f"\n  {status} [{elapsed:.1f}s] {t['prompt'][:62]}...")
+        print(f"     Expected: {t['expected']}  Got: {out}")
+
+    pct = correct / len(SEMANTIC_SHIFT) * 100
+    print(f"\n  Semantic shift: {correct}/{len(SEMANTIC_SHIFT)} = {pct:.0f}%")
+
+    if pct >= 60:
+        print("  ✅ GENERALIZING — syntax-agnostic reasoning confirmed")
+    elif pct >= 20:
+        print("  ⚠️  PARTIAL — some transfer but still syntax-dependent")
+    else:
+        print("  ❌ SYNTAX OVERFIT — matches 130M bAbI failure pattern (0%)")
+    return pct
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    """Run chain test suite and print results."""
-    # Find the final RLF checkpoint
+    """Run all three test suites."""
     final_ckpt = RLF_CKPT_DIR / "final"
     if not final_ckpt.exists():
-        # Fall back to latest partial checkpoint
         candidates = sorted(RLF_CKPT_DIR.glob("phase*_step*"))
         if not candidates:
-            print("ERROR: No RLF checkpoint found. Is training complete?")
+            print("ERROR: No RLF checkpoint found.")
             return
         final_ckpt = candidates[-1]
         print(f"Using partial checkpoint: {final_ckpt}")
 
     print("=" * 65)
-    print("  RLF CHAIN TEST — Mamba-1.4B Latent Reasoning Validation")
+    print("  RLF VALIDATION — Mamba-1.4B")
     print(f"  Checkpoint: {final_ckpt}")
+    print("  Tests: Chain accuracy | Ablation | Semantic shift")
     print("=" * 65)
 
     print("\nLoading RLF model...")
     model = load_rlf_final(final_ckpt)
 
-    results_by_cat: dict[str, list[bool]] = {}
-    total_pass = 0
+    chain_pct  = run_chain_suite(model)
+    ablation_d = run_ablation(model)
+    shift_pct  = run_semantic_shift(model)
 
-    for t in CHAIN_TESTS:
-        chain_out, elapsed = run_chain(model, t["prompt"])
-        passed, reason     = score_chain(chain_out, t["expected_chain"])
-        status             = "✅" if passed else "❌"
-        cat                = t["cat"]
-        results_by_cat.setdefault(cat, []).append(passed)
-        total_pass        += int(passed)
-
-        print(f"\n[{t['id']}] {cat}")
-        print(f"  Prompt:   {t['prompt']}")
-        print(f"  Expected: {t['expected_chain']}")
-        print(f"  Got:      {chain_out} ({elapsed:.1f}s)")
-        print(f"  {status} {reason}")
-
-    # Summary
     print("\n" + "=" * 65)
-    print("  RESULTS BY CATEGORY")
+    print("  OVERALL VERDICT")
     print("=" * 65)
-    print(f"  {'Category':<22} {'Pass':>5} {'Total':>6} {'Rate':>7}")
-    print(f"  {'-'*44}")
-    for cat, vals in sorted(results_by_cat.items()):
-        p, t_ = sum(vals), len(vals)
-        print(f"  {cat:<22} {p:>5} {t_:>6} {p/t_*100:>6.0f}%")
-    print(f"  {'-'*44}")
-    print(f"  {'TOTAL':<22} {total_pass:>5} {len(CHAIN_TESTS):>6} "
-          f"{total_pass/len(CHAIN_TESTS)*100:>6.0f}%")
-
-    base_score = total_pass / len(CHAIN_TESTS) * 100
-    if base_score >= 70:
-        verdict = "✅ RLF IS WORKING — latent scratchpad is retaining variables"
-    elif base_score >= 40:
-        verdict = "⚠️  PARTIAL — scratchpad learning but needs more training"
-    else:
-        verdict = "❌ RLF NOT YET WORKING — may need Phase 3b longer"
-    print(f"\n  {verdict}")
+    print(f"  Chain accuracy:    {chain_pct:.0f}%  "
+          f"{'✅' if chain_pct >= 70 else '⚠️ ' if chain_pct >= 40 else '❌'}")
+    print(f"  Scratchpad Δ:      {ablation_d:+d}        "
+          f"{'✅' if ablation_d > 1 else '⚠️ ' if ablation_d > 0 else '❌'}")
+    print(f"  Semantic shift:    {shift_pct:.0f}%  "
+          f"{'✅' if shift_pct >= 60 else '⚠️ ' if shift_pct >= 20 else '❌'}")
     print("=" * 65)
 
 
