@@ -1,0 +1,488 @@
+[
+  {
+    "id": "cg_01",
+    "cat": "Code Gen",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_02",
+    "cat": "Code Gen",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_03",
+    "cat": "Code Gen",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_04",
+    "cat": "Code Gen",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_05",
+    "cat": "Code Gen",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_06",
+    "cat": "Code Gen",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_07",
+    "cat": "Code Gen",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_08",
+    "cat": "Code Gen",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_09",
+    "cat": "Code Gen (Complex)",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_10",
+    "cat": "Code Gen (Complex)",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_11",
+    "cat": "Code Gen (Complex)",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_12",
+    "cat": "Code Gen (Complex)",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_13",
+    "cat": "Code Gen (Complex)",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cg_14",
+    "cat": "Code Gen (Complex)",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "al_01",
+    "cat": "Algorithm",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "al_02",
+    "cat": "Algorithm",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "al_03",
+    "cat": "Algorithm",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "al_04",
+    "cat": "Algorithm",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ds_01",
+    "cat": "Data Structures",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ds_02",
+    "cat": "Data Structures",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ds_03",
+    "cat": "Data Structures",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ds_04",
+    "cat": "Data Structures",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "st_01",
+    "cat": "Strings",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "st_02",
+    "cat": "Strings",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "st_03",
+    "cat": "Strings",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "st_04",
+    "cat": "Strings",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ma_01",
+    "cat": "Math",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ma_02",
+    "cat": "Math",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ma_03",
+    "cat": "Math",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ma_04",
+    "cat": "Math",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ma_05",
+    "cat": "Math",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ma_06",
+    "cat": "Math",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ma_07",
+    "cat": "Math",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ma_08",
+    "cat": "Math",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "wp_01",
+    "cat": "Word Problem",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "wp_02",
+    "cat": "Word Problem",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "wp_03",
+    "cat": "Word Problem",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "wp_04",
+    "cat": "Word Problem",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "wp_05",
+    "cat": "Word Problem",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "wp_06",
+    "cat": "Word Problem",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "bf_01",
+    "cat": "Bug Fix",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "bf_02",
+    "cat": "Bug Fix",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "bf_03",
+    "cat": "Bug Fix",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "bf_04",
+    "cat": "Bug Fix",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "bf_05",
+    "cat": "Bug Fix",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cc_01",
+    "cat": "Completion",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cc_02",
+    "cat": "Completion",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "cc_03",
+    "cat": "Completion",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "lg_01",
+    "cat": "Logic",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "lg_02",
+    "cat": "Logic",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "lg_03",
+    "cat": "Logic",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "lg_04",
+    "cat": "Logic",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ut_01",
+    "cat": "Unit Tests",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  },
+  {
+    "id": "ut_02",
+    "cat": "Unit Tests",
+    "passed": false,
+    "tps": 0.0,
+    "ntok": 0,
+    "rep": 0.0,
+    "output": ""
+  }
+]

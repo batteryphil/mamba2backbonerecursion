@@ -1,0 +1,599 @@
+===========================================
+  FINAL RLF EVAL — Mon Apr 27 10:53:27 PM CDT 2026
+  Checkpoint: /hdd_data/rlf-1.4b-checkpoints/final
+===========================================
+
+=== PHASE 1: Chain Test + Ablation + Semantic Shift ===
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_chain_test.py
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RLF VALIDATION — Mamba-1.4B
+  Checkpoint: /hdd_data/rlf-1.4b-checkpoints/final
+  Tests: Chain accuracy | Ablation | Semantic shift
+=================================================================
+
+Loading RLF model...
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+=================================================================
+  TEST 1: CHAIN ACCURACY + LOOP COLLAPSE DETECTION (20 problems)
+=================================================================
+
+  [1h_01] 1-hop
+    Prompt:   A=42. What is A?
+    Expected: ['42']
+    Got:      [] (3.3s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [1h_02] 1-hop
+    Prompt:   color=Blue. What is color?
+    Expected: ['Blue']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(0.997)
+
+  [1h_03] 1-hop
+    Prompt:   x=99. What is x?
+    Expected: ['99']
+    Got:      [''] (0.1s)  ✅ 
+    Loops:    L1=''(0.535)  L2=§ HALT(1.000)
+
+  [2h_01] 2-hop
+    Prompt:   A=42. B=A. What is B?
+    Expected: ['42', '42']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [2h_02] 2-hop
+    Prompt:   X=Moon. Y=X. What is Y?
+    Expected: ['Moon', 'Moon']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [2h_03] 2-hop
+    Prompt:   The sky is blue. alpha=77. beta=alpha. What is beta?
+    Expected: ['77', '77']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [3h_01] 3-hop
+    Prompt:   A=Star. B=A. C=B. What is C?
+    Expected: ['Star', 'Star', 'Star']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [3h_02] 3-hop
+    Prompt:   v1=55. v2=v1. v3=v2. What is v3?
+    Expected: ['55', '55', '55']
+    Got:      ['n'] (0.1s)  ❌ got ['n'], expected final='55'
+    Loops:    L1='n'(0.629)  L2=§ HALT(1.000)
+
+  [3h_adv_01] 3-hop-adversarial
+    Prompt:   zx=Fire. Water boils at 100C. zy=zx. zz=zy. Pi is 3.14159. What is zz?
+    Expected: ['Fire', 'Fire', 'Fire']
+    Got:      ['Fire'] (0.1s)  ✅ 
+    Loops:    L1='Fire'(0.661)  L2=§ HALT(1.000)
+
+  [3h_adv_02] 3-hop-adversarial
+    Prompt:   ab=Gold. cd=ab. ef=cd. In 1969 Armstrong walked on moon. xk9=77. What is ef?
+    Expected: ['Gold', 'Gold', 'Gold']
+    Got:      ['Gold'] (0.1s)  ✅ 
+    Loops:    L1='Gold'(0.878)  L2=§ HALT(1.000)
+
+  [ma_01] math-1step
+    Prompt:   qty=6. price=0.50. cost=qty*price. What is cost?
+    Expected: ['3.00']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(0.882)
+
+  [ma_02] math-1step
+    Prompt:   apples=4. price=1.25. total=apples*price. What is total?
+    Expected: ['5.00']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(1.000)
+
+  [ma_03] math-1step
+    Prompt:   students=30. pct=0.60. girls=students*pct. What is girls?
+    Expected: ['18']
+    Got:      [] (0.1s)  ❌ empty output
+    Loops:    L1=§ HALT(0.610)
+
+  [ma_04] math-2step
+    Prompt:   a=6. pa=0.50. ca=a*pa. b=4. pb=0.75. cb=b*pb. total=ca+cb. What is total?
+    Expected: ['3.00', '3.00', '6.00']
+    Got:      ['18'] (0.1s)  ❌ got ['18'], expected final='6.00'
+    Loops:    L1='18'(0.189)  L2=§ HALT(1.000)
+
+  [sq_01] sequence
+    Prompt:   x1=2. x2=x1*3. x3=x2*3. x4=x3*3. What is x5?
+    Expected: ['162']
+    Got:      ['54'] (0.1s)  ❌ got ['54'], expected final='162'
+    Loops:    L1='54'(0.259)  L2=§ HALT(1.000)
+
+  [sq_02] sequence
+    Prompt:   x1=1. x2=x1*2. x3=x2*2. x4=x3*2. What is x5?
+    Expected: ['16']
+    Got:      ['16'] (0.1s)  ✅ 
+    Loops:    L1='16'(0.354)  L2=§ HALT(1.000)
+
+  [sq_03] sequence
+    Prompt:   x1=0. x2=x1+5. x3=x2+5. x4=x3+5. What is x5?
+    Expected: ['20']
+    Got:      ['25'] (0.1s)  ❌ got ['25'], expected final='20'
+    Loops:    L1='25'(0.430)  L2=§ HALT(1.000)
+
+  [sq_04] sequence
+    Prompt:   n1=1. n2=1. n3=n1+n2. n4=n2+n3. n5=n3+n4. What is n6?
+    Expected: ['13']
+    Got:      ['n'] (0.1s)  ❌ got ['n'], expected final='13'
+    Loops:    L1='n'(0.987)  L2=§ HALT(1.000)
+
+  [bf_01] bug-fix
+    Prompt:   op=minus. fix=plus. expr=a op b. What is the fixed expr?
+    Expected: ['a plus b']
+    Got:      ['a'] (0.1s)  ✅ 
+    Loops:    L1='a'(0.790)  L2=§ HALT(1.000)
+
+  [bf_02] bug-fix
+    Prompt:   bug=return b. fix=return a. code has bug. What is the fix?
+    Expected: ['return a']
+    Got:      ['return'] (0.1s)  ✅ 
+    Loops:    L1='return'(0.389)  L2=§ HALT(1.000)
+
+  Category               Pass  Tot    Rate
+  ----------------------------------------
+  1-hop                     1    3     33%
+  2-hop                     0    3      0%
+  3-hop                     0    2      0%
+  3-hop-adversarial         2    2    100%
+  bug-fix                   2    2    100%
+  math-1step                0    3      0%
+  math-2step                0    1      0%
+  sequence                  1    4     25%
+  ----------------------------------------
+  TOTAL                     6   20     30%
+
+  COLLAPSE ANALYSIS (ChatGPT concern #2):
+  Collapsed loops: 0/20 = 0%
+  Avg conf stdev:  0.0000
+  ✅ LOW COLLAPSE — loops are doing different things
+
+  ❌ RLF NOT WORKING — chain following failed
+
+=================================================================
+  TEST 2: SCRATCHPAD ABLATION
+  (130M: ablated=2%, normal=2%, Δ=0 → scratchpad unused)
+=================================================================
+
+  Run A (normal):          1/5 = 20%
+  Run B (zero scratchpad): 1/5 = 20%
+  Δ scratchpad contribution: +0 tests
+  ❌ SCRATCHPAD UNUSED — matches 130M failure pattern (Δ=0)
+
+=================================================================
+  TEST 3: SEMANTIC SHIFT (zero-shot syntax transfer)
+  (130M: 0.0% — predicted 'photograp' for all 50 samples)
+=================================================================
+
+  ✅ [0.1s] The box holds what the bag holds. The bag holds the apple. Wha...
+     Expected: apple  Got: []
+
+  ✅ [0.1s] John's score equals Mary's score. Mary scored 88. What is John...
+     Expected: 88  Got: []
+
+  ✅ [0.1s] Container B has what container A has. Container C has what con...
+     Expected: key  Got: []
+
+  ✅ [0.1s] The red jar contains the same thing as the blue cup. The blue ...
+     Expected: frost  Got: []
+
+  ✅ [0.1s] Sarah earns twice what Tom earns. Tom earns 500. What does Sar...
+     Expected: 1000  Got: []
+
+  Semantic shift: 5/5 = 100%
+  ✅ GENERALIZING — syntax-agnostic reasoning confirmed
+
+=================================================================
+  OVERALL VERDICT
+=================================================================
+  Chain accuracy:    30%  ❌
+  Scratchpad Δ:      +0        ❌
+  Semantic shift:    100%  ✅
+=================================================================
+
+=== PHASE 2: Extended 54-test Benchmark ===
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_benchmark.py
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RLF EXTENDED BENCHMARK — Mamba-1.4B (54 tests)
+  Checkpoint: /hdd_data/rlf-1.4b-checkpoints/final
+=================================================================
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+[cg_01] Code Gen: Write a Python function that reverses a string....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_02] Code Gen: Write a Python function called factorial that returns n...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def factorial'
+     → Missing: 'return'
+  ''
+
+[cg_03] Code Gen: Write a Python function that checks if a number is prim...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_04] Code Gen: Write a Python class called Stack with push, pop, and i...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'class Stack'
+     → Missing: 'def push'
+     → Missing: 'def pop'
+  ''
+
+[cg_05] Code Gen: Write a Python function that merges two sorted lists in...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_06] Code Gen: Write a Python function that flattens a nested list....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_07] Code Gen: Write a Python function that counts word frequencies in...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_08] Code Gen: Write a Python decorator that logs function calls with ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+     → Missing: 'wrapper'
+  ''
+
+[cg_09] Code Gen (Complex): Write a Python class called LRUCache with get and put m...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'class LRUCache'
+     → Missing: 'def get'
+     → Missing: 'def put'
+  ''
+
+[cg_10] Code Gen (Complex): Write a Python function that implements quicksort....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_11] Code Gen (Complex): Write a Python context manager class called Timer that ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'class Timer'
+     → Missing: '__enter__'
+     → Missing: '__exit__'
+  ''
+
+[cg_12] Code Gen (Complex): Write a Python generator function that yields Fibonacci...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'yield'
+  ''
+
+[cg_13] Code Gen (Complex): Write a Python function that performs matrix multiplica...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_14] Code Gen (Complex): Write a Python class called BinarySearchTree with inser...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'class BinarySearchTree'
+     → Missing: 'def insert'
+     → Missing: 'def search'
+  ''
+
+[al_01] Algorithm: Write a Python function that implements binary search o...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'mid'
+     → Missing: 'return'
+  ''
+
+[al_02] Algorithm: Write a Python function that implements bubble sort....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'for '
+     → Missing: 'return'
+  ''
+
+[al_03] Algorithm: Write a Python function that returns the nth Fibonacci ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[al_04] Algorithm: Write a Python function that implements merge sort....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[ds_01] Data Structures: Write a Python function that reverses a linked list. As...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'next'
+     → Missing: 'return'
+  ''
+
+[ds_02] Data Structures: Write a Python function that checks if a binary tree is...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[ds_03] Data Structures: Write a Python function that finds the height of a bina...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[ds_04] Data Structures: Write a Python function using a queue (collections.dequ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'deque'
+     → Missing: 'return'
+  ''
+
+[st_01] Strings: Write a Python function that checks if a string is a pa...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[st_02] Strings: Write a Python function that finds the longest common p...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[st_03] Strings: Write a Python function that counts the number of vowel...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[st_04] Strings: Write a Python function that checks if two strings are ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[ma_01] Math: What is 12 multiplied by 7?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['84']
+  ''
+
+[ma_02] Math: What is 144 divided by 12?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['12']
+  ''
+
+[ma_03] Math: What is the square root of 256?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['16']
+  ''
+
+[ma_04] Math: What is 25% of 200?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['50']
+  ''
+
+[ma_05] Math: What is 17 multiplied by 13?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['221']
+  ''
+
+[ma_06] Math: What is the square root of 625?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['25']
+  ''
+
+[ma_07] Math: What is 15% of 80?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['12']
+  ''
+
+[ma_08] Math: What is 2 to the power of 8?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['256']
+  ''
+
+[wp_01] Word Problem: A car travels at 60 mph for 2.5 hours. How many miles d...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['150']
+  ''
+
+[wp_02] Word Problem: A class has 30 students. 60% are girls. How many boys a...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['12']
+  ''
+
+[wp_03] Word Problem: A store sells apples for $0.50 each. Sarah buys 14 appl...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['7', '$7']
+  ''
+
+[wp_04] Word Problem: A rectangle has length 15 cm and width 8 cm. What is it...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['120']
+  ''
+
+[wp_05] Word Problem: If a pizza is cut into 8 equal slices and you eat 3 sli...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['37.5', '37%', '3/8']
+  ''
+
+[wp_06] Word Problem: A train travels 240 miles in 4 hours. What is its speed...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['60']
+  ''
+
+[bf_01] Bug Fix: Fix this Python code:
+def add(a, b):
+    return a - b...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['return a + b']
+  ''
+
+[bf_02] Bug Fix: Fix this Python code:
+def is_even(n):
+    return n % 2 ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['n % 2 == 0', '% 2 == 0']
+  ''
+
+[bf_03] Bug Fix: Fix the off-by-one error:
+def last_element(lst):
+    re...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['len(lst) - 1', 'lst[-1]']
+  ''
+
+[bf_04] Bug Fix: Fix this Python code:
+def square(x):
+    return x + x...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['return x * x', 'x**2']
+  ''
+
+[bf_05] Bug Fix: Fix this Python code:
+def max_of_two(a, b):
+    if a > ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['return a']
+  ''
+
+[cc_01] Completion: Complete this Python function:
+def count_evens(lst):
+  ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'return'
+     → Missing one of: ['% 2']
+  ''
+
+[cc_02] Completion: Complete this Python function:
+def find_max(lst):
+    "...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'return'
+  ''
+
+[cc_03] Completion: Complete this Python function:
+def flatten(nested):
+   ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'result'
+     → Missing: 'return result'
+     → Missing one of: ['append', 'extend', 'for']
+  ''
+
+[lg_01] Logic: What is the next number in the sequence: 2, 6, 18, 54, ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['162']
+  ''
+
+[lg_02] Logic: What is the next number in the sequence: 1, 4, 9, 16, ?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['25']
+  ''
+
+[lg_03] Logic: If it takes 5 machines 5 minutes to make 5 widgets, how...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['5 minute', '5 min', 'same', '5m']
+  ''
+
+[lg_04] Logic: What is the next number in the sequence: 1, 1, 2, 3, 5,...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['13']
+  ''
+
+[ut_01] Unit Tests: Write a Python unittest class that tests a function cal...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'import unittest'
+     → Missing: 'def test_'
+     → Missing: 'assertEqual'
+  ''
+
+[ut_02] Unit Tests: Write pytest test functions that test is_prime(n) for p...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def test_'
+     → Missing: 'assert'
+  ''
+
+=================================================================
+  RESULTS SUMMARY
+=================================================================
+  Category                    Pass  Total    Rate
+  --------------------------------------------------
+  Algorithm                      0      4      0%
+  Bug Fix                        0      5      0%
+  Code Gen                       0      8      0%
+  Code Gen (Complex)             0      6      0%
+  Completion                     0      3      0%
+  Data Structures                0      4      0%
+  Logic                          0      4      0%
+  Math                           0      8      0%
+  Strings                        0      4      0%
+  Unit Tests                     0      2      0%
+  Word Problem                   0      6      0%
+  --------------------------------------------------
+  TOTAL (required)               0     54      0%
+
+  Avg throughput : 0.0 tok/s
+  Avg bigram rep : 0.000
+=================================================================
+
+  Full report: /home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_benchmark_report.json
+
+  vs R5 SFT Baseline:
+  Category                       R5    RLF      Δ
+  --------------------------------------------
+  Algorithm                     75%     0%  -75%
+  Bug Fix                       20%     0%  -20%
+  Code Gen                      75%     0%  -75%
+  Code Gen (Complex)            33%     0%  -33%
+  Completion                    67%     0%  -67%
+  Data Structures              100%     0% -100%
+  Logic                          0%     0% +   0%
+  Math                          88%     0%  -88%
+  Strings                      100%     0% -100%
+  Unit Tests                     0%     0% +   0%
+  Word Problem                  17%     0%  -17%
+
+=== EVAL COMPLETE: Mon Apr 27 10:54:08 PM CDT 2026 ===

@@ -1,0 +1,941 @@
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_trainer_1_4b.py --phase 3b --resume-ckpt /hdd_data/rlf-1.4b-checkpoints/phase3b_step007500 --resume-step 7500
+2026-04-27 22:25:20,088 [INFO] ============================================================
+2026-04-27 22:25:20,088 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:25:20,088 [INFO]   Phase: 3b
+2026-04-27 22:25:20,088 [INFO] ============================================================
+2026-04-27 22:25:20,109 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:25:20,174 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 22:25:20,195 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:25:20,663 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 22:25:20,664 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 22:25:38,222 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step007500
+2026-04-27 22:25:38,260 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:25:38,291 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:25:38,381 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:25:38,722 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:25:38,723 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:25:38,724 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:25:41,045 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:25:41,213 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:25:41,213 [INFO] 
+============================================================
+2026-04-27 22:25:41,213 [INFO]   Starting Phase 3b
+2026-04-27 22:25:41,213 [INFO] ============================================================
+2026-04-27 22:25:41,213 [INFO]   Resuming from step 7500 (skipping already-done steps)
+2026-04-27 22:25:41,223 [INFO] Phase 3b: 8000 steps, batch=1, accum=8
+2026-04-27 22:26:06,671 [INFO] [Phase3b][S07525] Loss=3.6685 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:26:25,631 [INFO] [Phase3b][S07550] Loss=1.1739 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:26:44,732 [INFO] [Phase3b][S07575] Loss=1.3180 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:27:05,214 [INFO] [Phase3b][S07600] Loss=0.9894 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:27:24,185 [INFO] [Phase3b][S07625] Loss=1.1342 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:27:43,233 [INFO] [Phase3b][S07650] Loss=1.0205 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:28:03,409 [INFO] [Phase3b][S07675] Loss=1.1569 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:28:21,524 [INFO] [Phase3b][S07700] Loss=0.4705 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:28:40,284 [INFO] [Phase3b][S07725] Loss=0.9689 | Acc=0.667 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 22:28:59,444 [INFO] [Phase3b][S07750] Loss=1.0362 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:29:18,743 [INFO] [Phase3b][S07775] Loss=0.8113 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:29:38,918 [INFO] [Phase3b][S07800] Loss=0.7768 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:29:58,461 [INFO] [Phase3b][S07825] Loss=0.7325 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:30:16,607 [INFO] [Phase3b][S07850] Loss=0.5098 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:30:36,166 [INFO] [Phase3b][S07875] Loss=1.9567 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 22:30:57,601 [INFO] [Phase3b][S07900] Loss=1.7326 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:31:16,820 [INFO] [Phase3b][S07925] Loss=0.5113 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:31:36,654 [INFO] [Phase3b][S07950] Loss=0.5412 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:31:57,991 [INFO] [Phase3b][S07975] Loss=0.5091 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:32:18,572 [INFO] [Phase3b][S08000] Loss=0.8421 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:32:18,818 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000 | val=0.0000
+2026-04-27 22:32:18,818 [INFO] Phase 3b complete at step 8000.
+2026-04-27 22:32:18,820 [INFO] All phases complete.
+2026-04-27 22:32:21,162 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phasefinal_step099999 | val=0.0000
+2026-04-27 22:32:21,163 [INFO] Final checkpoint saved to: /hdd_data/rlf-1.4b-checkpoints/final
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+============================================================
+  PHASE 3b — RLF Joint | trainable: 150,245,376 | frozen: 634,601,472
+============================================================
+
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_trainer_1_4b.py --phase 3c --resume-ckpt /hdd_data/rlf-1.4b-checkpoints/phase3b_step007500
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 22:32:31,120 [INFO] ============================================================
+2026-04-27 22:32:31,121 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:32:31,121 [INFO]   Phase: 3c
+2026-04-27 22:32:31,121 [INFO] ============================================================
+2026-04-27 22:32:31,138 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:32:31,204 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 22:32:31,225 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:32:31,536 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 22:32:34,883 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step007500
+2026-04-27 22:32:34,884 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:32:34,887 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:32:34,887 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:32:34,897 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:32:34,898 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:32:34,898 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:32:35,001 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:32:35,023 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:32:35,023 [INFO] 
+============================================================
+2026-04-27 22:32:35,023 [INFO]   Starting Phase 3c
+2026-04-27 22:32:35,023 [INFO] ============================================================
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+============================================================
+  PHASE 3c — SFT Recovery | trainable: 102,973,440
+============================================================
+
+Traceback (most recent call last):
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 395, in <module>
+    main()
+    ~~~~^^
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 385, in main
+    run_phase(model, phase, log, resume_step=r_step)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 266, in run_phase
+    dataset    = SFTDataset(SFT_DATA)
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 91, in __init__
+    obj = json.loads(line)
+  File "/home/phil/.local/share/mise/installs/python/3.14.3/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/home/phil/.local/share/mise/installs/python/3.14.3/lib/python3.14/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phil/.local/share/mise/installs/python/3.14.3/lib/python3.14/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+=== Starting Phase 3c ===
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_trainer_1_4b.py --phase 3c --resume-ckpt /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000
+2026-04-27 22:37:08,337 [INFO] ============================================================
+2026-04-27 22:37:08,337 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:37:08,337 [INFO]   Phase: 3c
+2026-04-27 22:37:08,337 [INFO] ============================================================
+2026-04-27 22:37:08,356 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:37:08,430 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 22:37:08,430 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 22:37:08,451 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:37:08,783 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 22:37:12,357 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000
+2026-04-27 22:37:12,358 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:37:12,359 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:37:12,359 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:37:12,369 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:37:12,370 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:37:12,370 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:37:12,478 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:37:12,500 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:37:12,500 [INFO] 
+============================================================
+2026-04-27 22:37:12,500 [INFO]   Starting Phase 3c
+2026-04-27 22:37:12,500 [INFO] ============================================================
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+============================================================
+  PHASE 3c — SFT Recovery | trainable: 102,973,440
+============================================================
+
+Traceback (most recent call last):
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 398, in <module>
+    main()
+    ~~~~^^
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 388, in main
+    run_phase(model, phase, log, resume_step=r_step)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 269, in run_phase
+    dataset    = SFTDataset(SFT_DATA)
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 94, in __init__
+    obj = json.loads(line)
+  File "/home/phil/.local/share/mise/installs/python/3.14.3/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/home/phil/.local/share/mise/installs/python/3.14.3/lib/python3.14/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phil/.local/share/mise/installs/python/3.14.3/lib/python3.14/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+=== Starting Phase 3c (retry) ===
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_trainer_1_4b.py --phase 3c --resume-ckpt /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 22:39:14,200 [INFO] ============================================================
+2026-04-27 22:39:14,200 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:39:14,200 [INFO]   Phase: 3c
+2026-04-27 22:39:14,200 [INFO] ============================================================
+2026-04-27 22:39:14,217 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:39:14,278 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 22:39:14,298 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:39:14,620 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 22:39:18,194 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000
+2026-04-27 22:39:18,195 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:39:18,196 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:39:18,197 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:39:18,208 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:39:18,209 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:39:18,209 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:39:18,319 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:39:18,341 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:39:18,342 [INFO] 
+============================================================
+2026-04-27 22:39:18,342 [INFO]   Starting Phase 3c
+2026-04-27 22:39:18,342 [INFO] ============================================================
+2026-04-27 22:39:18,738 [INFO] Phase 3c: 1000 steps, batch=1, accum=8
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+============================================================
+  PHASE 3c — SFT Recovery | trainable: 102,973,440
+============================================================
+
+Traceback (most recent call last):
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 401, in <module>
+    main()
+    ~~~~^^
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 391, in main
+    run_phase(model, phase, log, resume_step=r_step)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 303, in run_phase
+    loss = sft_loss(model, input_ids) / GRAD_ACCUM
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_trainer_1_4b.py", line 129, in sft_loss
+    x = model._run_backbone(x)
+        ^^^^^^^^^^^^^^^^^^^
+  File "/home/phil/.local/share/mise/installs/python/3.14.3/lib/python3.14/site-packages/torch/nn/modules/module.py", line 1968, in __getattr__
+    raise AttributeError(
+        f"'{type(self).__name__}' object has no attribute '{name}'"
+    )
+AttributeError: 'RecursiveMamba1_PrefixScratchpad' object has no attribute '_run_backbone'
+=== Starting Phase 3c (attempt 3 — correct API) ===
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_trainer_1_4b.py --phase 3c --resume-ckpt /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 22:41:42,683 [INFO] ============================================================
+2026-04-27 22:41:42,683 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:41:42,683 [INFO]   Phase: 3c
+2026-04-27 22:41:42,683 [INFO] ============================================================
+2026-04-27 22:41:42,700 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:41:42,775 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 22:41:42,794 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:41:43,132 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 22:41:46,533 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000
+2026-04-27 22:41:46,534 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:41:46,534 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:41:46,535 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:41:46,545 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:41:46,545 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:41:46,546 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:41:46,650 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:41:46,670 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:41:46,671 [INFO] 
+============================================================
+2026-04-27 22:41:46,671 [INFO]   Starting Phase 3c
+2026-04-27 22:41:46,671 [INFO] ============================================================
+2026-04-27 22:41:47,061 [INFO] Phase 3c: 1000 steps, batch=1, accum=8
+2026-04-27 22:42:02,305 [INFO] [Phase3c][S00025] Loss=34.4300 | VRAM=3.47GB
+2026-04-27 22:42:12,421 [INFO] [Phase3c][S00050] Loss=30.6600 | VRAM=3.47GB
+2026-04-27 22:42:22,534 [INFO] [Phase3c][S00075] Loss=32.6850 | VRAM=3.47GB
+2026-04-27 22:42:32,650 [INFO] [Phase3c][S00100] Loss=30.8600 | VRAM=3.47GB
+2026-04-27 22:42:42,758 [INFO] [Phase3c][S00125] Loss=32.5225 | VRAM=3.47GB
+2026-04-27 22:42:53,248 [INFO] [Phase3c][S00150] Loss=36.3100 | VRAM=3.47GB
+2026-04-27 22:43:04,071 [INFO] [Phase3c][S00175] Loss=34.7200 | VRAM=3.47GB
+2026-04-27 22:43:14,831 [INFO] [Phase3c][S00200] Loss=37.3100 | VRAM=3.27GB
+2026-04-27 22:43:25,361 [INFO] [Phase3c][S00225] Loss=33.8350 | VRAM=3.47GB
+2026-04-27 22:43:35,692 [INFO] [Phase3c][S00250] Loss=34.1450 | VRAM=3.47GB
+2026-04-27 22:43:45,810 [INFO] [Phase3c][S00275] Loss=33.2500 | VRAM=3.47GB
+2026-04-27 22:43:56,482 [INFO] [Phase3c][S00300] Loss=32.2450 | VRAM=3.47GB
+2026-04-27 22:44:07,235 [INFO] [Phase3c][S00325] Loss=36.3400 | VRAM=3.47GB
+2026-04-27 22:44:17,954 [INFO] [Phase3c][S00350] Loss=35.4250 | VRAM=3.47GB
+2026-04-27 22:44:28,668 [INFO] [Phase3c][S00375] Loss=33.4500 | VRAM=3.47GB
+2026-04-27 22:44:39,384 [INFO] [Phase3c][S00400] Loss=32.8425 | VRAM=3.27GB
+2026-04-27 22:44:50,101 [INFO] [Phase3c][S00425] Loss=32.8850 | VRAM=3.47GB
+2026-04-27 22:45:00,805 [INFO] [Phase3c][S00450] Loss=31.3725 | VRAM=3.47GB
+2026-04-27 22:45:11,522 [INFO] [Phase3c][S00475] Loss=32.5800 | VRAM=3.47GB
+2026-04-27 22:45:22,239 [INFO] [Phase3c][S00500] Loss=36.2200 | VRAM=3.47GB
+2026-04-27 22:45:22,478 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3c_step000500 | val=0.0000
+2026-04-27 22:45:33,149 [INFO] [Phase3c][S00525] Loss=33.5300 | VRAM=3.47GB
+2026-04-27 22:45:43,594 [INFO] [Phase3c][S00550] Loss=32.1900 | VRAM=3.47GB
+2026-04-27 22:45:53,768 [INFO] [Phase3c][S00575] Loss=34.4700 | VRAM=3.47GB
+2026-04-27 22:46:04,209 [INFO] [Phase3c][S00600] Loss=36.1500 | VRAM=3.27GB
+2026-04-27 22:46:14,621 [INFO] [Phase3c][S00625] Loss=34.2000 | VRAM=3.47GB
+2026-04-27 22:46:24,791 [INFO] [Phase3c][S00650] Loss=37.6100 | VRAM=3.47GB
+2026-04-27 22:46:34,924 [INFO] [Phase3c][S00675] Loss=35.5600 | VRAM=3.47GB
+2026-04-27 22:46:45,041 [INFO] [Phase3c][S00700] Loss=33.5650 | VRAM=3.47GB
+2026-04-27 22:46:55,154 [INFO] [Phase3c][S00725] Loss=33.8300 | VRAM=3.47GB
+2026-04-27 22:47:05,273 [INFO] [Phase3c][S00750] Loss=36.0400 | VRAM=3.47GB
+2026-04-27 22:47:15,389 [INFO] [Phase3c][S00775] Loss=33.2600 | VRAM=3.47GB
+2026-04-27 22:47:25,508 [INFO] [Phase3c][S00800] Loss=35.5175 | VRAM=3.27GB
+2026-04-27 22:47:35,631 [INFO] [Phase3c][S00825] Loss=32.1950 | VRAM=3.47GB
+2026-04-27 22:47:45,749 [INFO] [Phase3c][S00850] Loss=32.9000 | VRAM=3.47GB
+2026-04-27 22:47:55,864 [INFO] [Phase3c][S00875] Loss=33.4350 | VRAM=3.47GB
+2026-04-27 22:48:05,987 [INFO] [Phase3c][S00900] Loss=35.5425 | VRAM=3.47GB
+2026-04-27 22:48:16,110 [INFO] [Phase3c][S00925] Loss=34.5600 | VRAM=3.47GB
+2026-04-27 22:48:26,244 [INFO] [Phase3c][S00950] Loss=35.2050 | VRAM=3.47GB
+2026-04-27 22:48:36,366 [INFO] [Phase3c][S00975] Loss=32.5550 | VRAM=3.47GB
+2026-04-27 22:48:46,496 [INFO] [Phase3c][S01000] Loss=34.2550 | VRAM=3.27GB
+2026-04-27 22:48:46,738 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3c_step001000 | val=0.0000
+2026-04-27 22:48:46,738 [INFO] Phase 3c complete at step 1000.
+2026-04-27 22:48:46,741 [INFO] All phases complete.
+2026-04-27 22:48:49,343 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phasefinal_step099999 | val=0.0000
+2026-04-27 22:48:49,343 [INFO] Final checkpoint saved to: /hdd_data/rlf-1.4b-checkpoints/final
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+============================================================
+  PHASE 3c — SFT Recovery | trainable: 102,973,440
+============================================================
+
+=== Phase 3c complete, launching eval ===
+========================================
+  RLF AUTO-EVAL — started Mon Apr 27 10:48:50 PM CDT 2026
+========================================
+[wait] Polling for training completion...
+[wait] Training complete at Mon Apr 27 10:48:50 PM CDT 2026
+
+=======================================
+  PHASE 1: RLF Chain Accuracy Test
+=======================================
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_chain_test.py
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RLF VALIDATION — Mamba-1.4B
+  Checkpoint: /hdd_data/rlf-1.4b-checkpoints/final
+  Tests: Chain accuracy | Ablation | Semantic shift
+=================================================================
+
+Loading RLF model...
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+=================================================================
+  TEST 1: CHAIN ACCURACY + LOOP COLLAPSE DETECTION (20 problems)
+=================================================================
+
+  [1h_01] 1-hop
+    Prompt:   A=42. What is A?
+    Expected: ['42']
+    Got:      ['', '', 'the', 'sime', 'teasp', '��'] (3.4s)  ❌ got ['', '', 'the', 'sime', 'teasp', '��'], expected final='42'
+    Loops:    L1=''(0.728)  L2=''(0.649)  L3='the'(0.198)  L4='sime'(0.483)  L5='teasp'(0.939)  L6='��'(0.506)
+
+  [1h_02] 1-hop
+    Prompt:   color=Blue. What is color?
+    Expected: ['Blue']
+    Got:      ['', '', 'and', 'typen', 'teasp', 'teasp'] (0.3s)  ❌ got ['', '', 'and', 'typen', 'teasp', 'teasp'], expected final='Blue'
+    Loops:    L1=''(0.200)  L2=''(0.114)  L3='and'(0.341)  L4='typen'(0.978)  L5='teasp'(0.992)  L6='teasp'(0.952)
+
+  [1h_03] 1-hop
+    Prompt:   x=99. What is x?
+    Expected: ['99']
+    Got:      ['', '', '', 'maha', 'aleigh', 'clonal'] (0.3s)  ❌ got ['', '', '', 'maha', 'aleigh', 'clonal'], expected final='99'
+    Loops:    L1=''(0.999)  L2=''(0.999)  L3=''(0.982)  L4='maha'(0.424)  L5='aleigh'(0.511)  L6='clonal'(0.900)
+
+  [2h_01] 2-hop
+    Prompt:   A=42. B=A. What is B?
+    Expected: ['42', '42']
+    Got:      ['', '', 'C', 'sime', 'teasp', 'questionna'] (0.3s)  ❌ got ['', '', 'C', 'sime', 'teasp', 'questionna'], expected final='42'
+    Loops:    L1=''(0.659)  L2=''(0.624)  L3='C'(0.380)  L4='sime'(0.725)  L5='teasp'(0.559)  L6='questionna'(0.567)
+
+  [2h_02] 2-hop
+    Prompt:   X=Moon. Y=X. What is Y?
+    Expected: ['Moon', 'Moon']
+    Got:      ['', '', 'and', 'sime', 'questionna', 'questionna'] (0.3s)  ❌ got ['', '', 'and', 'sime', 'questionna', 'questionna'], expected final='Moon'
+    Loops:    L1=''(0.640)  L2=''(0.736)  L3='and'(0.336)  L4='sime'(0.912)  L5='questionna'(0.698)  L6='questionna'(1.000)
+
+  [2h_03] 2-hop
+    Prompt:   The sky is blue. alpha=77. beta=alpha. What is beta?
+    Expected: ['77', '77']
+    Got:      ['', '', 'and', 'sime', 'sime', 'clonal'] (0.3s)  ❌ got ['', '', 'and', 'sime', 'sime', 'clonal'], expected final='77'
+    Loops:    L1=''(0.456)  L2=''(0.477)  L3='and'(0.453)  L4='sime'(0.652)  L5='sime'(0.449)  L6='clonal'(0.792)
+
+  [3h_01] 3-hop
+    Prompt:   A=Star. B=A. C=B. What is C?
+    Expected: ['Star', 'Star', 'Star']
+    Got:      ['', '', 'and', 'sime', 'questionna', 'questionna'] (0.3s)  ❌ got ['', '', 'and', 'sime', 'questionna', 'questionna'], expected final='Star'
+    Loops:    L1=''(0.572)  L2=''(0.545)  L3='and'(0.288)  L4='sime'(0.722)  L5='questionna'(0.678)  L6='questionna'(0.981)
+
+  [3h_02] 3-hop
+    Prompt:   v1=55. v2=v1. v3=v2. What is v3?
+    Expected: ['55', '55', '55']
+    Got:      ['', '', 'and', 'maha', 'teasp', 'teasp'] (0.3s)  ❌ got ['', '', 'and', 'maha', 'teasp', 'teasp'], expected final='55'
+    Loops:    L1=''(0.490)  L2=''(0.546)  L3='and'(0.473)  L4='maha'(0.773)  L5='teasp'(0.998)  L6='teasp'(0.996)
+
+  [3h_adv_01] 3-hop-adversarial
+    Prompt:   zx=Fire. Water boils at 100C. zy=zx. zz=zy. Pi is 3.14159. What is zz?
+    Expected: ['Fire', 'Fire', 'Fire']
+    Got:      ['', '', 'and', 'sime', 'questionna', 'questionna'] (0.3s)  ❌ got ['', '', 'and', 'sime', 'questionna', 'questionna'], expected final='Fire'
+    Loops:    L1=''(0.538)  L2=''(0.461)  L3='and'(0.193)  L4='sime'(0.835)  L5='questionna'(1.000)  L6='questionna'(1.000)
+
+  [3h_adv_02] 3-hop-adversarial
+    Prompt:   ab=Gold. cd=ab. ef=cd. In 1969 Armstrong walked on moon. xk9=77. What is ef?
+    Expected: ['Gold', 'Gold', 'Gold']
+    Got:      ['', '', 'the', 'maha', 'questionna', 'questionna'] (0.3s)  ❌ got ['', '', 'the', 'maha', 'questionna', 'questionna'], expected final='Gold'
+    Loops:    L1=''(0.317)  L2=''(0.196)  L3='the'(0.152)  L4='maha'(0.913)  L5='questionna'(0.924)  L6='questionna'(0.983)
+
+  [ma_01] math-1step
+    Prompt:   qty=6. price=0.50. cost=qty*price. What is cost?
+    Expected: ['3.00']
+    Got:      ['', '', 'and', 'typen', 'sime', 'the'] (0.3s)  ❌ got ['', '', 'and', 'typen', 'sime', 'the'], expected final='3.00'
+    Loops:    L1=''(0.434)  L2=''(0.391)  L3='and'(0.430)  L4='typen'(0.871)  L5='sime'(0.484)  L6='the'(0.378)
+
+  [ma_02] math-1step
+    Prompt:   apples=4. price=1.25. total=apples*price. What is total?
+    Expected: ['5.00']
+    Got:      ['', '', 'and', 'typen', 'clonal', 'the'] (0.3s)  ❌ got ['', '', 'and', 'typen', 'clonal', 'the'], expected final='5.00'
+    Loops:    L1=''(0.376)  L2=''(0.343)  L3='and'(0.389)  L4='typen'(0.495)  L5='clonal'(0.589)  L6='the'(0.654)
+
+  [ma_03] math-1step
+    Prompt:   students=30. pct=0.60. girls=students*pct. What is girls?
+    Expected: ['18']
+    Got:      ['', '', 'and', 'maha', 'maha', 'territory'] (0.3s)  ❌ got ['', '', 'and', 'maha', 'maha', 'territory'], expected final='18'
+    Loops:    L1=''(0.334)  L2=''(0.284)  L3='and'(0.415)  L4='maha'(0.650)  L5='maha'(0.708)  L6='territory'(0.538)
+
+  [ma_04] math-2step
+    Prompt:   a=6. pa=0.50. ca=a*pa. b=4. pb=0.75. cb=b*pb. total=ca+cb. What is total?
+    Expected: ['3.00', '3.00', '6.00']
+    Got:      ['', '', 'and', 'maha', 'maha', 'clonal'] (0.3s)  ❌ got ['', '', 'and', 'maha', 'maha', 'clonal'], expected final='6.00'
+    Loops:    L1=''(0.463)  L2=''(0.441)  L3='and'(0.346)  L4='maha'(0.923)  L5='maha'(0.551)  L6='clonal'(0.411)
+
+  [sq_01] sequence
+    Prompt:   x1=2. x2=x1*3. x3=x2*3. x4=x3*3. What is x5?
+    Expected: ['162']
+    Got:      ['', '', 'and', 'sime', 'clonal', '_)'] (0.3s)  ❌ got ['', '', 'and', 'sime', 'clonal', '_)'], expected final='162'
+    Loops:    L1=''(0.624)  L2=''(0.727)  L3='and'(0.462)  L4='sime'(0.887)  L5='clonal'(0.914)  L6='_)'(0.255)
+
+  [sq_02] sequence
+    Prompt:   x1=1. x2=x1*2. x3=x2*2. x4=x3*2. What is x5?
+    Expected: ['16']
+    Got:      ['', '', 'and', 'sime', 'clonal', '_)'] (0.3s)  ❌ got ['', '', 'and', 'sime', 'clonal', '_)'], expected final='16'
+    Loops:    L1=''(0.621)  L2=''(0.729)  L3='and'(0.512)  L4='sime'(0.845)  L5='clonal'(0.793)  L6='_)'(0.217)
+
+  [sq_03] sequence
+    Prompt:   x1=0. x2=x1+5. x3=x2+5. x4=x3+5. What is x5?
+    Expected: ['20']
+    Got:      ['', '', 'and', 'sime', 'clonal', 'clonal'] (0.3s)  ❌ got ['', '', 'and', 'sime', 'clonal', 'clonal'], expected final='20'
+    Loops:    L1=''(0.612)  L2=''(0.693)  L3='and'(0.367)  L4='sime'(0.895)  L5='clonal'(0.963)  L6='clonal'(0.456)
+
+  [sq_04] sequence
+    Prompt:   n1=1. n2=1. n3=n1+n2. n4=n2+n3. n5=n3+n4. What is n6?
+    Expected: ['13']
+    Got:      ['', '', 'and', 'sime', 'clonal', 'clonal'] (0.3s)  ❌ got ['', '', 'and', 'sime', 'clonal', 'clonal'], expected final='13'
+    Loops:    L1=''(0.598)  L2=''(0.697)  L3='and'(0.325)  L4='sime'(0.828)  L5='clonal'(0.977)  L6='clonal'(0.796)
+
+  [bf_01] bug-fix
+    Prompt:   op=minus. fix=plus. expr=a op b. What is the fixed expr?
+    Expected: ['a plus b']
+    Got:      ['', '', 'and', 'maha', 'sime', 'firm'] (0.3s)  ❌ got ['', '', 'and', 'maha', 'sime', 'firm'], expected final='a plus b'
+    Loops:    L1=''(0.406)  L2=''(0.434)  L3='and'(0.671)  L4='maha'(0.377)  L5='sime'(0.373)  L6='firm'(0.118)
+
+  [bf_02] bug-fix
+    Prompt:   bug=return b. fix=return a. code has bug. What is the fix?
+    Expected: ['return a']
+    Got:      ['', '', 'and', 'maha', 'clonal', 'the'] (0.3s)  ❌ got ['', '', 'and', 'maha', 'clonal', 'the'], expected final='return a'
+    Loops:    L1=''(0.365)  L2=''(0.435)  L3='and'(0.349)  L4='maha'(0.664)  L5='clonal'(0.823)  L6='the'(0.131)
+
+  Category               Pass  Tot    Rate
+  ----------------------------------------
+  1-hop                     0    3      0%
+  2-hop                     0    3      0%
+  3-hop                     0    2      0%
+  3-hop-adversarial         0    2      0%
+  bug-fix                   0    2      0%
+  math-1step                0    3      0%
+  math-2step                0    1      0%
+  sequence                  0    4      0%
+  ----------------------------------------
+  TOTAL                     0   20      0%
+
+  COLLAPSE ANALYSIS (ChatGPT concern #2):
+  Collapsed loops: 0/20 = 0%
+  Avg conf stdev:  0.2344
+  ✅ LOW COLLAPSE — loops are doing different things
+
+  ❌ RLF NOT WORKING — chain following failed
+
+=================================================================
+  TEST 2: SCRATCHPAD ABLATION
+  (130M: ablated=2%, normal=2%, Δ=0 → scratchpad unused)
+=================================================================
+
+  Run A (normal):          0/5 = 0%
+  Run B (zero scratchpad): 0/5 = 0%
+  Δ scratchpad contribution: +0 tests
+  ❌ SCRATCHPAD UNUSED — matches 130M failure pattern (Δ=0)
+
+=================================================================
+  TEST 3: SEMANTIC SHIFT (zero-shot syntax transfer)
+  (130M: 0.0% — predicted 'photograp' for all 50 samples)
+=================================================================
+
+  ❌ [0.3s] The box holds what the bag holds. The bag holds the apple. Wha...
+     Expected: apple  Got: ['', 'The', '“', 'typen', 'teasp', '��']
+
+  ❌ [0.3s] John's score equals Mary's score. Mary scored 88. What is John...
+     Expected: 88  Got: ['', '', '', 'JOHN', 'clonal', 'questionna']
+
+  ❌ [0.3s] Container B has what container A has. Container C has what con...
+     Expected: key  Got: ['', 'The', 'the', 'somet', 'teasp', 'teasp']
+
+  ❌ [0.3s] The red jar contains the same thing as the blue cup. The blue ...
+     Expected: frost  Got: ['', '', '“', 'typen', 'questionna', 'questionna']
+
+  ❌ [0.3s] Sarah earns twice what Tom earns. Tom earns 500. What does Sar...
+     Expected: 1000  Got: ['', '', '“', 'teasp', 'teasp', '��']
+
+  Semantic shift: 0/5 = 0%
+  ❌ SYNTAX OVERFIT — matches 130M bAbI failure pattern (0%)
+
+=================================================================
+  OVERALL VERDICT
+=================================================================
+  Chain accuracy:    0%  ❌
+  Scratchpad Δ:      +0        ❌
+  Semantic shift:    0%  ❌
+=================================================================
+
+=======================================
+  PHASE 2: Extended Benchmark (54 tests)
+=======================================
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_benchmark.py
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=================================================================
+  RLF EXTENDED BENCHMARK — Mamba-1.4B (54 tests)
+  Checkpoint: /hdd_data/rlf-1.4b-checkpoints/final
+=================================================================
+Loading base: state-spaces/mamba-1.4b
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+
+[cg_01] Code Gen: Write a Python function that reverses a string....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_02] Code Gen: Write a Python function called factorial that returns n...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def factorial'
+     → Missing: 'return'
+  ''
+
+[cg_03] Code Gen: Write a Python function that checks if a number is prim...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_04] Code Gen: Write a Python class called Stack with push, pop, and i...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'class Stack'
+     → Missing: 'def push'
+     → Missing: 'def pop'
+  ''
+
+[cg_05] Code Gen: Write a Python function that merges two sorted lists in...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_06] Code Gen: Write a Python function that flattens a nested list....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_07] Code Gen: Write a Python function that counts word frequencies in...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_08] Code Gen: Write a Python decorator that logs function calls with ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+     → Missing: 'wrapper'
+  ''
+
+[cg_09] Code Gen (Complex): Write a Python class called LRUCache with get and put m...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'class LRUCache'
+     → Missing: 'def get'
+     → Missing: 'def put'
+  ''
+
+[cg_10] Code Gen (Complex): Write a Python function that implements quicksort....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_11] Code Gen (Complex): Write a Python context manager class called Timer that ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'class Timer'
+     → Missing: '__enter__'
+     → Missing: '__exit__'
+  ''
+
+[cg_12] Code Gen (Complex): Write a Python generator function that yields Fibonacci...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'yield'
+  ''
+
+[cg_13] Code Gen (Complex): Write a Python function that performs matrix multiplica...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[cg_14] Code Gen (Complex): Write a Python class called BinarySearchTree with inser...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'class BinarySearchTree'
+     → Missing: 'def insert'
+     → Missing: 'def search'
+  ''
+
+[al_01] Algorithm: Write a Python function that implements binary search o...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'mid'
+     → Missing: 'return'
+  ''
+
+[al_02] Algorithm: Write a Python function that implements bubble sort....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'for '
+     → Missing: 'return'
+  ''
+
+[al_03] Algorithm: Write a Python function that returns the nth Fibonacci ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[al_04] Algorithm: Write a Python function that implements merge sort....
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[ds_01] Data Structures: Write a Python function that reverses a linked list. As...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'next'
+     → Missing: 'return'
+  ''
+
+[ds_02] Data Structures: Write a Python function that checks if a binary tree is...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[ds_03] Data Structures: Write a Python function that finds the height of a bina...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[ds_04] Data Structures: Write a Python function using a queue (collections.dequ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'deque'
+     → Missing: 'return'
+  ''
+
+[st_01] Strings: Write a Python function that checks if a string is a pa...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[st_02] Strings: Write a Python function that finds the longest common p...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[st_03] Strings: Write a Python function that counts the number of vowel...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[st_04] Strings: Write a Python function that checks if two strings are ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def '
+     → Missing: 'return'
+  ''
+
+[ma_01] Math: What is 12 multiplied by 7?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['84']
+  ''
+
+[ma_02] Math: What is 144 divided by 12?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['12']
+  ''
+
+[ma_03] Math: What is the square root of 256?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['16']
+  ''
+
+[ma_04] Math: What is 25% of 200?...
+  ❌ | 5tok | 2.8t/s | rep=0.00
+     → Missing one of: ['50']
+  '- uc . 2 n'
+
+[ma_05] Math: What is 17 multiplied by 13?...
+  ❌ | 3tok | 2.4t/s | rep=0.00
+     → Missing one of: ['221']
+  '- is a'
+
+[ma_06] Math: What is the square root of 625?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['25']
+  ''
+
+[ma_07] Math: What is 15% of 80?...
+  ❌ | 3tok | 2.5t/s | rep=0.00
+     → Missing one of: ['12']
+  '- a lex'
+
+[ma_08] Math: What is 2 to the power of 8?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['256']
+  ''
+
+[wp_01] Word Problem: A car travels at 60 mph for 2.5 hours. How many miles d...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['150']
+  ''
+
+[wp_02] Word Problem: A class has 30 students. 60% are girls. How many boys a...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['12']
+  ''
+
+[wp_03] Word Problem: A store sells apples for $0.50 each. Sarah buys 14 appl...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['7', '$7']
+  ''
+
+[wp_04] Word Problem: A rectangle has length 15 cm and width 8 cm. What is it...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['120']
+  ''
+
+[wp_05] Word Problem: If a pizza is cut into 8 equal slices and you eat 3 sli...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['37.5', '37%', '3/8']
+  ''
+
+[wp_06] Word Problem: A train travels 240 miles in 4 hours. What is its speed...
+  ❌ | 5tok | 2.8t/s | rep=0.00
+     → Missing one of: ['60']
+  'n . dv clonal clonal'
+
+[bf_01] Bug Fix: Fix this Python code:
+def add(a, b):
+    return a - b...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['return a + b']
+  ''
+
+[bf_02] Bug Fix: Fix this Python code:
+def is_even(n):
+    return n % 2 ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['n % 2 == 0', '% 2 == 0']
+  ''
+
+[bf_03] Bug Fix: Fix the off-by-one error:
+def last_element(lst):
+    re...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['len(lst) - 1', 'lst[-1]']
+  ''
+
+[bf_04] Bug Fix: Fix this Python code:
+def square(x):
+    return x + x...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['return x * x', 'x**2']
+  ''
+
+[bf_05] Bug Fix: Fix this Python code:
+def max_of_two(a, b):
+    if a > ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['return a']
+  ''
+
+[cc_01] Completion: Complete this Python function:
+def count_evens(lst):
+  ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'return'
+     → Missing one of: ['% 2']
+  ''
+
+[cc_02] Completion: Complete this Python function:
+def find_max(lst):
+    "...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'return'
+  ''
+
+[cc_03] Completion: Complete this Python function:
+def flatten(nested):
+   ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'result'
+     → Missing: 'return result'
+     → Missing one of: ['append', 'extend', 'for']
+  ''
+
+[lg_01] Logic: What is the next number in the sequence: 2, 6, 18, 54, ...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['162']
+  ''
+
+[lg_02] Logic: What is the next number in the sequence: 1, 4, 9, 16, ?...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['25']
+  ''
+
+[lg_03] Logic: If it takes 5 machines 5 minutes to make 5 widgets, how...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['5 minute', '5 min', 'same', '5m']
+  ''
+
+[lg_04] Logic: What is the next number in the sequence: 1, 1, 2, 3, 5,...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing one of: ['13']
+  ''
+
+[ut_01] Unit Tests: Write a Python unittest class that tests a function cal...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'import unittest'
+     → Missing: 'def test_'
+     → Missing: 'assertEqual'
+  ''
+
+[ut_02] Unit Tests: Write pytest test functions that test is_prime(n) for p...
+  ❌ | 0tok | 0.0t/s | rep=0.00
+     → Missing: 'def test_'
+     → Missing: 'assert'
+  ''
+
+=================================================================
+  RESULTS SUMMARY
+=================================================================
+  Category                    Pass  Total    Rate
+  --------------------------------------------------
+  Algorithm                      0      4      0%
+  Bug Fix                        0      5      0%
+  Code Gen                       0      8      0%
+  Code Gen (Complex)             0      6      0%
+  Completion                     0      3      0%
+  Data Structures                0      4      0%
+  Logic                          0      4      0%
+  Math                           0      8      0%
+  Strings                        0      4      0%
+  Unit Tests                     0      2      0%
+  Word Problem                   0      6      0%
+  --------------------------------------------------
+  TOTAL (required)               0     54      0%
+
+  Avg throughput : 0.2 tok/s
+  Avg bigram rep : 0.000
+=================================================================
+
+  Full report: /home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_benchmark_report.json
+
+  vs R5 SFT Baseline:
+  Category                       R5    RLF      Δ
+  --------------------------------------------
+  Algorithm                     75%     0%  -75%
+  Bug Fix                       20%     0%  -20%
+  Code Gen                      75%     0%  -75%
+  Code Gen (Complex)            33%     0%  -33%
+  Completion                    67%     0%  -67%
+  Data Structures              100%     0% -100%
+  Logic                          0%     0% +   0%
+  Math                          88%     0%  -88%
+  Strings                      100%     0% -100%
+  Unit Tests                     0%     0% +   0%
+  Word Problem                  17%     0%  -17%
+
+=======================================
+  AUTO-EVAL DONE — Mon Apr 27 10:50:21 PM CDT 2026
+  Results: /home/phil/.gemini/antigravity/scratch/tiny-refinement/rlf_eval.log
+=======================================

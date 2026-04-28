@@ -1,0 +1,1024 @@
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_trainer_1_4b.py --phase 3a
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 20:07:51,561 [INFO] ============================================================
+2026-04-27 20:07:51,561 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 20:07:51,561 [INFO]   Phase: 3a
+2026-04-27 20:07:51,561 [INFO] ============================================================
+2026-04-27 20:07:51,584 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+Loading base: state-spaces/mamba-1.4b
+2026-04-27 20:07:51,650 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 20:07:51,674 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 20:07:51,988 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+2026-04-27 20:07:55,463 [INFO] 
+============================================================
+2026-04-27 20:07:55,464 [INFO]   Starting Phase 3a
+2026-04-27 20:07:55,464 [INFO] ============================================================
+
+============================================================
+  PHASE 3a — Scratchpad Warmup | trainable: 278,528
+============================================================
+
+2026-04-27 20:07:55,486 [INFO] Phase 3a: 2000 steps, batch=1, accum=8
+2026-04-27 20:08:14,727 [INFO] [Phase3a][S00025] Loss=13.0612 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:08:27,971 [INFO] [Phase3a][S00050] Loss=11.7214 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:08:41,133 [INFO] [Phase3a][S00075] Loss=10.5655 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:08:56,055 [INFO] [Phase3a][S00100] Loss=10.6979 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:09:09,741 [INFO] [Phase3a][S00125] Loss=8.7768 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:09:24,168 [INFO] [Phase3a][S00150] Loss=9.5263 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:09:39,170 [INFO] [Phase3a][S00175] Loss=9.2144 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:09:55,158 [INFO] [Phase3a][S00200] Loss=10.0816 | Acc=0.333 | AnsAcc=0.500 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:10:09,788 [INFO] [Phase3a][S00225] Loss=7.8873 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:10:23,622 [INFO] [Phase3a][S00250] Loss=7.6839 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:10:37,690 [INFO] [Phase3a][S00275] Loss=6.4927 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:10:52,081 [INFO] [Phase3a][S00300] Loss=7.3952 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:11:05,819 [INFO] [Phase3a][S00325] Loss=6.7275 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:11:20,782 [INFO] [Phase3a][S00350] Loss=5.7823 | Acc=0.750 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:11:34,998 [INFO] [Phase3a][S00375] Loss=5.6269 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:11:48,659 [INFO] [Phase3a][S00400] Loss=4.6973 | Acc=0.667 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:12:04,303 [INFO] [Phase3a][S00425] Loss=7.2733 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:12:18,724 [INFO] [Phase3a][S00450] Loss=3.0026 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:12:34,516 [INFO] [Phase3a][S00475] Loss=4.5034 | Acc=0.500 | AnsAcc=0.667 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:12:48,469 [INFO] [Phase3a][S00500] Loss=3.1814 | Acc=0.333 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:12:48,710 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3a_step000500 | val=0.0000
+2026-04-27 20:13:02,515 [INFO] [Phase3a][S00525] Loss=2.9476 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:13:16,520 [INFO] [Phase3a][S00550] Loss=4.5441 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:13:30,935 [INFO] [Phase3a][S00575] Loss=2.7214 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:13:45,785 [INFO] [Phase3a][S00600] Loss=5.5626 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:14:00,493 [INFO] [Phase3a][S00625] Loss=3.3412 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:14:14,570 [INFO] [Phase3a][S00650] Loss=3.8318 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:14:27,983 [INFO] [Phase3a][S00675] Loss=2.3584 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:14:41,912 [INFO] [Phase3a][S00700] Loss=2.9110 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:14:56,920 [INFO] [Phase3a][S00725] Loss=3.7160 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:15:11,456 [INFO] [Phase3a][S00750] Loss=3.3112 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:15:26,159 [INFO] [Phase3a][S00775] Loss=2.9506 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:15:41,119 [INFO] [Phase3a][S00800] Loss=3.0618 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:15:55,204 [INFO] [Phase3a][S00825] Loss=3.1254 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:16:08,152 [INFO] [Phase3a][S00850] Loss=2.9091 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:16:22,460 [INFO] [Phase3a][S00875] Loss=1.9914 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:16:36,079 [INFO] [Phase3a][S00900] Loss=2.6305 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:16:50,173 [INFO] [Phase3a][S00925] Loss=2.4885 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:17:03,963 [INFO] [Phase3a][S00950] Loss=2.3821 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:17:17,177 [INFO] [Phase3a][S00975] Loss=1.9635 | Acc=0.333 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:17:32,800 [INFO] [Phase3a][S01000] Loss=2.2369 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:17:33,033 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3a_step001000 | val=0.0000
+2026-04-27 20:17:47,069 [INFO] [Phase3a][S01025] Loss=2.6092 | Acc=0.667 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:18:00,734 [INFO] [Phase3a][S01050] Loss=2.3355 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:18:14,788 [INFO] [Phase3a][S01075] Loss=1.9454 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:18:29,707 [INFO] [Phase3a][S01100] Loss=2.3743 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:18:44,940 [INFO] [Phase3a][S01125] Loss=2.3031 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:19:00,139 [INFO] [Phase3a][S01150] Loss=2.4168 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:19:15,630 [INFO] [Phase3a][S01175] Loss=2.1168 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:19:29,539 [INFO] [Phase3a][S01200] Loss=2.2913 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:19:45,939 [INFO] [Phase3a][S01225] Loss=3.0513 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:20:00,259 [INFO] [Phase3a][S01250] Loss=2.0657 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:20:17,357 [INFO] [Phase3a][S01275] Loss=2.9222 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:20:31,812 [INFO] [Phase3a][S01300] Loss=2.2098 | Acc=0.667 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:20:47,159 [INFO] [Phase3a][S01325] Loss=2.8132 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:21:00,246 [INFO] [Phase3a][S01350] Loss=1.7633 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:21:14,804 [INFO] [Phase3a][S01375] Loss=1.8349 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:21:31,085 [INFO] [Phase3a][S01400] Loss=2.2451 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:21:46,303 [INFO] [Phase3a][S01425] Loss=2.4269 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:22:00,230 [INFO] [Phase3a][S01450] Loss=2.5467 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:22:15,545 [INFO] [Phase3a][S01475] Loss=2.1667 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:22:30,145 [INFO] [Phase3a][S01500] Loss=1.9353 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:22:30,379 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3a_step001500 | val=0.0000
+2026-04-27 20:22:43,899 [INFO] [Phase3a][S01525] Loss=2.0951 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:22:57,400 [INFO] [Phase3a][S01550] Loss=2.2013 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:23:11,227 [INFO] [Phase3a][S01575] Loss=2.0803 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:23:26,790 [INFO] [Phase3a][S01600] Loss=2.1382 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:23:41,065 [INFO] [Phase3a][S01625] Loss=1.8663 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:23:54,504 [INFO] [Phase3a][S01650] Loss=1.8473 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:24:10,095 [INFO] [Phase3a][S01675] Loss=2.6073 | Acc=0.667 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:24:24,484 [INFO] [Phase3a][S01700] Loss=1.9467 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:24:40,556 [INFO] [Phase3a][S01725] Loss=2.4365 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:24:55,246 [INFO] [Phase3a][S01750] Loss=2.6495 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:25:07,418 [INFO] [Phase3a][S01775] Loss=1.8851 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:25:21,452 [INFO] [Phase3a][S01800] Loss=2.0695 | Acc=0.750 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:25:35,221 [INFO] [Phase3a][S01825] Loss=1.7821 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:25:50,003 [INFO] [Phase3a][S01850] Loss=2.1280 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:26:04,786 [INFO] [Phase3a][S01875] Loss=1.7110 | Acc=0.667 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:26:18,401 [INFO] [Phase3a][S01900] Loss=1.7032 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:26:33,180 [INFO] [Phase3a][S01925] Loss=1.6758 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:26:46,275 [INFO] [Phase3a][S01950] Loss=1.9645 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:27:01,864 [INFO] [Phase3a][S01975] Loss=2.0832 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=2.86GB
+2026-04-27 20:27:16,356 [INFO] [Phase3a][S02000] Loss=2.3743 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=2.86GB
+2026-04-27 20:27:16,587 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3a_step002000 | val=0.0000
+2026-04-27 20:27:16,587 [INFO] Phase 3a complete at step 2000.
+2026-04-27 20:27:16,588 [INFO] All phases complete.
+2026-04-27 20:27:16,814 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phasefinal_step099999 | val=0.0000
+2026-04-27 20:27:16,814 [INFO] Final checkpoint saved to: /hdd_data/rlf-1.4b-checkpoints/final
+[run_env] LD_PRELOAD set for NCCL + nvJitLink
+[run_env] Launching: /home/phil/.local/share/mise/installs/python/3.14.3/bin/python rlf_trainer_1_4b.py --phase 3b --resume
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 20:32:58,981 [INFO] ============================================================
+2026-04-27 20:32:58,981 [INFO] ============================================================
+2026-04-27 20:32:58,981 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 20:32:58,981 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 20:32:58,981 [INFO]   Phase: 3b
+2026-04-27 20:32:58,981 [INFO]   Phase: 3b
+2026-04-27 20:32:58,981 [INFO] ============================================================
+2026-04-27 20:32:58,981 [INFO] ============================================================
+2026-04-27 20:32:59,001 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 20:32:59,001 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+Loading base: state-spaces/mamba-1.4b
+2026-04-27 20:32:59,066 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 20:32:59,066 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 20:32:59,087 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 20:32:59,087 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 20:32:59,420 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 20:32:59,420 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+  Loaded SFT lm_head from /hdd_data/latent-spacer-checkpoints/best
+Building RLF engine...
+  LoRA params:     3,145,728
+  Loop engine:     13,219,840
+  Prefix memory:   16,384 (8 × 2048)
+  Latent bridge:   262,144 (2048→64→2048)
+  Total trainable: 150,245,376
+  Base frozen:     634,601,472
+  HALT token:      7803 (§)
+2026-04-27 20:33:03,198 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phasefinal_step099999
+2026-04-27 20:33:03,198 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phasefinal_step099999
+2026-04-27 20:33:03,199 [INFO]   Loaded: latent_memory.pt
+2026-04-27 20:33:03,199 [INFO]   Loaded: latent_memory.pt
+2026-04-27 20:33:03,200 [INFO]   Loaded: bridge_down.pt
+2026-04-27 20:33:03,200 [INFO]   Loaded: bridge_down.pt
+2026-04-27 20:33:03,201 [INFO]   Loaded: bridge_up.pt
+2026-04-27 20:33:03,201 [INFO]   Loaded: bridge_up.pt
+2026-04-27 20:33:03,211 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 20:33:03,211 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 20:33:03,212 [INFO]   Loaded: loop_norm.pt
+2026-04-27 20:33:03,212 [INFO]   Loaded: loop_norm.pt
+2026-04-27 20:33:03,212 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 20:33:03,212 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 20:33:03,330 [INFO]   Loaded: lm_head.pt
+2026-04-27 20:33:03,330 [INFO]   Loaded: lm_head.pt
+2026-04-27 20:33:03,353 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 20:33:03,353 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 20:33:03,353 [INFO] 
+============================================================
+2026-04-27 20:33:03,353 [INFO] 
+============================================================
+2026-04-27 20:33:03,353 [INFO]   Starting Phase 3b
+2026-04-27 20:33:03,353 [INFO]   Starting Phase 3b
+2026-04-27 20:33:03,353 [INFO] ============================================================
+2026-04-27 20:33:03,353 [INFO] ============================================================
+
+============================================================
+  PHASE 3b — RLF Joint | trainable: 150,245,376 | frozen: 634,601,472
+============================================================
+
+2026-04-27 20:33:03,357 [INFO] Phase 3b: 8000 steps, batch=1, accum=8
+2026-04-27 20:33:03,357 [INFO] Phase 3b: 8000 steps, batch=1, accum=8
+2026-04-27 20:33:30,288 [INFO] [Phase3b][S00025] Loss=2.3293 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:33:30,288 [INFO] [Phase3b][S00025] Loss=2.3293 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:33:51,643 [INFO] [Phase3b][S00050] Loss=2.2292 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:33:51,643 [INFO] [Phase3b][S00050] Loss=2.2292 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:34:12,015 [INFO] [Phase3b][S00075] Loss=2.0796 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:34:12,015 [INFO] [Phase3b][S00075] Loss=2.0796 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:34:33,864 [INFO] [Phase3b][S00100] Loss=1.8497 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:34:33,864 [INFO] [Phase3b][S00100] Loss=1.8497 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:34:54,332 [INFO] [Phase3b][S00125] Loss=2.1257 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:34:54,332 [INFO] [Phase3b][S00125] Loss=2.1257 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:35:14,772 [INFO] [Phase3b][S00150] Loss=1.7680 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:35:14,772 [INFO] [Phase3b][S00150] Loss=1.7680 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:35:34,850 [INFO] [Phase3b][S00175] Loss=1.6801 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:35:34,850 [INFO] [Phase3b][S00175] Loss=1.6801 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:35:54,788 [INFO] [Phase3b][S00200] Loss=1.9184 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:35:54,788 [INFO] [Phase3b][S00200] Loss=1.9184 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:36:15,230 [INFO] [Phase3b][S00225] Loss=1.7912 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:36:15,230 [INFO] [Phase3b][S00225] Loss=1.7912 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:36:33,031 [INFO] [Phase3b][S00250] Loss=1.1826 | Acc=0.667 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:36:33,031 [INFO] [Phase3b][S00250] Loss=1.1826 | Acc=0.667 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:36:52,106 [INFO] [Phase3b][S00275] Loss=1.4284 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:36:52,106 [INFO] [Phase3b][S00275] Loss=1.4284 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:37:11,312 [INFO] [Phase3b][S00300] Loss=0.9896 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:37:11,312 [INFO] [Phase3b][S00300] Loss=0.9896 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:37:30,958 [INFO] [Phase3b][S00325] Loss=0.9208 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:37:30,958 [INFO] [Phase3b][S00325] Loss=0.9208 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:37:51,245 [INFO] [Phase3b][S00350] Loss=1.6808 | Acc=0.250 | AnsAcc=0.333 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:37:51,245 [INFO] [Phase3b][S00350] Loss=1.6808 | Acc=0.250 | AnsAcc=0.333 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:38:10,226 [INFO] [Phase3b][S00375] Loss=0.9788 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:38:10,226 [INFO] [Phase3b][S00375] Loss=0.9788 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:38:29,602 [INFO] [Phase3b][S00400] Loss=1.4452 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:38:29,602 [INFO] [Phase3b][S00400] Loss=1.4452 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:38:49,894 [INFO] [Phase3b][S00425] Loss=0.9799 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:38:49,894 [INFO] [Phase3b][S00425] Loss=0.9799 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:39:12,268 [INFO] [Phase3b][S00450] Loss=1.5360 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:39:12,268 [INFO] [Phase3b][S00450] Loss=1.5360 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:39:30,240 [INFO] [Phase3b][S00475] Loss=1.0184 | Acc=0.750 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:39:30,240 [INFO] [Phase3b][S00475] Loss=1.0184 | Acc=0.750 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:39:49,491 [INFO] [Phase3b][S00500] Loss=1.0964 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:39:49,491 [INFO] [Phase3b][S00500] Loss=1.0964 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:39:49,731 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step000500 | val=0.0000
+2026-04-27 20:39:49,731 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step000500 | val=0.0000
+2026-04-27 20:40:09,547 [INFO] [Phase3b][S00525] Loss=0.7589 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:40:09,547 [INFO] [Phase3b][S00525] Loss=0.7589 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:40:31,300 [INFO] [Phase3b][S00550] Loss=1.1663 | Acc=0.750 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:40:31,300 [INFO] [Phase3b][S00550] Loss=1.1663 | Acc=0.750 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:40:49,658 [INFO] [Phase3b][S00575] Loss=1.4554 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:40:49,658 [INFO] [Phase3b][S00575] Loss=1.4554 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:41:08,200 [INFO] [Phase3b][S00600] Loss=0.8191 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:41:08,200 [INFO] [Phase3b][S00600] Loss=0.8191 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:41:27,307 [INFO] [Phase3b][S00625] Loss=1.0393 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:41:27,307 [INFO] [Phase3b][S00625] Loss=1.0393 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:41:48,280 [INFO] [Phase3b][S00650] Loss=1.0893 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:41:48,280 [INFO] [Phase3b][S00650] Loss=1.0893 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:42:09,619 [INFO] [Phase3b][S00675] Loss=1.0857 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:42:09,619 [INFO] [Phase3b][S00675] Loss=1.0857 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:42:29,198 [INFO] [Phase3b][S00700] Loss=1.5304 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:42:29,198 [INFO] [Phase3b][S00700] Loss=1.5304 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:42:48,389 [INFO] [Phase3b][S00725] Loss=0.9973 | Acc=0.667 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:42:48,389 [INFO] [Phase3b][S00725] Loss=0.9973 | Acc=0.667 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:43:06,792 [INFO] [Phase3b][S00750] Loss=0.9799 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:43:06,792 [INFO] [Phase3b][S00750] Loss=0.9799 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:43:25,143 [INFO] [Phase3b][S00775] Loss=0.9293 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:43:25,143 [INFO] [Phase3b][S00775] Loss=0.9293 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:43:45,533 [INFO] [Phase3b][S00800] Loss=1.0667 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:43:45,533 [INFO] [Phase3b][S00800] Loss=1.0667 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:44:03,401 [INFO] [Phase3b][S00825] Loss=1.0219 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:44:03,401 [INFO] [Phase3b][S00825] Loss=1.0219 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:44:22,649 [INFO] [Phase3b][S00850] Loss=0.8640 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:44:22,649 [INFO] [Phase3b][S00850] Loss=0.8640 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:44:41,190 [INFO] [Phase3b][S00875] Loss=1.0363 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:44:41,190 [INFO] [Phase3b][S00875] Loss=1.0363 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:44:59,661 [INFO] [Phase3b][S00900] Loss=0.6728 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:44:59,661 [INFO] [Phase3b][S00900] Loss=0.6728 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:45:18,769 [INFO] [Phase3b][S00925] Loss=0.7506 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:45:18,769 [INFO] [Phase3b][S00925] Loss=0.7506 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:45:37,537 [INFO] [Phase3b][S00950] Loss=0.8227 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:45:37,537 [INFO] [Phase3b][S00950] Loss=0.8227 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:45:59,102 [INFO] [Phase3b][S00975] Loss=1.3376 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:45:59,102 [INFO] [Phase3b][S00975] Loss=1.3376 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:46:18,078 [INFO] [Phase3b][S01000] Loss=0.8968 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:46:18,078 [INFO] [Phase3b][S01000] Loss=0.8968 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:46:18,322 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step001000 | val=0.0000
+2026-04-27 20:46:18,322 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step001000 | val=0.0000
+2026-04-27 20:46:38,558 [INFO] [Phase3b][S01025] Loss=1.0799 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:46:38,558 [INFO] [Phase3b][S01025] Loss=1.0799 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:46:58,718 [INFO] [Phase3b][S01050] Loss=0.8448 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:46:58,718 [INFO] [Phase3b][S01050] Loss=0.8448 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:47:18,835 [INFO] [Phase3b][S01075] Loss=1.3751 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:47:18,835 [INFO] [Phase3b][S01075] Loss=1.3751 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:47:35,603 [INFO] [Phase3b][S01100] Loss=0.9842 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:47:35,603 [INFO] [Phase3b][S01100] Loss=0.9842 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:47:54,897 [INFO] [Phase3b][S01125] Loss=1.0243 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:47:54,897 [INFO] [Phase3b][S01125] Loss=1.0243 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:48:13,816 [INFO] [Phase3b][S01150] Loss=0.7185 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:48:13,816 [INFO] [Phase3b][S01150] Loss=0.7185 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:48:32,641 [INFO] [Phase3b][S01175] Loss=0.8909 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:48:32,641 [INFO] [Phase3b][S01175] Loss=0.8909 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:48:51,543 [INFO] [Phase3b][S01200] Loss=1.2253 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:48:51,543 [INFO] [Phase3b][S01200] Loss=1.2253 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:49:11,095 [INFO] [Phase3b][S01225] Loss=0.8767 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:49:11,095 [INFO] [Phase3b][S01225] Loss=0.8767 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:49:30,264 [INFO] [Phase3b][S01250] Loss=0.7724 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:49:30,264 [INFO] [Phase3b][S01250] Loss=0.7724 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:49:50,531 [INFO] [Phase3b][S01275] Loss=0.7856 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:49:50,531 [INFO] [Phase3b][S01275] Loss=0.7856 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:50:10,236 [INFO] [Phase3b][S01300] Loss=0.8655 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:50:10,236 [INFO] [Phase3b][S01300] Loss=0.8655 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:50:29,787 [INFO] [Phase3b][S01325] Loss=0.9631 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:50:29,787 [INFO] [Phase3b][S01325] Loss=0.9631 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:50:47,858 [INFO] [Phase3b][S01350] Loss=1.0813 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:50:47,858 [INFO] [Phase3b][S01350] Loss=1.0813 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:51:08,609 [INFO] [Phase3b][S01375] Loss=1.0165 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:51:08,609 [INFO] [Phase3b][S01375] Loss=1.0165 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:51:29,471 [INFO] [Phase3b][S01400] Loss=1.0217 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.47GB
+2026-04-27 20:51:29,471 [INFO] [Phase3b][S01400] Loss=1.0217 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.47GB
+2026-04-27 20:51:49,197 [INFO] [Phase3b][S01425] Loss=0.8984 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:51:49,197 [INFO] [Phase3b][S01425] Loss=0.8984 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 20:52:06,423 [INFO] [Phase3b][S01450] Loss=0.3323 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:52:06,423 [INFO] [Phase3b][S01450] Loss=0.3323 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:52:27,190 [INFO] [Phase3b][S01475] Loss=0.9919 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:52:27,190 [INFO] [Phase3b][S01475] Loss=0.9919 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:52:46,520 [INFO] [Phase3b][S01500] Loss=1.0511 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:52:46,520 [INFO] [Phase3b][S01500] Loss=1.0511 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:52:46,750 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step001500 | val=0.0000
+2026-04-27 20:52:46,750 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step001500 | val=0.0000
+2026-04-27 20:53:05,477 [INFO] [Phase3b][S01525] Loss=1.1499 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:53:05,477 [INFO] [Phase3b][S01525] Loss=1.1499 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:53:25,195 [INFO] [Phase3b][S01550] Loss=0.7325 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:53:25,195 [INFO] [Phase3b][S01550] Loss=0.7325 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:53:45,328 [INFO] [Phase3b][S01575] Loss=1.0774 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:53:45,328 [INFO] [Phase3b][S01575] Loss=1.0774 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:54:05,271 [INFO] [Phase3b][S01600] Loss=0.8647 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:54:05,271 [INFO] [Phase3b][S01600] Loss=0.8647 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:54:25,555 [INFO] [Phase3b][S01625] Loss=0.7198 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:54:25,555 [INFO] [Phase3b][S01625] Loss=0.7198 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:54:45,396 [INFO] [Phase3b][S01650] Loss=1.2927 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:54:45,396 [INFO] [Phase3b][S01650] Loss=1.2927 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:55:06,487 [INFO] [Phase3b][S01675] Loss=1.0254 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:55:06,487 [INFO] [Phase3b][S01675] Loss=1.0254 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:55:24,671 [INFO] [Phase3b][S01700] Loss=0.8980 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:55:24,671 [INFO] [Phase3b][S01700] Loss=0.8980 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:55:46,571 [INFO] [Phase3b][S01725] Loss=0.8705 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:55:46,571 [INFO] [Phase3b][S01725] Loss=0.8705 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:56:06,058 [INFO] [Phase3b][S01750] Loss=0.7523 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:56:06,058 [INFO] [Phase3b][S01750] Loss=0.7523 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:56:25,786 [INFO] [Phase3b][S01775] Loss=0.7291 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:56:25,786 [INFO] [Phase3b][S01775] Loss=0.7291 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:56:44,086 [INFO] [Phase3b][S01800] Loss=0.9209 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:56:44,086 [INFO] [Phase3b][S01800] Loss=0.9209 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:57:03,965 [INFO] [Phase3b][S01825] Loss=0.7637 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:57:03,965 [INFO] [Phase3b][S01825] Loss=0.7637 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:57:25,082 [INFO] [Phase3b][S01850] Loss=0.6043 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:57:25,082 [INFO] [Phase3b][S01850] Loss=0.6043 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:57:44,278 [INFO] [Phase3b][S01875] Loss=0.4510 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:57:44,278 [INFO] [Phase3b][S01875] Loss=0.4510 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:58:02,315 [INFO] [Phase3b][S01900] Loss=0.4554 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:58:02,315 [INFO] [Phase3b][S01900] Loss=0.4554 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:58:21,371 [INFO] [Phase3b][S01925] Loss=0.7071 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:58:21,371 [INFO] [Phase3b][S01925] Loss=0.7071 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:58:41,644 [INFO] [Phase3b][S01950] Loss=0.8667 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:58:41,644 [INFO] [Phase3b][S01950] Loss=0.8667 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:59:02,438 [INFO] [Phase3b][S01975] Loss=1.0068 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:59:02,438 [INFO] [Phase3b][S01975] Loss=1.0068 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:59:21,778 [INFO] [Phase3b][S02000] Loss=0.7486 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:59:21,778 [INFO] [Phase3b][S02000] Loss=0.7486 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 20:59:22,009 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step002000 | val=0.0000
+2026-04-27 20:59:22,009 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step002000 | val=0.0000
+2026-04-27 20:59:43,205 [INFO] [Phase3b][S02025] Loss=1.1242 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 20:59:43,205 [INFO] [Phase3b][S02025] Loss=1.1242 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:00:02,996 [INFO] [Phase3b][S02050] Loss=0.8413 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:00:02,996 [INFO] [Phase3b][S02050] Loss=0.8413 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:00:23,701 [INFO] [Phase3b][S02075] Loss=0.5200 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:00:23,701 [INFO] [Phase3b][S02075] Loss=0.5200 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:00:41,451 [INFO] [Phase3b][S02100] Loss=0.4467 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:00:41,451 [INFO] [Phase3b][S02100] Loss=0.4467 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:01:01,351 [INFO] [Phase3b][S02125] Loss=0.4539 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:01:01,351 [INFO] [Phase3b][S02125] Loss=0.4539 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:01:20,512 [INFO] [Phase3b][S02150] Loss=0.5913 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:01:20,512 [INFO] [Phase3b][S02150] Loss=0.5913 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:01:41,597 [INFO] [Phase3b][S02175] Loss=0.8765 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:01:41,597 [INFO] [Phase3b][S02175] Loss=0.8765 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:02:01,113 [INFO] [Phase3b][S02200] Loss=0.8034 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:02:01,113 [INFO] [Phase3b][S02200] Loss=0.8034 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:02:20,132 [INFO] [Phase3b][S02225] Loss=0.9023 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:02:20,132 [INFO] [Phase3b][S02225] Loss=0.9023 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:02:38,632 [INFO] [Phase3b][S02250] Loss=0.8926 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:02:38,632 [INFO] [Phase3b][S02250] Loss=0.8926 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:02:57,781 [INFO] [Phase3b][S02275] Loss=0.8419 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:02:57,781 [INFO] [Phase3b][S02275] Loss=0.8419 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:03:17,808 [INFO] [Phase3b][S02300] Loss=1.0074 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:03:17,808 [INFO] [Phase3b][S02300] Loss=1.0074 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:03:35,905 [INFO] [Phase3b][S02325] Loss=0.4995 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:03:35,905 [INFO] [Phase3b][S02325] Loss=0.4995 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:03:55,391 [INFO] [Phase3b][S02350] Loss=0.7211 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:03:55,391 [INFO] [Phase3b][S02350] Loss=0.7211 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:04:12,896 [INFO] [Phase3b][S02375] Loss=0.7921 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:04:12,896 [INFO] [Phase3b][S02375] Loss=0.7921 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:04:32,603 [INFO] [Phase3b][S02400] Loss=0.6009 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:04:32,603 [INFO] [Phase3b][S02400] Loss=0.6009 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:04:52,067 [INFO] [Phase3b][S02425] Loss=0.6820 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:04:52,067 [INFO] [Phase3b][S02425] Loss=0.6820 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:05:10,901 [INFO] [Phase3b][S02450] Loss=0.6377 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:05:10,901 [INFO] [Phase3b][S02450] Loss=0.6377 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:05:31,261 [INFO] [Phase3b][S02475] Loss=0.8867 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:05:31,261 [INFO] [Phase3b][S02475] Loss=0.8867 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:05:49,772 [INFO] [Phase3b][S02500] Loss=0.5105 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:05:49,772 [INFO] [Phase3b][S02500] Loss=0.5105 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:05:50,004 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step002500 | val=0.0000
+2026-04-27 21:05:50,004 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step002500 | val=0.0000
+2026-04-27 21:06:08,236 [INFO] [Phase3b][S02525] Loss=0.5736 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:06:08,236 [INFO] [Phase3b][S02525] Loss=0.5736 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:06:27,916 [INFO] [Phase3b][S02550] Loss=1.0675 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:06:27,916 [INFO] [Phase3b][S02550] Loss=1.0675 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:06:48,379 [INFO] [Phase3b][S02575] Loss=1.0847 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:06:48,379 [INFO] [Phase3b][S02575] Loss=1.0847 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:07:07,012 [INFO] [Phase3b][S02600] Loss=0.6501 | Acc=0.667 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:07:07,012 [INFO] [Phase3b][S02600] Loss=0.6501 | Acc=0.667 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:07:24,770 [INFO] [Phase3b][S02625] Loss=0.6673 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:07:24,770 [INFO] [Phase3b][S02625] Loss=0.6673 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:07:44,837 [INFO] [Phase3b][S02650] Loss=0.4724 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:07:44,837 [INFO] [Phase3b][S02650] Loss=0.4724 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:08:04,455 [INFO] [Phase3b][S02675] Loss=0.4018 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:08:04,455 [INFO] [Phase3b][S02675] Loss=0.4018 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:08:24,760 [INFO] [Phase3b][S02700] Loss=0.9343 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:08:24,760 [INFO] [Phase3b][S02700] Loss=0.9343 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:08:43,229 [INFO] [Phase3b][S02725] Loss=0.6194 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:08:43,229 [INFO] [Phase3b][S02725] Loss=0.6194 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:09:02,822 [INFO] [Phase3b][S02750] Loss=0.6942 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:09:02,822 [INFO] [Phase3b][S02750] Loss=0.6942 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:09:22,690 [INFO] [Phase3b][S02775] Loss=0.5867 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:09:22,690 [INFO] [Phase3b][S02775] Loss=0.5867 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:09:42,900 [INFO] [Phase3b][S02800] Loss=0.6168 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:09:42,900 [INFO] [Phase3b][S02800] Loss=0.6168 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:10:02,889 [INFO] [Phase3b][S02825] Loss=0.7380 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:10:02,889 [INFO] [Phase3b][S02825] Loss=0.7380 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:10:21,583 [INFO] [Phase3b][S02850] Loss=0.5308 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:10:21,583 [INFO] [Phase3b][S02850] Loss=0.5308 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:10:41,041 [INFO] [Phase3b][S02875] Loss=0.7209 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:10:41,041 [INFO] [Phase3b][S02875] Loss=0.7209 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:10:58,465 [INFO] [Phase3b][S02900] Loss=0.4947 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:10:58,465 [INFO] [Phase3b][S02900] Loss=0.4947 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:11:18,403 [INFO] [Phase3b][S02925] Loss=0.8318 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:11:18,403 [INFO] [Phase3b][S02925] Loss=0.8318 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:11:38,659 [INFO] [Phase3b][S02950] Loss=0.6094 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:11:38,659 [INFO] [Phase3b][S02950] Loss=0.6094 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:11:58,836 [INFO] [Phase3b][S02975] Loss=0.4619 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:11:58,836 [INFO] [Phase3b][S02975] Loss=0.4619 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:12:17,136 [INFO] [Phase3b][S03000] Loss=0.3623 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:12:17,136 [INFO] [Phase3b][S03000] Loss=0.3623 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:12:17,371 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step003000 | val=0.0000
+2026-04-27 21:12:17,371 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step003000 | val=0.0000
+2026-04-27 21:12:35,932 [INFO] [Phase3b][S03025] Loss=1.1422 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:12:35,932 [INFO] [Phase3b][S03025] Loss=1.1422 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:12:55,523 [INFO] [Phase3b][S03050] Loss=0.6513 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:12:55,523 [INFO] [Phase3b][S03050] Loss=0.6513 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:13:15,967 [INFO] [Phase3b][S03075] Loss=0.9252 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:13:15,967 [INFO] [Phase3b][S03075] Loss=0.9252 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:13:35,428 [INFO] [Phase3b][S03100] Loss=0.6479 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:13:35,428 [INFO] [Phase3b][S03100] Loss=0.6479 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:13:53,502 [INFO] [Phase3b][S03125] Loss=0.5842 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:13:53,502 [INFO] [Phase3b][S03125] Loss=0.5842 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:14:10,973 [INFO] [Phase3b][S03150] Loss=0.4436 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:14:10,973 [INFO] [Phase3b][S03150] Loss=0.4436 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:14:30,613 [INFO] [Phase3b][S03175] Loss=0.5521 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:14:30,613 [INFO] [Phase3b][S03175] Loss=0.5521 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:14:49,242 [INFO] [Phase3b][S03200] Loss=0.4923 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:14:49,242 [INFO] [Phase3b][S03200] Loss=0.4923 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:15:09,682 [INFO] [Phase3b][S03225] Loss=0.8309 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:15:09,682 [INFO] [Phase3b][S03225] Loss=0.8309 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:15:29,430 [INFO] [Phase3b][S03250] Loss=0.8369 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:15:29,430 [INFO] [Phase3b][S03250] Loss=0.8369 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:15:48,236 [INFO] [Phase3b][S03275] Loss=0.6158 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:15:48,236 [INFO] [Phase3b][S03275] Loss=0.6158 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:16:08,279 [INFO] [Phase3b][S03300] Loss=0.7000 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:16:08,279 [INFO] [Phase3b][S03300] Loss=0.7000 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:16:27,164 [INFO] [Phase3b][S03325] Loss=0.7460 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:16:27,164 [INFO] [Phase3b][S03325] Loss=0.7460 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:16:44,898 [INFO] [Phase3b][S03350] Loss=0.6508 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:16:44,898 [INFO] [Phase3b][S03350] Loss=0.6508 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:17:01,989 [INFO] [Phase3b][S03375] Loss=0.3720 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:17:01,989 [INFO] [Phase3b][S03375] Loss=0.3720 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:17:23,065 [INFO] [Phase3b][S03400] Loss=0.8582 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:17:23,065 [INFO] [Phase3b][S03400] Loss=0.8582 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:17:42,648 [INFO] [Phase3b][S03425] Loss=0.7766 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:17:42,648 [INFO] [Phase3b][S03425] Loss=0.7766 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:18:02,594 [INFO] [Phase3b][S03450] Loss=0.6882 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:18:02,594 [INFO] [Phase3b][S03450] Loss=0.6882 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:18:21,451 [INFO] [Phase3b][S03475] Loss=0.4297 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:18:21,451 [INFO] [Phase3b][S03475] Loss=0.4297 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:18:40,899 [INFO] [Phase3b][S03500] Loss=0.7821 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:18:40,899 [INFO] [Phase3b][S03500] Loss=0.7821 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:18:41,133 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step003500 | val=0.0000
+2026-04-27 21:18:41,133 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step003500 | val=0.0000
+2026-04-27 21:18:58,758 [INFO] [Phase3b][S03525] Loss=0.2896 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:18:58,758 [INFO] [Phase3b][S03525] Loss=0.2896 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:19:19,429 [INFO] [Phase3b][S03550] Loss=0.8043 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:19:19,429 [INFO] [Phase3b][S03550] Loss=0.8043 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:19:38,792 [INFO] [Phase3b][S03575] Loss=0.6455 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:19:38,792 [INFO] [Phase3b][S03575] Loss=0.6455 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:19:57,625 [INFO] [Phase3b][S03600] Loss=0.5341 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:19:57,625 [INFO] [Phase3b][S03600] Loss=0.5341 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:20:17,279 [INFO] [Phase3b][S03625] Loss=0.6666 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:20:17,279 [INFO] [Phase3b][S03625] Loss=0.6666 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:20:35,118 [INFO] [Phase3b][S03650] Loss=0.5793 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:20:35,118 [INFO] [Phase3b][S03650] Loss=0.5793 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:20:54,076 [INFO] [Phase3b][S03675] Loss=0.6713 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:20:54,076 [INFO] [Phase3b][S03675] Loss=0.6713 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:21:13,926 [INFO] [Phase3b][S03700] Loss=0.5909 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:21:13,926 [INFO] [Phase3b][S03700] Loss=0.5909 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:21:31,741 [INFO] [Phase3b][S03725] Loss=0.3204 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:21:31,741 [INFO] [Phase3b][S03725] Loss=0.3204 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:21:51,979 [INFO] [Phase3b][S03750] Loss=0.6632 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:21:51,979 [INFO] [Phase3b][S03750] Loss=0.6632 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:22:10,312 [INFO] [Phase3b][S03775] Loss=0.3164 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:22:10,312 [INFO] [Phase3b][S03775] Loss=0.3164 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:22:28,964 [INFO] [Phase3b][S03800] Loss=0.6097 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:22:28,964 [INFO] [Phase3b][S03800] Loss=0.6097 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:22:49,003 [INFO] [Phase3b][S03825] Loss=0.5549 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:22:49,003 [INFO] [Phase3b][S03825] Loss=0.5549 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:23:07,877 [INFO] [Phase3b][S03850] Loss=0.4385 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:23:07,877 [INFO] [Phase3b][S03850] Loss=0.4385 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:23:27,143 [INFO] [Phase3b][S03875] Loss=0.6614 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:23:27,143 [INFO] [Phase3b][S03875] Loss=0.6614 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:23:47,075 [INFO] [Phase3b][S03900] Loss=0.7142 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:23:47,075 [INFO] [Phase3b][S03900] Loss=0.7142 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:24:05,148 [INFO] [Phase3b][S03925] Loss=0.4722 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:24:05,148 [INFO] [Phase3b][S03925] Loss=0.4722 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:24:22,171 [INFO] [Phase3b][S03950] Loss=0.3653 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:24:22,171 [INFO] [Phase3b][S03950] Loss=0.3653 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:24:41,227 [INFO] [Phase3b][S03975] Loss=0.4474 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:24:41,227 [INFO] [Phase3b][S03975] Loss=0.4474 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:24:59,779 [INFO] [Phase3b][S04000] Loss=0.5884 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:24:59,779 [INFO] [Phase3b][S04000] Loss=0.5884 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:25:00,016 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step004000 | val=0.0000
+2026-04-27 21:25:00,016 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step004000 | val=0.0000
+2026-04-27 21:25:19,833 [INFO] [Phase3b][S04025] Loss=0.4569 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:25:19,833 [INFO] [Phase3b][S04025] Loss=0.4569 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:25:38,519 [INFO] [Phase3b][S04050] Loss=0.4819 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:25:38,519 [INFO] [Phase3b][S04050] Loss=0.4819 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:25:57,771 [INFO] [Phase3b][S04075] Loss=0.4740 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:25:57,771 [INFO] [Phase3b][S04075] Loss=0.4740 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:26:16,579 [INFO] [Phase3b][S04100] Loss=0.6455 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:26:16,579 [INFO] [Phase3b][S04100] Loss=0.6455 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:26:33,981 [INFO] [Phase3b][S04125] Loss=0.4459 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:26:33,981 [INFO] [Phase3b][S04125] Loss=0.4459 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:26:54,220 [INFO] [Phase3b][S04150] Loss=0.7313 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:26:54,220 [INFO] [Phase3b][S04150] Loss=0.7313 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:27:14,590 [INFO] [Phase3b][S04175] Loss=0.6753 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:27:14,590 [INFO] [Phase3b][S04175] Loss=0.6753 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:27:33,884 [INFO] [Phase3b][S04200] Loss=0.4845 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:27:33,884 [INFO] [Phase3b][S04200] Loss=0.4845 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:27:53,185 [INFO] [Phase3b][S04225] Loss=0.5707 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:27:53,185 [INFO] [Phase3b][S04225] Loss=0.5707 | Acc=0.000 | AnsAcc=0.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:28:11,215 [INFO] [Phase3b][S04250] Loss=0.4456 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:28:11,215 [INFO] [Phase3b][S04250] Loss=0.4456 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:28:29,095 [INFO] [Phase3b][S04275] Loss=0.4640 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:28:29,095 [INFO] [Phase3b][S04275] Loss=0.4640 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:28:48,775 [INFO] [Phase3b][S04300] Loss=0.8936 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:28:48,775 [INFO] [Phase3b][S04300] Loss=0.8936 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:29:07,690 [INFO] [Phase3b][S04325] Loss=0.6110 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:29:07,690 [INFO] [Phase3b][S04325] Loss=0.6110 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:29:27,163 [INFO] [Phase3b][S04350] Loss=0.6297 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:29:27,163 [INFO] [Phase3b][S04350] Loss=0.6297 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:29:45,431 [INFO] [Phase3b][S04375] Loss=0.4567 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:29:45,431 [INFO] [Phase3b][S04375] Loss=0.4567 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:30:04,865 [INFO] [Phase3b][S04400] Loss=0.4364 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:30:04,865 [INFO] [Phase3b][S04400] Loss=0.4364 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:30:23,541 [INFO] [Phase3b][S04425] Loss=0.4285 | Acc=0.600 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:30:23,541 [INFO] [Phase3b][S04425] Loss=0.4285 | Acc=0.600 | AnsAcc=0.500 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:30:42,902 [INFO] [Phase3b][S04450] Loss=0.6014 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:30:42,902 [INFO] [Phase3b][S04450] Loss=0.6014 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:31:00,334 [INFO] [Phase3b][S04475] Loss=0.2991 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:31:00,334 [INFO] [Phase3b][S04475] Loss=0.2991 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:31:18,813 [INFO] [Phase3b][S04500] Loss=0.5488 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:31:18,813 [INFO] [Phase3b][S04500] Loss=0.5488 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:31:19,051 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step004500 | val=0.0000
+2026-04-27 21:31:19,051 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step004500 | val=0.0000
+2026-04-27 21:31:36,931 [INFO] [Phase3b][S04525] Loss=0.1721 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:31:36,931 [INFO] [Phase3b][S04525] Loss=0.1721 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:31:54,031 [INFO] [Phase3b][S04550] Loss=0.3740 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:31:54,031 [INFO] [Phase3b][S04550] Loss=0.3740 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:32:13,077 [INFO] [Phase3b][S04575] Loss=0.2761 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:32:13,077 [INFO] [Phase3b][S04575] Loss=0.2761 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:32:33,155 [INFO] [Phase3b][S04600] Loss=0.4462 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:32:33,155 [INFO] [Phase3b][S04600] Loss=0.4462 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:32:53,355 [INFO] [Phase3b][S04625] Loss=0.7615 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:32:53,355 [INFO] [Phase3b][S04625] Loss=0.7615 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:33:13,194 [INFO] [Phase3b][S04650] Loss=0.5336 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:33:13,194 [INFO] [Phase3b][S04650] Loss=0.5336 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:33:31,399 [INFO] [Phase3b][S04675] Loss=0.6283 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:33:31,399 [INFO] [Phase3b][S04675] Loss=0.6283 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:33:51,012 [INFO] [Phase3b][S04700] Loss=0.3892 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:33:51,012 [INFO] [Phase3b][S04700] Loss=0.3892 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:34:09,098 [INFO] [Phase3b][S04725] Loss=0.3145 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:34:09,098 [INFO] [Phase3b][S04725] Loss=0.3145 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:34:26,992 [INFO] [Phase3b][S04750] Loss=0.0390 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:34:26,992 [INFO] [Phase3b][S04750] Loss=0.0390 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:34:47,018 [INFO] [Phase3b][S04775] Loss=0.6101 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:34:47,018 [INFO] [Phase3b][S04775] Loss=0.6101 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:35:06,690 [INFO] [Phase3b][S04800] Loss=1.1058 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:35:06,690 [INFO] [Phase3b][S04800] Loss=1.1058 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:35:27,388 [INFO] [Phase3b][S04825] Loss=0.5571 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:35:27,388 [INFO] [Phase3b][S04825] Loss=0.5571 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:35:46,498 [INFO] [Phase3b][S04850] Loss=0.3453 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:35:46,498 [INFO] [Phase3b][S04850] Loss=0.3453 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:36:07,012 [INFO] [Phase3b][S04875] Loss=0.6410 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:36:07,012 [INFO] [Phase3b][S04875] Loss=0.6410 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:36:27,202 [INFO] [Phase3b][S04900] Loss=0.2989 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:36:27,202 [INFO] [Phase3b][S04900] Loss=0.2989 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:36:47,068 [INFO] [Phase3b][S04925] Loss=0.3539 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:36:47,068 [INFO] [Phase3b][S04925] Loss=0.3539 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:37:04,793 [INFO] [Phase3b][S04950] Loss=0.3276 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:37:04,793 [INFO] [Phase3b][S04950] Loss=0.3276 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:37:24,317 [INFO] [Phase3b][S04975] Loss=0.6816 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:37:24,317 [INFO] [Phase3b][S04975] Loss=0.6816 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:37:44,108 [INFO] [Phase3b][S05000] Loss=0.5802 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:37:44,108 [INFO] [Phase3b][S05000] Loss=0.5802 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:37:44,342 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step005000 | val=0.0000
+2026-04-27 21:37:44,342 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step005000 | val=0.0000
+2026-04-27 21:38:03,062 [INFO] [Phase3b][S05025] Loss=0.4269 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:38:03,062 [INFO] [Phase3b][S05025] Loss=0.4269 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:38:23,198 [INFO] [Phase3b][S05050] Loss=0.7880 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:38:23,198 [INFO] [Phase3b][S05050] Loss=0.7880 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:38:41,868 [INFO] [Phase3b][S05075] Loss=0.4518 | Acc=0.667 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:38:41,868 [INFO] [Phase3b][S05075] Loss=0.4518 | Acc=0.667 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 21:39:00,400 [INFO] [Phase3b][S05100] Loss=0.3131 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:39:00,400 [INFO] [Phase3b][S05100] Loss=0.3131 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:39:19,648 [INFO] [Phase3b][S05125] Loss=0.4534 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:39:19,648 [INFO] [Phase3b][S05125] Loss=0.4534 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:39:40,125 [INFO] [Phase3b][S05150] Loss=0.7921 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:39:40,125 [INFO] [Phase3b][S05150] Loss=0.7921 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:39:59,061 [INFO] [Phase3b][S05175] Loss=0.3525 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:39:59,061 [INFO] [Phase3b][S05175] Loss=0.3525 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:40:19,025 [INFO] [Phase3b][S05200] Loss=0.5146 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:40:19,025 [INFO] [Phase3b][S05200] Loss=0.5146 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:40:37,925 [INFO] [Phase3b][S05225] Loss=0.3926 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:40:37,925 [INFO] [Phase3b][S05225] Loss=0.3926 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:40:57,743 [INFO] [Phase3b][S05250] Loss=0.5337 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:40:57,743 [INFO] [Phase3b][S05250] Loss=0.5337 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:41:18,066 [INFO] [Phase3b][S05275] Loss=0.4938 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:41:18,066 [INFO] [Phase3b][S05275] Loss=0.4938 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:41:37,402 [INFO] [Phase3b][S05300] Loss=0.4091 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:41:37,402 [INFO] [Phase3b][S05300] Loss=0.4091 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:41:58,665 [INFO] [Phase3b][S05325] Loss=0.6743 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:41:58,665 [INFO] [Phase3b][S05325] Loss=0.6743 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:42:18,069 [INFO] [Phase3b][S05350] Loss=0.4692 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:42:18,069 [INFO] [Phase3b][S05350] Loss=0.4692 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:42:38,407 [INFO] [Phase3b][S05375] Loss=0.5678 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:42:38,407 [INFO] [Phase3b][S05375] Loss=0.5678 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:42:57,509 [INFO] [Phase3b][S05400] Loss=0.2717 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:42:57,509 [INFO] [Phase3b][S05400] Loss=0.2717 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:43:15,850 [INFO] [Phase3b][S05425] Loss=0.0681 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:43:15,850 [INFO] [Phase3b][S05425] Loss=0.0681 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:43:34,393 [INFO] [Phase3b][S05450] Loss=0.2054 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:43:34,393 [INFO] [Phase3b][S05450] Loss=0.2054 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:43:53,375 [INFO] [Phase3b][S05475] Loss=0.5517 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:43:53,375 [INFO] [Phase3b][S05475] Loss=0.5517 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:44:12,915 [INFO] [Phase3b][S05500] Loss=0.4936 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:44:12,915 [INFO] [Phase3b][S05500] Loss=0.4936 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:44:13,151 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step005500 | val=0.0000
+2026-04-27 21:44:13,151 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step005500 | val=0.0000
+2026-04-27 21:44:33,468 [INFO] [Phase3b][S05525] Loss=0.3791 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:44:33,468 [INFO] [Phase3b][S05525] Loss=0.3791 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:44:52,521 [INFO] [Phase3b][S05550] Loss=0.5527 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:44:52,521 [INFO] [Phase3b][S05550] Loss=0.5527 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:45:11,832 [INFO] [Phase3b][S05575] Loss=0.3833 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:45:11,832 [INFO] [Phase3b][S05575] Loss=0.3833 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:45:33,462 [INFO] [Phase3b][S05600] Loss=1.0270 | Acc=0.667 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.47GB
+2026-04-27 21:45:33,462 [INFO] [Phase3b][S05600] Loss=1.0270 | Acc=0.667 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.47GB
+2026-04-27 21:45:51,724 [INFO] [Phase3b][S05625] Loss=0.3585 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:45:51,724 [INFO] [Phase3b][S05625] Loss=0.3585 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:46:09,083 [INFO] [Phase3b][S05650] Loss=0.1849 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:46:09,083 [INFO] [Phase3b][S05650] Loss=0.1849 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:46:30,004 [INFO] [Phase3b][S05675] Loss=0.4774 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:46:30,004 [INFO] [Phase3b][S05675] Loss=0.4774 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:46:49,480 [INFO] [Phase3b][S05700] Loss=0.7967 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:46:49,480 [INFO] [Phase3b][S05700] Loss=0.7967 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:47:12,063 [INFO] [Phase3b][S05725] Loss=1.1181 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:47:12,063 [INFO] [Phase3b][S05725] Loss=1.1181 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:47:31,999 [INFO] [Phase3b][S05750] Loss=0.5065 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:47:31,999 [INFO] [Phase3b][S05750] Loss=0.5065 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:47:53,306 [INFO] [Phase3b][S05775] Loss=0.7975 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:47:53,306 [INFO] [Phase3b][S05775] Loss=0.7975 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:48:13,011 [INFO] [Phase3b][S05800] Loss=0.3935 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:48:13,011 [INFO] [Phase3b][S05800] Loss=0.3935 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:48:31,224 [INFO] [Phase3b][S05825] Loss=0.3598 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:48:31,224 [INFO] [Phase3b][S05825] Loss=0.3598 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:48:48,591 [INFO] [Phase3b][S05850] Loss=0.2345 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:48:48,591 [INFO] [Phase3b][S05850] Loss=0.2345 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:49:07,079 [INFO] [Phase3b][S05875] Loss=0.3727 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:49:07,079 [INFO] [Phase3b][S05875] Loss=0.3727 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:49:27,007 [INFO] [Phase3b][S05900] Loss=0.5753 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:49:27,007 [INFO] [Phase3b][S05900] Loss=0.5753 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:49:45,969 [INFO] [Phase3b][S05925] Loss=0.5645 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:49:45,969 [INFO] [Phase3b][S05925] Loss=0.5645 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:50:06,503 [INFO] [Phase3b][S05950] Loss=0.6364 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:50:06,503 [INFO] [Phase3b][S05950] Loss=0.6364 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:50:26,655 [INFO] [Phase3b][S05975] Loss=0.4146 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:50:26,655 [INFO] [Phase3b][S05975] Loss=0.4146 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:50:45,432 [INFO] [Phase3b][S06000] Loss=0.1580 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:50:45,432 [INFO] [Phase3b][S06000] Loss=0.1580 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:50:45,669 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step006000 | val=0.0000
+2026-04-27 21:50:45,669 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step006000 | val=0.0000
+2026-04-27 21:51:04,364 [INFO] [Phase3b][S06025] Loss=0.3170 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:51:04,364 [INFO] [Phase3b][S06025] Loss=0.3170 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:51:23,900 [INFO] [Phase3b][S06050] Loss=0.4569 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:51:23,900 [INFO] [Phase3b][S06050] Loss=0.4569 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:51:43,936 [INFO] [Phase3b][S06075] Loss=0.8042 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:51:43,936 [INFO] [Phase3b][S06075] Loss=0.8042 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:52:03,008 [INFO] [Phase3b][S06100] Loss=1.0990 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:52:03,008 [INFO] [Phase3b][S06100] Loss=1.0990 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:52:22,360 [INFO] [Phase3b][S06125] Loss=0.4280 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:52:22,360 [INFO] [Phase3b][S06125] Loss=0.4280 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:52:42,296 [INFO] [Phase3b][S06150] Loss=0.7683 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:52:42,296 [INFO] [Phase3b][S06150] Loss=0.7683 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:53:00,264 [INFO] [Phase3b][S06175] Loss=0.3419 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:53:00,264 [INFO] [Phase3b][S06175] Loss=0.3419 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:53:20,436 [INFO] [Phase3b][S06200] Loss=0.2918 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:53:20,436 [INFO] [Phase3b][S06200] Loss=0.2918 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:53:41,353 [INFO] [Phase3b][S06225] Loss=0.6819 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:53:41,353 [INFO] [Phase3b][S06225] Loss=0.6819 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:53:59,431 [INFO] [Phase3b][S06250] Loss=0.3401 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:53:59,431 [INFO] [Phase3b][S06250] Loss=0.3401 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:54:19,360 [INFO] [Phase3b][S06275] Loss=0.7097 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:54:19,360 [INFO] [Phase3b][S06275] Loss=0.7097 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:54:38,390 [INFO] [Phase3b][S06300] Loss=0.3547 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:54:38,390 [INFO] [Phase3b][S06300] Loss=0.3547 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:54:57,861 [INFO] [Phase3b][S06325] Loss=0.4421 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:54:57,861 [INFO] [Phase3b][S06325] Loss=0.4421 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:55:16,783 [INFO] [Phase3b][S06350] Loss=0.4726 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:55:16,783 [INFO] [Phase3b][S06350] Loss=0.4726 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:55:37,704 [INFO] [Phase3b][S06375] Loss=0.7398 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:55:37,704 [INFO] [Phase3b][S06375] Loss=0.7398 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:55:57,683 [INFO] [Phase3b][S06400] Loss=0.4008 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:55:57,683 [INFO] [Phase3b][S06400] Loss=0.4008 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:56:14,980 [INFO] [Phase3b][S06425] Loss=0.4456 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:56:14,980 [INFO] [Phase3b][S06425] Loss=0.4456 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:56:33,890 [INFO] [Phase3b][S06450] Loss=0.1826 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:56:33,890 [INFO] [Phase3b][S06450] Loss=0.1826 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:56:53,750 [INFO] [Phase3b][S06475] Loss=0.4301 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:56:53,750 [INFO] [Phase3b][S06475] Loss=0.4301 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:57:14,085 [INFO] [Phase3b][S06500] Loss=0.4265 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:57:14,085 [INFO] [Phase3b][S06500] Loss=0.4265 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:57:14,320 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step006500 | val=0.0000
+2026-04-27 21:57:14,320 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step006500 | val=0.0000
+2026-04-27 21:57:34,735 [INFO] [Phase3b][S06525] Loss=0.6486 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:57:34,735 [INFO] [Phase3b][S06525] Loss=0.6486 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:57:54,462 [INFO] [Phase3b][S06550] Loss=0.5149 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:57:54,462 [INFO] [Phase3b][S06550] Loss=0.5149 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:58:12,341 [INFO] [Phase3b][S06575] Loss=0.2006 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:58:12,341 [INFO] [Phase3b][S06575] Loss=0.2006 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:58:31,533 [INFO] [Phase3b][S06600] Loss=0.3198 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:58:31,533 [INFO] [Phase3b][S06600] Loss=0.3198 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 21:58:50,892 [INFO] [Phase3b][S06625] Loss=0.3616 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:58:50,892 [INFO] [Phase3b][S06625] Loss=0.3616 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:59:10,709 [INFO] [Phase3b][S06650] Loss=0.4737 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:59:10,709 [INFO] [Phase3b][S06650] Loss=0.4737 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:59:29,687 [INFO] [Phase3b][S06675] Loss=0.4274 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:59:29,687 [INFO] [Phase3b][S06675] Loss=0.4274 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:59:51,845 [INFO] [Phase3b][S06700] Loss=1.1428 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 21:59:51,845 [INFO] [Phase3b][S06700] Loss=1.1428 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:00:10,549 [INFO] [Phase3b][S06725] Loss=0.5799 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:00:10,549 [INFO] [Phase3b][S06725] Loss=0.5799 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:00:29,891 [INFO] [Phase3b][S06750] Loss=0.3324 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:00:29,891 [INFO] [Phase3b][S06750] Loss=0.3324 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:00:47,870 [INFO] [Phase3b][S06775] Loss=0.4692 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:00:47,870 [INFO] [Phase3b][S06775] Loss=0.4692 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:01:07,697 [INFO] [Phase3b][S06800] Loss=0.7611 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:01:07,697 [INFO] [Phase3b][S06800] Loss=0.7611 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:01:27,028 [INFO] [Phase3b][S06825] Loss=0.4935 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:01:27,028 [INFO] [Phase3b][S06825] Loss=0.4935 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:01:45,363 [INFO] [Phase3b][S06850] Loss=0.1502 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:01:45,363 [INFO] [Phase3b][S06850] Loss=0.1502 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:02:05,829 [INFO] [Phase3b][S06875] Loss=0.5518 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:02:05,829 [INFO] [Phase3b][S06875] Loss=0.5518 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:02:25,072 [INFO] [Phase3b][S06900] Loss=0.3155 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:02:25,072 [INFO] [Phase3b][S06900] Loss=0.3155 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:02:42,231 [INFO] [Phase3b][S06925] Loss=0.1369 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:02:42,231 [INFO] [Phase3b][S06925] Loss=0.1369 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:03:01,129 [INFO] [Phase3b][S06950] Loss=0.3564 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:03:01,129 [INFO] [Phase3b][S06950] Loss=0.3564 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:03:19,687 [INFO] [Phase3b][S06975] Loss=0.5983 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:03:19,687 [INFO] [Phase3b][S06975] Loss=0.5983 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:03:39,459 [INFO] [Phase3b][S07000] Loss=0.3395 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:03:39,459 [INFO] [Phase3b][S07000] Loss=0.3395 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:03:39,691 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step007000 | val=0.0000
+2026-04-27 22:03:39,691 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step007000 | val=0.0000
+2026-04-27 22:03:58,913 [INFO] [Phase3b][S07025] Loss=0.3655 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:03:58,913 [INFO] [Phase3b][S07025] Loss=0.3655 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:04:19,247 [INFO] [Phase3b][S07050] Loss=0.6412 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:04:19,247 [INFO] [Phase3b][S07050] Loss=0.6412 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:04:37,780 [INFO] [Phase3b][S07075] Loss=0.2523 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:04:37,780 [INFO] [Phase3b][S07075] Loss=0.2523 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:04:55,268 [INFO] [Phase3b][S07100] Loss=0.4971 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:04:55,268 [INFO] [Phase3b][S07100] Loss=0.4971 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:05:14,305 [INFO] [Phase3b][S07125] Loss=0.4668 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:05:14,305 [INFO] [Phase3b][S07125] Loss=0.4668 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:05:32,790 [INFO] [Phase3b][S07150] Loss=0.4421 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:05:32,790 [INFO] [Phase3b][S07150] Loss=0.4421 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:05:51,321 [INFO] [Phase3b][S07175] Loss=0.3506 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 22:05:51,321 [INFO] [Phase3b][S07175] Loss=0.3506 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 22:06:10,475 [INFO] [Phase3b][S07200] Loss=0.3277 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:06:10,475 [INFO] [Phase3b][S07200] Loss=0.3277 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:06:29,517 [INFO] [Phase3b][S07225] Loss=0.4627 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:06:29,517 [INFO] [Phase3b][S07225] Loss=0.4627 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:06:50,397 [INFO] [Phase3b][S07250] Loss=0.4217 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:06:50,397 [INFO] [Phase3b][S07250] Loss=0.4217 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:07:12,241 [INFO] [Phase3b][S07275] Loss=0.4723 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:07:12,241 [INFO] [Phase3b][S07275] Loss=0.4723 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:07:32,290 [INFO] [Phase3b][S07300] Loss=0.5266 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:07:32,290 [INFO] [Phase3b][S07300] Loss=0.5266 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:07:50,319 [INFO] [Phase3b][S07325] Loss=0.5379 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:07:50,319 [INFO] [Phase3b][S07325] Loss=0.5379 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:08:07,966 [INFO] [Phase3b][S07350] Loss=0.1645 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:08:07,966 [INFO] [Phase3b][S07350] Loss=0.1645 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:08:28,657 [INFO] [Phase3b][S07375] Loss=0.3193 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:08:28,657 [INFO] [Phase3b][S07375] Loss=0.3193 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:08:47,679 [INFO] [Phase3b][S07400] Loss=0.4909 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:08:47,679 [INFO] [Phase3b][S07400] Loss=0.4909 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:09:08,037 [INFO] [Phase3b][S07425] Loss=0.6615 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:09:08,037 [INFO] [Phase3b][S07425] Loss=0.6615 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:09:27,086 [INFO] [Phase3b][S07450] Loss=0.1389 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:09:27,086 [INFO] [Phase3b][S07450] Loss=0.1389 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:09:45,150 [INFO] [Phase3b][S07475] Loss=0.5436 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:09:45,150 [INFO] [Phase3b][S07475] Loss=0.5436 | Acc=0.500 | AnsAcc=0.333 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:10:03,147 [INFO] [Phase3b][S07500] Loss=0.1097 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:10:03,147 [INFO] [Phase3b][S07500] Loss=0.1097 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:10:03,380 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step007500 | val=0.0000
+2026-04-27 22:10:03,380 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step007500 | val=0.0000
+2026-04-27 22:10:23,965 [INFO] [Phase3b][S07525] Loss=0.6349 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:10:23,965 [INFO] [Phase3b][S07525] Loss=0.6349 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:10:44,633 [INFO] [Phase3b][S07550] Loss=0.4126 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:10:44,633 [INFO] [Phase3b][S07550] Loss=0.4126 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:11:05,280 [INFO] [Phase3b][S07575] Loss=0.7870 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:11:05,280 [INFO] [Phase3b][S07575] Loss=0.7870 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:11:24,869 [INFO] [Phase3b][S07600] Loss=0.6031 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:11:24,869 [INFO] [Phase3b][S07600] Loss=0.6031 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:11:43,309 [INFO] [Phase3b][S07625] Loss=0.3804 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:11:43,309 [INFO] [Phase3b][S07625] Loss=0.3804 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:12:04,400 [INFO] [Phase3b][S07650] Loss=0.6876 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:12:04,400 [INFO] [Phase3b][S07650] Loss=0.6876 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:12:23,825 [INFO] [Phase3b][S07675] Loss=0.4001 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:12:23,825 [INFO] [Phase3b][S07675] Loss=0.4001 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:12:42,100 [INFO] [Phase3b][S07700] Loss=0.4157 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:12:42,100 [INFO] [Phase3b][S07700] Loss=0.4157 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:12:59,271 [INFO] [Phase3b][S07725] Loss=0.1876 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:12:59,271 [INFO] [Phase3b][S07725] Loss=0.1876 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:13:19,444 [INFO] [Phase3b][S07750] Loss=0.6317 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:13:19,444 [INFO] [Phase3b][S07750] Loss=0.6317 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:13:37,402 [INFO] [Phase3b][S07775] Loss=0.4415 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:13:37,402 [INFO] [Phase3b][S07775] Loss=0.4415 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:13:56,825 [INFO] [Phase3b][S07800] Loss=0.4924 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:13:56,825 [INFO] [Phase3b][S07800] Loss=0.4924 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:14:15,367 [INFO] [Phase3b][S07825] Loss=0.4381 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:14:15,367 [INFO] [Phase3b][S07825] Loss=0.4381 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:14:37,634 [INFO] [Phase3b][S07850] Loss=0.7415 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:14:37,634 [INFO] [Phase3b][S07850] Loss=0.7415 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+                                                                                                                                                                                                                                            === RESUME PHASE 3b from step 7500 ===
+2026-04-27 22:25:20,088 [INFO] ============================================================
+2026-04-27 22:25:20,088 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:25:20,088 [INFO]   Phase: 3b
+2026-04-27 22:25:20,088 [INFO] ============================================================
+2026-04-27 22:25:20,109 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:25:20,174 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 22:25:20,195 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:25:20,663 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 22:25:20,664 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 22:25:38,222 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step007500
+2026-04-27 22:25:38,260 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:25:38,291 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:25:38,381 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:25:38,722 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:25:38,723 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:25:38,724 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:25:41,045 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:25:41,213 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:25:41,213 [INFO] 
+============================================================
+2026-04-27 22:25:41,213 [INFO]   Starting Phase 3b
+2026-04-27 22:25:41,213 [INFO] ============================================================
+2026-04-27 22:25:41,213 [INFO]   Resuming from step 7500 (skipping already-done steps)
+2026-04-27 22:25:41,223 [INFO] Phase 3b: 8000 steps, batch=1, accum=8
+2026-04-27 22:26:06,671 [INFO] [Phase3b][S07525] Loss=3.6685 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:26:25,631 [INFO] [Phase3b][S07550] Loss=1.1739 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:26:44,732 [INFO] [Phase3b][S07575] Loss=1.3180 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:27:05,214 [INFO] [Phase3b][S07600] Loss=0.9894 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:27:24,185 [INFO] [Phase3b][S07625] Loss=1.1342 | Acc=0.750 | AnsAcc=0.667 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:27:43,233 [INFO] [Phase3b][S07650] Loss=1.0205 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:28:03,409 [INFO] [Phase3b][S07675] Loss=1.1569 | Acc=0.250 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:28:21,524 [INFO] [Phase3b][S07700] Loss=0.4705 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:28:40,284 [INFO] [Phase3b][S07725] Loss=0.9689 | Acc=0.667 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 22:28:59,444 [INFO] [Phase3b][S07750] Loss=1.0362 | Acc=0.500 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:29:18,743 [INFO] [Phase3b][S07775] Loss=0.8113 | Acc=0.200 | AnsAcc=0.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:29:38,918 [INFO] [Phase3b][S07800] Loss=0.7768 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:29:58,461 [INFO] [Phase3b][S07825] Loss=0.7325 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:30:16,607 [INFO] [Phase3b][S07850] Loss=0.5098 | Acc=0.400 | AnsAcc=0.250 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:30:36,166 [INFO] [Phase3b][S07875] Loss=1.9567 | Acc=0.500 | AnsAcc=1.000 | HaltAcc=0.000 | VRAM=3.78GB
+2026-04-27 22:30:57,601 [INFO] [Phase3b][S07900] Loss=1.7326 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:31:16,820 [INFO] [Phase3b][S07925] Loss=0.5113 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:31:36,654 [INFO] [Phase3b][S07950] Loss=0.5412 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:31:57,991 [INFO] [Phase3b][S07975] Loss=0.5091 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.78GB
+2026-04-27 22:32:18,572 [INFO] [Phase3b][S08000] Loss=0.8421 | Acc=1.000 | AnsAcc=1.000 | HaltAcc=1.000 | VRAM=3.47GB
+2026-04-27 22:32:18,818 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000 | val=0.0000
+2026-04-27 22:32:18,818 [INFO] Phase 3b complete at step 8000.
+2026-04-27 22:32:18,820 [INFO] All phases complete.
+2026-04-27 22:32:21,162 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phasefinal_step099999 | val=0.0000
+2026-04-27 22:32:21,163 [INFO] Final checkpoint saved to: /hdd_data/rlf-1.4b-checkpoints/final
+=== Phase 3b complete, starting 3c ===
+2026-04-27 22:32:31,120 [INFO] ============================================================
+2026-04-27 22:32:31,121 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:32:31,121 [INFO]   Phase: 3c
+2026-04-27 22:32:31,121 [INFO] ============================================================
+2026-04-27 22:32:31,138 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:32:31,204 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 22:32:31,225 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:32:31,536 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 22:32:34,883 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step007500
+2026-04-27 22:32:34,884 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:32:34,887 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:32:34,887 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:32:34,897 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:32:34,898 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:32:34,898 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:32:35,001 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:32:35,023 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:32:35,023 [INFO] 
+============================================================
+2026-04-27 22:32:35,023 [INFO]   Starting Phase 3c
+2026-04-27 22:32:35,023 [INFO] ============================================================
+2026-04-27 22:37:08,337 [INFO] ============================================================
+2026-04-27 22:37:08,337 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:37:08,337 [INFO]   Phase: 3c
+2026-04-27 22:37:08,337 [INFO] ============================================================
+2026-04-27 22:37:08,356 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:37:08,430 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 22:37:08,430 [WARNING] Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+2026-04-27 22:37:08,451 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:37:08,783 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 22:37:12,357 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000
+2026-04-27 22:37:12,358 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:37:12,359 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:37:12,359 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:37:12,369 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:37:12,370 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:37:12,370 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:37:12,478 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:37:12,500 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:37:12,500 [INFO] 
+============================================================
+2026-04-27 22:37:12,500 [INFO]   Starting Phase 3c
+2026-04-27 22:37:12,500 [INFO] ============================================================
+2026-04-27 22:39:14,200 [INFO] ============================================================
+2026-04-27 22:39:14,200 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:39:14,200 [INFO]   Phase: 3c
+2026-04-27 22:39:14,200 [INFO] ============================================================
+2026-04-27 22:39:14,217 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:39:14,278 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 22:39:14,298 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:39:14,620 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 22:39:18,194 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000
+2026-04-27 22:39:18,195 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:39:18,196 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:39:18,197 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:39:18,208 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:39:18,209 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:39:18,209 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:39:18,319 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:39:18,341 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:39:18,342 [INFO] 
+============================================================
+2026-04-27 22:39:18,342 [INFO]   Starting Phase 3c
+2026-04-27 22:39:18,342 [INFO] ============================================================
+2026-04-27 22:39:18,738 [INFO] Phase 3c: 1000 steps, batch=1, accum=8
+2026-04-27 22:41:42,683 [INFO] ============================================================
+2026-04-27 22:41:42,683 [INFO]   Mamba-1.4B RLF Trainer
+2026-04-27 22:41:42,683 [INFO]   Phase: 3c
+2026-04-27 22:41:42,683 [INFO] ============================================================
+2026-04-27 22:41:42,700 [INFO] Loading from SFT checkpoint: /hdd_data/latent-spacer-checkpoints/best
+2026-04-27 22:41:42,775 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/config.json "HTTP/1.1 307 Temporary Redirect"
+2026-04-27 22:41:42,794 [INFO] HTTP Request: HEAD https://huggingface.co/api/resolve-cache/models/state-spaces/mamba-1.4b/ef1092d8dc2123005d7d608c12665be82cd4c576/config.json "HTTP/1.1 200 OK"
+2026-04-27 22:41:43,132 [INFO] HTTP Request: HEAD https://huggingface.co/state-spaces/mamba-1.4b/resolve/main/pytorch_model.bin "HTTP/1.1 302 Found"
+2026-04-27 22:41:46,533 [INFO] Resuming from: /hdd_data/rlf-1.4b-checkpoints/phase3b_step008000
+2026-04-27 22:41:46,534 [INFO]   Loaded: latent_memory.pt
+2026-04-27 22:41:46,534 [INFO]   Loaded: bridge_down.pt
+2026-04-27 22:41:46,535 [INFO]   Loaded: bridge_up.pt
+2026-04-27 22:41:46,545 [INFO]   Loaded: mamba1_loop.pt
+2026-04-27 22:41:46,545 [INFO]   Loaded: loop_norm.pt
+2026-04-27 22:41:46,546 [INFO]   Loaded: lifeline_gate.pt
+2026-04-27 22:41:46,650 [INFO]   Loaded: lm_head.pt
+2026-04-27 22:41:46,670 [INFO]   Loaded: lora.pt (96 tensors)
+2026-04-27 22:41:46,671 [INFO] 
+============================================================
+2026-04-27 22:41:46,671 [INFO]   Starting Phase 3c
+2026-04-27 22:41:46,671 [INFO] ============================================================
+2026-04-27 22:41:47,061 [INFO] Phase 3c: 1000 steps, batch=1, accum=8
+2026-04-27 22:42:02,305 [INFO] [Phase3c][S00025] Loss=34.4300 | VRAM=3.47GB
+2026-04-27 22:42:12,421 [INFO] [Phase3c][S00050] Loss=30.6600 | VRAM=3.47GB
+2026-04-27 22:42:22,534 [INFO] [Phase3c][S00075] Loss=32.6850 | VRAM=3.47GB
+2026-04-27 22:42:32,650 [INFO] [Phase3c][S00100] Loss=30.8600 | VRAM=3.47GB
+2026-04-27 22:42:42,758 [INFO] [Phase3c][S00125] Loss=32.5225 | VRAM=3.47GB
+2026-04-27 22:42:53,248 [INFO] [Phase3c][S00150] Loss=36.3100 | VRAM=3.47GB
+2026-04-27 22:43:04,071 [INFO] [Phase3c][S00175] Loss=34.7200 | VRAM=3.47GB
+2026-04-27 22:43:14,831 [INFO] [Phase3c][S00200] Loss=37.3100 | VRAM=3.27GB
+2026-04-27 22:43:25,361 [INFO] [Phase3c][S00225] Loss=33.8350 | VRAM=3.47GB
+2026-04-27 22:43:35,692 [INFO] [Phase3c][S00250] Loss=34.1450 | VRAM=3.47GB
+2026-04-27 22:43:45,810 [INFO] [Phase3c][S00275] Loss=33.2500 | VRAM=3.47GB
+2026-04-27 22:43:56,482 [INFO] [Phase3c][S00300] Loss=32.2450 | VRAM=3.47GB
+2026-04-27 22:44:07,235 [INFO] [Phase3c][S00325] Loss=36.3400 | VRAM=3.47GB
+2026-04-27 22:44:17,954 [INFO] [Phase3c][S00350] Loss=35.4250 | VRAM=3.47GB
+2026-04-27 22:44:28,668 [INFO] [Phase3c][S00375] Loss=33.4500 | VRAM=3.47GB
+2026-04-27 22:44:39,384 [INFO] [Phase3c][S00400] Loss=32.8425 | VRAM=3.27GB
+2026-04-27 22:44:50,101 [INFO] [Phase3c][S00425] Loss=32.8850 | VRAM=3.47GB
+2026-04-27 22:45:00,805 [INFO] [Phase3c][S00450] Loss=31.3725 | VRAM=3.47GB
+2026-04-27 22:45:11,522 [INFO] [Phase3c][S00475] Loss=32.5800 | VRAM=3.47GB
+2026-04-27 22:45:22,239 [INFO] [Phase3c][S00500] Loss=36.2200 | VRAM=3.47GB
+2026-04-27 22:45:22,478 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3c_step000500 | val=0.0000
+2026-04-27 22:45:33,149 [INFO] [Phase3c][S00525] Loss=33.5300 | VRAM=3.47GB
+2026-04-27 22:45:43,594 [INFO] [Phase3c][S00550] Loss=32.1900 | VRAM=3.47GB
+2026-04-27 22:45:53,768 [INFO] [Phase3c][S00575] Loss=34.4700 | VRAM=3.47GB
+2026-04-27 22:46:04,209 [INFO] [Phase3c][S00600] Loss=36.1500 | VRAM=3.27GB
+2026-04-27 22:46:14,621 [INFO] [Phase3c][S00625] Loss=34.2000 | VRAM=3.47GB
+2026-04-27 22:46:24,791 [INFO] [Phase3c][S00650] Loss=37.6100 | VRAM=3.47GB
+2026-04-27 22:46:34,924 [INFO] [Phase3c][S00675] Loss=35.5600 | VRAM=3.47GB
+2026-04-27 22:46:45,041 [INFO] [Phase3c][S00700] Loss=33.5650 | VRAM=3.47GB
+2026-04-27 22:46:55,154 [INFO] [Phase3c][S00725] Loss=33.8300 | VRAM=3.47GB
+2026-04-27 22:47:05,273 [INFO] [Phase3c][S00750] Loss=36.0400 | VRAM=3.47GB
+2026-04-27 22:47:15,389 [INFO] [Phase3c][S00775] Loss=33.2600 | VRAM=3.47GB
+2026-04-27 22:47:25,508 [INFO] [Phase3c][S00800] Loss=35.5175 | VRAM=3.27GB
+2026-04-27 22:47:35,631 [INFO] [Phase3c][S00825] Loss=32.1950 | VRAM=3.47GB
+2026-04-27 22:47:45,749 [INFO] [Phase3c][S00850] Loss=32.9000 | VRAM=3.47GB
+2026-04-27 22:47:55,864 [INFO] [Phase3c][S00875] Loss=33.4350 | VRAM=3.47GB
+2026-04-27 22:48:05,987 [INFO] [Phase3c][S00900] Loss=35.5425 | VRAM=3.47GB
+2026-04-27 22:48:16,110 [INFO] [Phase3c][S00925] Loss=34.5600 | VRAM=3.47GB
+2026-04-27 22:48:26,244 [INFO] [Phase3c][S00950] Loss=35.2050 | VRAM=3.47GB
+2026-04-27 22:48:36,366 [INFO] [Phase3c][S00975] Loss=32.5550 | VRAM=3.47GB
+2026-04-27 22:48:46,496 [INFO] [Phase3c][S01000] Loss=34.2550 | VRAM=3.27GB
+2026-04-27 22:48:46,738 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phase3c_step001000 | val=0.0000
+2026-04-27 22:48:46,738 [INFO] Phase 3c complete at step 1000.
+2026-04-27 22:48:46,741 [INFO] All phases complete.
+2026-04-27 22:48:49,343 [INFO] Checkpoint: /hdd_data/rlf-1.4b-checkpoints/phasefinal_step099999 | val=0.0000
+2026-04-27 22:48:49,343 [INFO] Final checkpoint saved to: /hdd_data/rlf-1.4b-checkpoints/final
+All phases complete

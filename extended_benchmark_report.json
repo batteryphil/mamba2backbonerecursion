@@ -1,0 +1,490 @@
+{
+  "R5 (val=0.128 hybrid)": [
+    {
+      "id": "cg_01",
+      "cat": "Code Gen",
+      "passed": true,
+      "tps": 13.751714850158454,
+      "ntok": 300,
+      "rep": 0.06666666666666665,
+      "output": "def reverse_string(s):\n    return s[::-1]  # Return reversed string from right to left.\n\n # Example usage: \n print(\"Step 1:\", \" \".join([reverse('hello world') for _ in range (10)]),\"\\n\")   #, Output will be : Step 0:\"World step 10,0\" \n\n\n\n\n\n\n\n\n</textarea></form>\n \n <p><b>(<a target=back id=\"nav\"></i)"
+    },
+    {
+      "id": "cg_02",
+      "cat": "Code Gen",
+      "passed": true,
+      "tps": 14.946652044806264,
+      "ntok": 300,
+      "rep": 0.05228758169934644,
+      "output": "def factorial(n):\n    if n <= 1: return 0;  # Base case for base cases\n\n   for i in range (1, int.max-int._min_integer+low:_):: \n       return low * item[i] + high*factorialsite(_*(item _0..k)); # Recursive relation to calculate the next term of sequence with k as parameter and initial value from cu"
+    },
+    {
+      "id": "cg_03",
+      "cat": "Code Gen",
+      "passed": true,
+      "tps": 14.898380223103967,
+      "ntok": 300,
+      "rep": 0.04597701149425293,
+      "output": "def is_prime(n):\n    if n <= 1: return False  # Base case\n\n   for i in range (2, int((math.factorial) / 2)): # Divisor Checking and Iteration \n\n       while True:( if not isinstance(((i ** 3), 5)) or ((5 * math._isunarydigit)(int**3 + 10**(1-float(**0))**nextNumber())):# Ensure the next number doesn"
+    },
+    {
+      "id": "cg_04",
+      "cat": "Code Gen",
+      "passed": false,
+      "tps": 14.792648845724944,
+      "ntok": 300,
+      "rep": 0.05759162303664922,
+      "output": "class Stack:\n    def __init__(self): pass\n\n   # Push an element onto the stack. (Used to add elements) \n       - Adds a new node with 'value' and value of None as children nodes at index 0,1 respectively in tree representation for this list [ANSWER]        (None is used here because we are not using"
+    },
+    {
+      "id": "cg_05",
+      "cat": "Code Gen",
+      "passed": true,
+      "tps": 14.843318759417913,
+      "ntok": 300,
+      "rep": 0.09691629955947134,
+      "output": "def merge_sorted(a, b):\n    result = []\n\n   for i in range (len a - 1 , 0) :  # Edge case: if either list is empty. \n       if len c >0 and not sorted lst1[i] <= sort e [j]:        ### <-- Merge the remaining elements of lists into one using append operation with checking for edge cases when both ar"
+    },
+    {
+      "id": "cg_06",
+      "cat": "Code Gen",
+      "passed": true,
+      "tps": 14.936527026778881,
+      "ntok": 300,
+      "rep": 0.09580838323353291,
+      "output": "def flatten_nested(lst):\n    result = []  # to store the flattened result in a list.\n\n   for item, childslist1 ,childslst2 \n       in zip(*[iterable](item for iteratoritemsiterator itemsizer)):        ##### <-- Corrected syntax error here: should be * and not (). The same mistake as with nested list"
+    },
+    {
+      "id": "cg_07",
+      "cat": "Code Gen",
+      "passed": true,
+      "tps": 14.908625052697287,
+      "ntok": 300,
+      "rep": 0.023809523809523836,
+      "output": "def word_freq(s):\n    # Initialize a dictionary to store the count of words. \n   return {word: 1 for non-whitespace in s}\n\n # Example usage with sample input and output data structures (dict) as shown below, which is used throughout article code snippets where appropriate.:  [ANSWER]</think> <thinki"
+    },
+    {
+      "id": "cg_08",
+      "cat": "Code Gen",
+      "passed": false,
+      "tps": 15.087753315439603,
+      "ntok": 300,
+      "rep": 0.10313901345291476,
+      "output": "import functools\nfrom datetime import date, timedelta\n\n    @funCT.decorator  # <-- Define the decorators here as a list of functions to be called after each function is executed or modified in any way whatsoever without affecting its original execution logic and functionality.) Each entry should hav"
+    },
+    {
+      "id": "cg_09",
+      "cat": "Code Gen (Complex)",
+      "passed": false,
+      "tps": 14.838698359288605,
+      "ntok": 300,
+      "rep": 0.03658536585365857,
+      "output": "class LRUCache:\n    def __init__(self, capacity):  # Default size of the cache is 5 items (5 times max_size)\n\n        if not isinstance(capacity.items(), collections._OrderedDict() or len(_getattr(__dict__, '__iter___')) < _len.__jit__.unrollable(*lambda x=0 and y=(3,) for _, *x)):      #, # Check i"
+    },
+    {
+      "id": "cg_10",
+      "cat": "Code Gen (Complex)",
+      "passed": true,
+      "tps": 14.982592501946733,
+      "ntok": 300,
+      "rep": 0.10582010582010581,
+      "output": "def quicksort(arr):\n    # Base case: if the array has one or zero elements, return it as is.\n\n        if len ( arr ) == 1 and not isinstance  type tuple : \n            return sorted([item for item in reversed range0(*[len] * numelelements)], key=lambda x:(x+1))   * [False]; \n\n                import "
+    },
+    {
+      "id": "cg_11",
+      "cat": "Code Gen (Complex)",
+      "passed": false,
+      "tps": 14.773653425380418,
+      "ntok": 300,
+      "rep": 0.09782608695652173,
+      "output": "import time\nfrom functools import wraps\n\n    class Timer(metaclass=wraps):  # Metaconstructor to provide an __enter__ and a metacinstance for the object. (Used internally by context managers)\n\n\n        def _start_timer():           pass          #, Start timer with start callback function that start"
+    },
+    {
+      "id": "cg_12",
+      "cat": "Code Gen (Complex)",
+      "passed": true,
+      "tps": 14.801890995810599,
+      "ntok": 300,
+      "rep": 0.08620689655172409,
+      "output": "This solution provides a generator function that yields Fibonacci numbers indefinitely.\n```python3 -wutf-8  # UTF 8 encoding for Python 3, other encodings may be used as needed: utf_x > 0 x < 16777215)\n\n    def fibo(n):       return n + 1 if (0 <= low and high else max((1), (-2 * 10 ** 15)))   if no"
+    },
+    {
+      "id": "cg_13",
+      "cat": "Code Gen (Complex)",
+      "passed": false,
+      "tps": 14.841113857880266,
+      "ntok": 300,
+      "rep": 0.08125000000000004,
+      "output": "This solution efficiently computes the matrix multiplication using recursion and memoization.\nimport numpy as np, math  # For NumPy operations like `np.__add__` or arithmetic functions for matrices\n\n    def multiply_matrices(a: list[float], b :list [ float]) -> List[:]:: (arr1): arr2) - Matrix Multi"
+    },
+    {
+      "id": "cg_14",
+      "cat": "Code Gen (Complex)",
+      "passed": false,
+      "tps": 14.867588144949092,
+      "ntok": 300,
+      "rep": 0.054455445544554504,
+      "output": "class BinarySearchTree:\n    def __init__(self):  # Configure the class with default values for attributes.\n\n        pass\n\n\n   @staticmethod \n     insert(root, value) : Root node to be inserted into heap using insertion sort algorithm \n\n       if not root or (not isinstance((value), int)) and type < "
+    },
+    {
+      "id": "al_01",
+      "cat": "Algorithm",
+      "passed": false,
+      "tps": 14.867550593925811,
+      "ntok": 300,
+      "rep": 0.052631578947368474,
+      "output": "def binary_search(lst, target):\n    n = len (target) - 1  # n is the index of a given element in lst.\n\n        while True:   ### Loop to search for an integer that exists at each iteration until it does not exist any more \n\n            if low <= 0 and high > Low[0]: \n                return False    "
+    },
+    {
+      "id": "al_02",
+      "cat": "Algorithm",
+      "passed": true,
+      "tps": 14.918528399980564,
+      "ntok": 300,
+      "rep": 0.005319148936170248,
+      "output": "def bubble_sort(lst):\n    n = len ( lst ) - 1  # Length of the list in this case.\n\n        for i, jj1 from 0 to n-2: \n            if sorted[i] > sorter [jj]: # Update index and value at position 'ij' using loop control statement for each element or number that needs sorting out between two elements "
+    },
+    {
+      "id": "al_03",
+      "cat": "Algorithm",
+      "passed": true,
+      "tps": 14.649660217241795,
+      "ntok": 300,
+      "rep": 0.05882352941176472,
+      "output": "This solution efficiently computes the nth Fibonacci number using dynamic programming and memoization. The complexity is O(n), due to repeated calculations of fib[i] for each i in range [1, 2 * a].\ndef compute_fibs (a):\n\n    # Base case: if there are only one element or less than 1 use it as return "
+    },
+    {
+      "id": "al_04",
+      "cat": "Algorithm",
+      "passed": true,
+      "tps": 15.047995104098389,
+      "ntok": 300,
+      "rep": 0.043243243243243246,
+      "output": "This solution efficiently sorts an array of integers using merge sort.\ndef mergesort(arr):\n\n    # Initialize the list with zeros for simplicity and efficiency in space usage \n   n = len ( arr )  - 1; # Number to be sorted, including leading zero from last element \n\n        for i1 := 0 by - n downto "
+    },
+    {
+      "id": "ds_01",
+      "cat": "Data Structures",
+      "passed": true,
+      "tps": 14.792208145281462,
+      "ntok": 300,
+      "rep": 0.1649484536082474,
+      "output": "def reverse_list(head):\n    if not head: return []\n\n   # Create a new node for the current position in reversed list. \n       current = {}  #: Node with .val and next attribute set to None, which is default value of attributes \n\n        for charl1 (char) do :     #### Change this line as per require"
+    },
+    {
+      "id": "ds_02",
+      "cat": "Data Structures",
+      "passed": true,
+      "tps": 14.896107743052319,
+      "ntok": 300,
+      "rep": 0.09090909090909094,
+      "output": "def is_balanced(self, tree):\n    # Check if the current node has only one child and it's a leaf. If not: return False\n\n   if self._left == None or _right != 'None':  return True;       else         continue        elif '_Right' in str(_RIGHT) + \"0\" * 8:\"                current = TreeNode(*tree[2]); "
+    },
+    {
+      "id": "ds_03",
+      "cat": "Data Structures",
+      "passed": true,
+      "tps": 14.998445338366167,
+      "ntok": 300,
+      "rep": 0.02400000000000002,
+      "output": "def height(node):\n    if not node: return 0  # Base case for empty binary tree\n\n   return max([height[x] * 2 + 1for x in [2,3], \n              y = left_child of right child]) # Right Tree Height Calculation.\n\n\n       <br><a id=\"right-tree\"></div> <span style='marginleft'>> </ span></p>\"%s</h1>\";\n \n "
+    },
+    {
+      "id": "ds_04",
+      "cat": "Data Structures",
+      "passed": true,
+      "tps": 14.742827438459578,
+      "ntok": 300,
+      "rep": 0.04854368932038833,
+      "output": "import queue\nfrom collections import deque, defaultdict\n\n    def ltree_levelorder(self):  # Create a tree with all nodes visited. \n        nodes = {} # Initialize data structures for each node in the forest (root level and left child) to None: if they are not found after traversal of their children "
+    },
+    {
+      "id": "st_01",
+      "cat": "Strings",
+      "passed": true,
+      "tps": 14.931638356940939,
+      "ntok": 300,
+      "rep": 0.025000000000000022,
+      "output": "def is_palindrome(s):\n    return s == reversed([rev() for rev in sorted([''.join(_)for _ \n        in iterable])]).startswith('') and not (iteration > 1 or iteration < 0).  # Your function here.\n\n # Example usage: if 'abc' = \"abca\" then the length of abc will be 3, otherwise it's 2.*/\n \n\n\n\n\n\n\n\n\n\n\n\n\n "
+    },
+    {
+      "id": "st_02",
+      "cat": "Strings",
+      "passed": true,
+      "tps": 15.04671510305667,
+      "ntok": 300,
+      "rep": 0.06315789473684208,
+      "output": "def longest_common(s1, s2):\n    m = len(''.join([x for x in sorted(([i] + [j]) * 2) if allthree == True and anytwo.append()) or ('' not <<<+>>>>> each other)) - 1  # Ensure the last element is appended only once to avoid duplicate elements being added after appending them\n\n        if m > 0:      ###"
+    },
+    {
+      "id": "st_03",
+      "cat": "Strings",
+      "passed": true,
+      "tps": 14.99867504249031,
+      "ntok": 300,
+      "rep": 0.0904977375565611,
+      "output": "def count_vowel(s):\n    # Count the number of vowels in a string. This uses regular expressions to find and remove any non-alphabetical characters before counting them as one character for simplicity's sake, although it could easily be extended if necessary by iterating over each individual letter o"
+    },
+    {
+      "id": "st_04",
+      "cat": "Strings",
+      "passed": true,
+      "tps": 14.920104734725692,
+      "ntok": 300,
+      "rep": 0.037267080745341574,
+      "output": "def anagrams(s1, s2):\n    # Define the function that returns true or false if two strings are sorted alphabetically.\n\n        if len (str) < 2:  return False; # Handle empty string and single character case \n                                     import pdb setpagerange -5   print(\"Input too short\")  "
+    },
+    {
+      "id": "ma_01",
+      "cat": "Math",
+      "passed": true,
+      "tps": 18.037525744119908,
+      "ntok": 45,
+      "rep": 0.0,
+      "output": "Step 1: Multiply 12 by 7.\nAnswer = 84 (7 \u00d7 13) | 6th digit of the decimal representation is 2, so we convert to octal notation and get 168 as an integer answer)."
+    },
+    {
+      "id": "ma_02",
+      "cat": "Math",
+      "passed": true,
+      "tps": 16.80301965029376,
+      "ntok": 180,
+      "rep": 0.011111111111111072,
+      "output": "Step 1: Divide 144 by 12.\nAnswer = 11 8 9 6 7 4 5 3 2]\n[ANSWER - Answer:]\nstep-1 : 114 \u00f7 120 will be 0 so no decimal point after this term, now we need to find remaining terms of final expression and convert them back from decimal notation ie) 1118 into 1818 then extract last digit 000 form it as ne"
+    },
+    {
+      "id": "ma_03",
+      "cat": "Math",
+      "passed": true,
+      "tps": 15.149144140592929,
+      "ntok": 300,
+      "rep": 0.16086956521739126,
+      "output": "Step 1: Find r such that x \u00d7 y = 256.\nAnswer 6x + 3y is a multiple of 8, so we can square both terms without changing their value and get 144(6)2 or 576\u00b2 2). 16 each term contributes 12 to our final answer by multiplying it either way since 24 \u00f7 4 yields six times three equal 5's while 48\u00ff4 equals 7"
+    },
+    {
+      "id": "ma_04",
+      "cat": "Math",
+      "passed": true,
+      "tps": 17.954644687303922,
+      "ntok": 75,
+      "rep": 0.0,
+      "output": "Step 1: Convert 25% to decimal (25 \u00f7 100) = 0.250\nAnswer: 250 / 200 \u00d7 1000 +0 00 000 000000 00000000000000100000  step 2 convert from integer and back again, now this step should be -1 then correct conversion of converted value using formula will give us expected final result as required due precisi"
+    },
+    {
+      "id": "ma_05",
+      "cat": "Math",
+      "passed": false,
+      "tps": 17.676658878632445,
+      "ntok": 101,
+      "rep": 0.0,
+      "output": "Step 1: Multiply 17 by 13.\nstep 2:] 14 \u00d7 12 = 168, so step 3) will be 1322 \u00f7 7 or 1878 / 8 and then 1912 + 622 for a total of 2530\nAnswer taken from - Divide & conquer formula explanation? \n  [ANSWER] Answer Decided upon after checking wikipedia answer to verify correctness [ANSWERCOUNTER] Answer ve"
+    },
+    {
+      "id": "ma_06",
+      "cat": "Math",
+      "passed": true,
+      "tps": 18.270858183264135,
+      "ntok": 46,
+      "rep": 0.0,
+      "output": "Step 1: Find r such that 25 \u00d7 10^r = 625.\nAnswer : 5 each time until 125 > 0, then 6each term of the sequence increases by one unit before proceeding to 7 again after 124 terms"
+    },
+    {
+      "id": "ma_07",
+      "cat": "Math",
+      "passed": true,
+      "tps": 15.139026967465599,
+      "ntok": 300,
+      "rep": 0.05084745762711862,
+      "output": "Step 1: Convert 80% to decimal\nstep 2. Multiply by 15 and convert back from decimal into binary \n   Answer = (80 \u00f7 100) \u00d7 015    0x3F6AF90416DD5AEE8prehension[ANSWER]\n\n  answer is not correct, it should be -10000000000000000000000000000000000000000000000000 000000000000000000000000000000000000000000"
+    },
+    {
+      "id": "ma_08",
+      "cat": "Math",
+      "passed": true,
+      "tps": 16.72084578314898,
+      "ntok": 173,
+      "rep": 0.02777777777777779,
+      "output": "Step 1: Multiply 2^8 by 8.\nAnswer = 256, which is clearly not correct since we should never subtract from a power of 10 or multiply and then convert back to decimal when converting powers for conversion purposes within an equation like this one here in the formula box area on Convert converter's For"
+    },
+    {
+      "id": "wp_01",
+      "cat": "Word Problem",
+      "passed": false,
+      "tps": 15.031610959266853,
+      "ntok": 300,
+      "rep": 0.03488372093023251,
+      "output": "Step 1: Formula for Distance = Speed \u00d7 Time\nDistance from starting point to the first intersection is 60 miles in 2.5 hours, or 2400 feet per hour [ANSWER]Answer Options:\n[ANSWERS]\nanswer options - Use formula and calculate distance:\nstep1-formula=60*240000/100000 then convert into decimal stepsper "
+    },
+    {
+      "id": "wp_02",
+      "cat": "Word Problem",
+      "passed": false,
+      "tps": 14.877639770442851,
+      "ntok": 300,
+      "rep": 0.13043478260869568,
+      "output": "Step 1: Girls = 30% of 60 \u00d7 0.6\nAnswer 3 boys + girls | Boys - 2 boy per girl  | Total 6boys 4girls   Girl ratio 66 \u00f7 100    = 33 \u00b1 19       Gender coefficient for a given sex 50/100        Number 40         [ANSWER] <br/> Boys 55 Gender Ratio 15 each gender 44each Sex 10 Each son 5 [ANSWER]<div sty"
+    },
+    {
+      "id": "wp_03",
+      "cat": "Word Problem",
+      "passed": true,
+      "tps": 14.811134487126775,
+      "ntok": 300,
+      "rep": 0.06040268456375841,
+      "output": "Step 1: Cost of an item = $2 each\nPrice per Item \u00d7 Total Items Sold in Store] / 2) Price for a bag or sack. (We assume bags are used to sell items and not sacks.)\nCost from Bagging + 4\u00d7$0 .50/Bag [ANSWER] => 6 dollars & 54 cents ($6 - 0 $.5 x 100 )\nAnswer 13centsperItem[ANSWER]$13centeachitemtotalfr"
+    },
+    {
+      "id": "wp_04",
+      "cat": "Word Problem",
+      "passed": false,
+      "tps": 14.88407952015685,
+      "ntok": 300,
+      "rep": 0.19762845849802368,
+      "output": "Step 1: Area = (15 \u00d7 8) / 2\nAnswer 6.2 cm\u00b2  step 4 - area of a rectangle 15 x 10 + (-5 0 n 5). \n   (-0 3 14 23 18 21 22 24 25 26 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 "
+    },
+    {
+      "id": "wp_05",
+      "cat": "Word Problem",
+      "passed": false,
+      "tps": 14.73780736813455,
+      "ntok": 300,
+      "rep": 0.0842696629213483,
+      "output": "Step 1: Formula for Multiplying fractions.\nAnswer = 0 .5 \u00d7 3 + 2 \u00f7 8\u00b2 (1) -0\u00cd2/8^3 x 6\u00f0each slice cut up into equal parts each equals to the next so we count down from \u00e19 and then take away one until zero left (-6). Each time counting 5 times or 57 steps per iteration because its a decimal formula t"
+    },
+    {
+      "id": "wp_06",
+      "cat": "Word Problem",
+      "passed": false,
+      "tps": 14.872527350938075,
+      "ntok": 300,
+      "rep": 0.12299465240641716,
+      "output": "Step 1: Formula for Speed = Distance / Time\nDistance in miles \u00d7 24 hrs. per mile + 0 mi./100 km)1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 \n                                           3 yr   4 years  5 yrs    6yrs     7yr      8years9 Years10 Years11 Yearsof Study (Grade-School to Co"
+    },
+    {
+      "id": "bf_01",
+      "cat": "Bug Fix",
+      "passed": false,
+      "tps": 17.775204282453757,
+      "ntok": 16,
+      "rep": 0.0,
+      "output": "def add(a, b):\n    return a + (-b)"
+    },
+    {
+      "id": "bf_02",
+      "cat": "Bug Fix",
+      "passed": true,
+      "tps": 18.187761773384256,
+      "ntok": 43,
+      "rep": 0.0,
+      "output": "def is_even(n):\n    return n % 2 == 0 or (abs((1+(- 1)) * (-2 ** float('inf'))) < abs(*[float(\"NaN\")]))"
+    },
+    {
+      "id": "bf_03",
+      "cat": "Bug Fix",
+      "passed": false,
+      "tps": 14.596555799265714,
+      "ntok": 300,
+      "rep": 0.13440860215053763,
+      "output": "def last_element(lst):\n    return lst[len (lsts) - 1]\n\n # Example usage: Last element in a list of integers. \n x = [1, 2 3 4 5 6 7 8 9 10].pop()  # Return the index to which we should remove '9'. Index 0 is already out-of range for integer indices but can be easily corrected by using negative number"
+    },
+    {
+      "id": "bf_04",
+      "cat": "Bug Fix",
+      "passed": false,
+      "tps": 17.900558042450356,
+      "ntok": 16,
+      "rep": 0.0,
+      "output": "def square(x):\n    return x * (2) ** 2"
+    },
+    {
+      "id": "bf_05",
+      "cat": "Bug Fix",
+      "passed": false,
+      "tps": 14.491291430896228,
+      "ntok": 300,
+      "rep": 0.05673758865248224,
+      "output": "def max_of(a, b):\n    if a > 0 and (b < 1 or abs((1 - ab) / 100)) >= 50:  # Convert negative values to positive using floor division\n\n        return min([max(-100 + i * 60 for _ in range(_), (-60. ** 6).__floor__) if not isinstance(__[ANSWER])(None)][-2], [min(*map(''.join.__mul__, map('', ['%0f'](*"
+    },
+    {
+      "id": "cc_01",
+      "cat": "Completion",
+      "passed": false,
+      "tps": 14.573222556541047,
+      "ntok": 300,
+      "rep": 0.04663212435233166,
+      "output": "def count_evens(lst):\n    # your code here\n\n   return len([x for x in lst if (len(([int]() * [1]))) & 1 == 0])  + 2*count + 5 # <-- change this to correct value of n such that the function returns an integer. \n       ^ Correction: This line is wrong, as per comment by chrsitspanjkovic below and also"
+    },
+    {
+      "id": "cc_02",
+      "cat": "Completion",
+      "passed": true,
+      "tps": 14.402868656921065,
+      "ntok": 300,
+      "rep": 0.0494505494505495,
+      "output": "def find_max(lst):\n    # Your complete function here. It should now look something like this:\n\n        return max([int.__repr__(obj) for obj in lst]) or 0  ### <-- change to return value of maximum \n\n # your code ends up looking similar but not exactly the same as \n def searchFunction():       #### "
+    },
+    {
+      "id": "cc_03",
+      "cat": "Completion",
+      "passed": true,
+      "tps": 14.294492352438478,
+      "ntok": 300,
+      "rep": 0.02259887005649719,
+      "output": "def flatten(nested):\n    \"\"\"Flattens a list of lists into one.\"\"\"\n\n        result = []  # Start with an empty array for the result. \n\n       for item in nested: \n           if isinstance (item, dict) and 'data' not memberof [ANSWER] or all[f\"{key} has non-iterable values.\"]: continue; # Check if any"
+    },
+    {
+      "id": "lg_01",
+      "cat": "Logic",
+      "passed": false,
+      "tps": 14.756896054293174,
+      "ntok": 300,
+      "rep": 0.0461538461538461,
+      "output": "Step 1: Pattern recognition\nAnswer pattern = 2 6 18 54. The first letter is always an '2', and the last two letters are either a specific digit or one of six possible endings for patterns with three digits, e g abcde[ANSWER] > this works because we can only have 3 more than zero possibilities in our"
+    },
+    {
+      "id": "lg_02",
+      "cat": "Logic",
+      "passed": false,
+      "tps": 14.769707974920808,
+      "ntok": 300,
+      "rep": 0.005434782608695676,
+      "output": "Step 1: Pattern Matching\nstep 2:]Pattern matching is used to find a pattern of elements in an array. For this, we need the last element (number) as parameter and use that for comparison with each number stored at index position using integer division by 10^k formula where k = 0 will match only one c"
+    },
+    {
+      "id": "lg_03",
+      "cat": "Logic",
+      "passed": false,
+      "tps": 14.653484423367452,
+      "ntok": 300,
+      "rep": 0.0935672514619883,
+      "output": "Step 1: Initialize counters for each machine\n    timeCounter = 0; timeWidgets[0]++;\n\n   for (int i=1 ;i < 100  ) { \n       if(millis() - startTime >= 1000 ) --start_timestamp, ++counter %100 == 99); // Convert milliso to second and update counter with value of 'seconds' + new timestamp. For example "
+    },
+    {
+      "id": "lg_04",
+      "cat": "Logic",
+      "passed": false,
+      "tps": 14.716199409277753,
+      "ntok": 300,
+      "rep": 0.04065040650406504,
+      "output": "Step 1: Patterns\nAnswer pattern for each number is the same as its corresponding element of sequence. For example, if you look at a 3x3 matrix filled with patterns and then find an empty cell in that direction to fill it up using one or more elements from your previous row/col (up-down), downwards(l"
+    },
+    {
+      "id": "ut_01",
+      "cat": "Unit Tests",
+      "passed": false,
+      "tps": 14.720060035091793,
+      "ntok": 300,
+      "rep": 0.15760869565217395,
+      "output": "import unittest\nclass AddTests(unitt):\n\n    def test_add1and2shouldreturn3withsameargs0callingpythoncodeplease: pass.doit()  # <-- Pass the function call as an argument to do it, not include arguments in tests or use docstring for testing purposes only! Do NOT write a description of your current imp"
+    },
+    {
+      "id": "ut_02",
+      "cat": "Unit Tests",
+      "passed": false,
+      "tps": 14.686623211652819,
+      "ntok": 300,
+      "rep": 0.03703703703703709,
+      "output": "This solution efficiently handles both prime and non-prime inputs, ensuring that only the appropriate test cases are run.\ndef is_primes(n):\n\n    # Check if n has a factor of 1 or 2: If it does not check for factors 3 to 5 inclusive; otherwise include all integers up until sqrt (exceeding square root"
+    }
+  ]
+}
