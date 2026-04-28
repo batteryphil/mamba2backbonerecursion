@@ -217,10 +217,10 @@ def compute_rlf_loss(
         logits   = model.lm_head(x_normed)      # [B, T, V]
         V        = logits.shape[-1]
 
-        # Priority 1: HALT Suppression — mask §HALT for early loops.
-        if loop_i < HALT_SUPPRESS_LOOPS:
-            logits = logits.clone()
-            logits[:, :, HALT_ID] = float("-inf")
+        # Priority 1: HALT Suppression — mask §HALT on a per-sample basis.
+        # Applied only when loop_i < HALT_SUPPRESS_LOOPS AND the target for
+        # that sample is a content token (not HALT itself). Masking HALT when
+        # the target IS HALT yields log(0) = inf loss — the original bug.
 
         loop_loss = torch.tensor(0.0, device=x_ext.device, requires_grad=True)
         loop_acc  = torch.tensor(0.0, device=x_ext.device)
@@ -233,11 +233,17 @@ def compute_rlf_loss(
             tgt_id = int(chain_targets[b][min(loop_i, len(chain_targets[b]) - 1)])
             if tgt_id >= V:
                 continue
-            lg_b   = logits[b, as_ - 1, :]
-            pred   = lg_b.argmax().item()
-            tgt_t  = torch.tensor(tgt_id, device=x_ext.device)
-            # Priority 5: scale HALT loss contribution by hw schedule.
+            lg_b    = logits[b, as_ - 1, :].clone()
             is_halt = (tgt_id == HALT_ID)
+
+            # Mask §HALT only when we are in the suppression window AND the
+            # target is a real content token — never mask what we're predicting.
+            if loop_i < HALT_SUPPRESS_LOOPS and not is_halt:
+                lg_b[HALT_ID] = float("-inf")
+
+            pred  = lg_b.argmax().item()
+            tgt_t = torch.tensor(tgt_id, device=x_ext.device)
+            # Priority 5: scale HALT loss contribution by hw schedule.
             ce = F.cross_entropy(lg_b.unsqueeze(0), tgt_t.unsqueeze(0))
             loop_loss = loop_loss + (ce * hw if is_halt else ce)
             loop_acc  = loop_acc + float(pred == tgt_id)
