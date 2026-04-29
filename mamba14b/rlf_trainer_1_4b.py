@@ -274,7 +274,9 @@ def compute_rlf_loss(
     # Prevents ConceptPerceptron from silently collapsing to all-zeros map.
     # Penalty = 0.1 * (1 - mem_norm)^2, minimum at mem_norm = 1.0.
     mem_norm_val = getattr(model, "mem_norm", None)
-    if mem_norm_val is not None and mem_norm_val.requires_grad:
+    if mem_norm_val is not None:
+        # Norm penalty anchors mem_norm to 1.0. Gradient flows through
+        # mem_norm → concept_perceptron weights whenever they require grad.
         norm_penalty = 0.1 * ((1.0 - mem_norm_val) ** 2)
         avg_loss = avg_loss + norm_penalty
 
