@@ -53,32 +53,34 @@ def make_env() -> dict:
 
 
 # ── Notifications ─────────────────────────────────────────────────────────────
-def notify(title: str, body: str) -> None:
-    """Send a desktop notification (Linux notify-send)."""
+NTFY_TOPIC = "rlf-v3-phil"   # install ntfy app → subscribe to this topic
+
+def notify(title: str, body: str, priority: str = "default") -> None:
+    """Push notification via ntfy.sh — works on any phone with the ntfy app."""
+    import urllib.request
     try:
-        # Try notify-send (GNOME/KDE)
-        subprocess.run(
-            ["notify-send", "--urgency=critical", "--expire-time=0",
-             f"🤖 RLF Agent: {title}", body],
-            timeout=5, env={**os.environ, "DISPLAY": ":0",
-                            "DBUS_SESSION_BUS_ADDRESS":
-                            f"unix:path=/run/user/{os.getuid()}/bus"}
+        data = json.dumps({
+            "topic":    NTFY_TOPIC,
+            "title":    f"🤖 RLF Agent: {title}",
+            "message":  body,
+            "priority": priority,
+        }).encode()
+        req = urllib.request.Request(
+            "https://ntfy.sh",
+            data=data,
+            headers={"Content-Type": "application/json"},
+            method="POST",
         )
-    except Exception:
-        pass
+        urllib.request.urlopen(req, timeout=10)
+    except Exception as e:
+        print(f"[notify] ntfy.sh failed: {e}")
 
-    try:
-        # Also beep terminal bell for audio alert
-        subprocess.run(["paplay", "/usr/share/sounds/freedesktop/stereo/bell.oga"],
-                       timeout=3, capture_output=True)
-    except Exception:
-        pass
-
-    # Always write to a prominent file
-    alert_file = DIAG_DIR / "ALERT.txt"
-    with open(alert_file, "w") as f:
+    # Always write alert file for dashboard to display
+    DIAG_DIR.mkdir(parents=True, exist_ok=True)
+    with open(DIAG_DIR / "ALERT.txt", "w") as f:
         f.write(f"[{datetime.now()}] {title}\n\n{body}\n")
-    print(f"\n{'!'*60}\n  ALERT: {title}\n  Body: {body}\n{'!'*60}\n")
+    print(f"\n{'!'*55}\n  {title}\n  {body}\n{'!'*55}\n")
+
 
 
 # ── Log analysis ──────────────────────────────────────────────────────────────
