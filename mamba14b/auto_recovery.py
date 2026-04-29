@@ -59,16 +59,14 @@ def notify(title: str, body: str, priority: str = "default") -> None:
     """Push notification via ntfy.sh — works on any phone with the ntfy app."""
     import urllib.request
     try:
-        data = json.dumps({
-            "topic":    NTFY_TOPIC,
-            "title":    f"🤖 RLF Agent: {title}",
-            "message":  body,
-            "priority": priority,
-        }).encode()
         req = urllib.request.Request(
-            "https://ntfy.sh",
-            data=data,
-            headers={"Content-Type": "application/json"},
+            f"https://ntfy.sh/{NTFY_TOPIC}",
+            data=body.encode(),
+            headers={
+                "Title":    title,
+                "Priority": priority,
+                "Tags":     "robot",
+            },
             method="POST",
         )
         urllib.request.urlopen(req, timeout=10)
@@ -80,6 +78,7 @@ def notify(title: str, body: str, priority: str = "default") -> None:
     with open(DIAG_DIR / "ALERT.txt", "w") as f:
         f.write(f"[{datetime.now()}] {title}\n\n{body}\n")
     print(f"\n{'!'*55}\n  {title}\n  {body}\n{'!'*55}\n")
+
 
 
 
