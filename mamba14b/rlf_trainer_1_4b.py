@@ -277,7 +277,7 @@ def compute_rlf_loss(
     if mem_norm_val is not None:
         # Norm penalty anchors mem_norm to 1.0. Gradient flows through
         # mem_norm → concept_perceptron weights whenever they require grad.
-        norm_penalty = 0.1 * ((1.0 - mem_norm_val) ** 2)
+        norm_penalty = 0.3 * ((1.0 - mem_norm_val) ** 2)
         avg_loss = avg_loss + norm_penalty
 
     avg_acc  = (torch.stack([a.detach() for a in step_accs]).mean()
