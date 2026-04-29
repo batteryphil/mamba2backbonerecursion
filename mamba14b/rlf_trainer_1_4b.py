@@ -276,27 +276,43 @@ def sft_loss(
     compute next-token CE. This recovers code generation ability.
     """
     model.train()
-    # Inline forward without chain targets → uses inference path
-    # but we need gradients, so do it manually:
     B = input_ids.shape[0]
-    x = model.embedding(input_ids)
-    x = model._run_backbone(x)
-    x_prompt = x.clone().detach()
-    from rlf_engine_1_4b import PREFIX_M
-    import torch
-    mem  = model.latent_memory.expand(B, -1, -1)
-    x_ext = torch.cat([mem, x], dim=1)
-    # Single RLF loop (loop_i=0) for SFT recovery
-    x_ext = model._lifeline_inject(x_ext, x_prompt)
+
+    # V2 API: _encode takes input_ids directly, returns (hidden, residual)
+    x, res = model._encode(input_ids)
+    x_prompt   = x.detach().clone()
+    res_prompt = res.detach().clone() if res is not None else None
+
+    # Build extended sequence with ConceptPerceptron scratchpad prefix
+    mem   = model.concept_perceptron(x_prompt)       # [B, M, D]
+    x_ext = torch.cat([mem, x], dim=1)               # [B, M+T, D]
+    if res is not None:
+        res_pad = torch.zeros(B, model.M, model.d_model,
+                              device=res.device, dtype=res.dtype)
+        res_ext = torch.cat([res_pad, res], dim=1)
+    else:
+        res_ext = None
+
+    # Single RLF loop (loop_i=0) — no decay on first loop
+    x_ext, res_ext = model._lifeline_inject(
+        x_ext, res_ext, x_prompt, res_prompt
+    )
     x_ext = model.loop_rope(x_ext, 0)
-    for layer in model.backbone_layers[24:]:
-        x_ext = layer(x_ext)
-    x_ext = x_ext + model.mamba1_loop(x_ext)
-    x_ext = model.loop_norm(x_ext)
+    if res_ext is not None:
+        res_ext = model.loop_rope(res_ext, 0)
+
+    from rlf_engine_1_4b import BASE_SPLIT
+    x_ext, res_ext = model._run_top_layers(x_ext, res_ext)
+    x_ext  = x_ext + model.mamba1_loop(x_ext)
+    x_ext  = model.loop_norm(x_ext)
     x_bridged = x_ext + model.bridge_up(model.bridge_down(x_ext))
-    x_out  = x_bridged[:, model.M :, :]
-    logits = model.lm_head(model.norm_f(x_out))   # [B, T, V]
-    # Next-token prediction
+
+    x_out    = x_bridged[:, model.M:, :]             # [B, T, D]
+    r_out    = res_ext[:, model.M:, :] if res_ext is not None else None
+    x_normed = model._apply_norm(x_out, r_out)
+    logits   = model.lm_head(x_normed)               # [B, T, V]
+
+    # Causal next-token prediction
     shift_logits = logits[:, :-1, :].contiguous()
     shift_labels = input_ids[:, 1:].contiguous()
     return F.cross_entropy(
