@@ -1,0 +1,478 @@
+================================================================================
+  MAMBA-1.4B RLF ENGINE — V2 TRAINING RUN: DEEPTHINK REVIEW REPORT
+  Date: 2026-04-28
+  Repo: https://github.com/batteryphil/mamba2backbonerecursion.git
+  HEAD: 19437aa
+================================================================================
+
+EXECUTIVE SUMMARY
+-----------------
+V2 successfully cured the HALT-gaming failure mode from Run 2. The model no
+longer fires §HALT on Loop 1. Training loss stayed finite and healthy through
+all three phases, including the HW=1.0 ramp that previously caused catastrophic
+collapse. However, V2 converged to a new failure mode: a degenerate fixed-token
+attractor ("" "" "and" "sime" "clonal" ...) that persists across every prompt
+regardless of content. Chain accuracy: 0/20 = 0%. Scratchpad Δ = 0.
+
+Root cause: ConceptPerceptron was initialised from random weights and given
+only 2000 Phase 3a warmup steps (18.9M params). It learned to suppress HALT
+but not to produce meaningful content tokens. The backbone SSM then settled
+into an output attractor before Phase 3b content supervision could override it.
+
+
+================================================================================
+SECTION 1 — WHAT CHANGED FROM V1 (Run 2) TO V2
+================================================================================
+
+1.1 ARCHITECTURE — rlf_engine_1_4b.py
+--------------------------------------
+REMOVED:
+  - latent_memory: nn.Parameter(shape=[1, PREFIX_M, d_model])
+    Static scratchpad initialised as zeros. Gradient only flowed into it
+    when backprop unrolled through the full loop chain. On L1-HALT samples
+    (run 2's dominant failure) gradient never arrived → Δ=0 always.
+
+ADDED:
+  - ConceptPerceptron (18,891,776 params):
+      prompt → mean-pool → Linear(d_model, d_model//2) → GELU
+           → Linear(d_model//2, PREFIX_M * d_model) → reshape [B, M, D]
+    Scratchpad is now dynamically derived from input. Gradient flows through
+    the perceptron regardless of when §HALT fires.
+
+  - LIFELINE_DECAY = 0.7 per loop:
+      At loop_i, prompt re-injection is scaled by 0.7^loop_i.
+      Loop 0: 100% text signal. Loop 3: 34%. Loop 6: 12%.
+      Forces model to shift dependency from raw tokens to perceptron map.
+
+  - BRIDGE_RANK widened 64 → 128:
+      bridge_down: [d_model → 128], bridge_up: [128 → d_model]
+      More capacity for semantic transfer between base backbone and loop engine.
+
+PARAM COUNTS (V2):
+  LoRA:              3,145,728
+  Loop engine:      13,219,840
+  ConceptPerceptron:18,891,776   ← new
+  Latent bridge:       524,288   (widened from 262,144)
+  Total trainable:  169,382,912
+  Base frozen:      634,601,472
+  VRAM at inference:  2.83 GB
+
+
+1.2 TRAINER — rlf_trainer_1_4b.py
+----------------------------------
+ADDED — compute_rlf_loss() with two priority fixes:
+
+  Priority 1: HALT Suppression (Muzzle)
+    logits[b, HALT_ID] = -inf  when loop_i < 2 AND tgt_id != HALT_ID
+    Applied per-sample (not batch-wide) to avoid masking when HALT IS the target.
+    BUG CAUGHT: original implementation was batch-wide → log(0) = inf loss
+    on 1-hop chains where Loop 1 target IS §HALT. Fixed before relaunch.
+
+  Priority 5: Dynamic HALT Weight schedule
+    Steps < 2000: HW = 0.10  (AnsAcc stabilises before HALT penalty)
+    Steps < 4000: HW = 0.30  (transition zone)
+    Steps ≥ 4000: HW = 1.00  (full HALT competition)
+    HW logged every LOG_EVERY steps.
+
+UPDATED:
+  - save_ckpt / load_rlf_components: concept_perceptron.pt replaces
+    latent_memory.pt
+  - Optimizer param group: lr_percep (1e-3 warmup, 1e-4 joint)
+  - sft_loss(): completely rewritten for V2 API (see bug log below)
+
+
+1.3 DATASET — rlf_dataset.py
+-----------------------------
+ADDED — make_math_chain_v2():
+  Step-aligned targets: each loop has a distinct intermediate target.
+  - 1-hop:  [cost, §]
+  - 3-hop:  [node_c, node_f, total, §]
+  §HALT at Loop 1 on a 3-hop sample incurs full CE loss against node_c.
+  HALT gaming has no cheap escape route.
+
+CHANGED:
+  RLFDataset.__getitem__: math branch now calls make_math_chain_v2()
+  instead of make_math_chain(). V1 function kept as make_math_chain() for
+  A/B reference.
+
+
+1.4 EVAL — rlf_chain_test.py
+-----------------------------
+FIXED (this session):
+  1. load_rlf_final: latent_memory.pt → concept_perceptron.pt
+  2. run_ablation: model.latent_memory.data.zero_() →
+     zero all concept_perceptron.named_parameters() for ablation
+  3. score_chain: added guard for empty-string false positive.
+     In Python, "" in "3.00" == True. Math-1step was scoring 100% when
+     output was all blank tokens. Fixed: require out_last to be non-empty.
+
+
+================================================================================
+SECTION 2 — BUGS ENCOUNTERED AND FIXED DURING SESSION
+================================================================================
+
+BUG 1: Loss=inf from Step 1 (HALT suppression mask)
+  Commit: 4f74bed
+  Root cause: logits[:,:,HALT_ID] = -inf applied to the entire batch before
+    checking if tgt_id == HALT_ID. On 1-hop chains, Loop 1 target IS §HALT.
+    CE(log(0)) = inf. Persisted through S00100+ until process was killed.
+  Fix: Move mask inside per-sample loop. Only suppress when tgt_id != HALT_ID.
+  Detection: Ran ~5 min before spotted. Killed and relaunched.
+
+BUG 2: sft_loss() used stale V1 API (would have crashed Phase 3c step 1)
+  Commit: b920a17
+  Root cause: Function was written against V1 engine, not updated for V2.
+  Broken calls:
+    model._run_backbone(x)       → _encode(input_ids)
+    model.latent_memory          → concept_perceptron(x_prompt)
+    model.backbone_layers[24:]   → _run_top_layers()
+    model._lifeline_inject(x, p) → _lifeline_inject(x, res, x_p, res_p)
+    model.norm_f(x_out)          → _apply_norm(x_out, r_out)
+  Fix: Full rewrite of sft_loss() using correct V2 API.
+  Detection: Caught by code inspection before Phase 3c started. Watchdog
+    killed old process and relaunched with fixed code.
+
+BUG 3: SFTDataset crash on blank lines in JSONL
+  Commit: 80fdbfd
+  Root cause: combined_training_data.jsonl has blank lines.
+    json.loads("") → JSONDecodeError. Phase 3c crashed on first call.
+  Fix: line.strip(); if not line: continue
+
+BUG 4: SFTDataset crash on null-byte line (line 7906)
+  Commit: 313c566
+  Root cause: Line 7906 consists entirely of \x00 bytes. strip() does not
+    remove null chars. json.loads("\x00\x00...") → JSONDecodeError.
+  Fix: line.replace("\x00", "").strip() + try/except wrapper.
+
+BUG 5: score_chain empty-string false positive
+  Commit: 19437aa
+  Root cause: Python: "" in "3.00" == True. Math-1step reported 100% (3/3)
+    in first eval run because all outputs were blank and the fuzzy matcher
+    accepted them as correct.
+  Fix: if not out_last: return False, "blank final token"
+
+BUG 6: run_ablation references model.latent_memory (AttributeError)
+  Commit: 19437aa
+  Root cause: Ablation function not updated for V2 — latent_memory removed.
+  Fix: Zero concept_perceptron.named_parameters() for ablation, restore after.
+
+BUG 7: load_rlf_final tries to load latent_memory.pt (doesn't exist in V2)
+  Commit: 19437aa
+  Root cause: Same as Bug 6 — load list not updated.
+  Fix: Replace (latent_memory.pt, None) with (concept_perceptron.pt,
+    model.concept_perceptron).
+
+
+================================================================================
+SECTION 3 — TRAINING TELEMETRY
+================================================================================
+
+3.1 PHASE 3a — ConceptPerceptron + Bridge Warmup
+  Duration: 2000 steps | LR: 1e-3 | Batch: 1 | GradAccum: 8
+  Started:  2026-04-28 18:35 CDT (after HALT-mask bug fix + relaunch)
+  Ended:    ~18:57 CDT
+
+  Key readings (V2 run, after bug fix):
+    S00025  Loss=9.3033  Acc=0.000  AnsAcc=0.000  HaltAcc=0.000  HW=0.10
+    S00050  Loss=4.7110  Acc=0.000  AnsAcc=0.000  HaltAcc=0.000  HW=0.10
+    S00125  Loss=2.6149  Acc=0.500  AnsAcc=1.000  HaltAcc=0.000  HW=0.10
+    S00150  Loss=2.1050  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=0.10
+    S00500  Loss=1.8614  Acc=0.500  AnsAcc=0.000  HaltAcc=1.000  HW=0.10
+    S00750  Loss=1.7006  Acc=0.500  AnsAcc=0.000  HaltAcc=1.000  HW=0.10
+    S00900  Loss=1.1256  Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=0.10
+    S01000  Loss=1.0973  Acc=0.250  AnsAcc=0.000  HaltAcc=1.000  HW=0.10
+    S01075  Loss=1.6638  Acc=0.500  AnsAcc=0.000  HaltAcc=1.000  HW=0.10
+    S02000  (Phase 3a complete)
+
+  Assessment: Normal warm-up arc. Loss 9.3 → ~1.1. AnsAcc noisy but
+  non-zero. HALT muzzle (HW=0.10) confirmed active throughout.
+
+
+3.2 PHASE 3b — Full RLF Joint Training
+  Duration: 8000 steps | LR: 1e-4 | Batch: 1 | GradAccum: 8
+  Started:  ~18:57 CDT
+  Ended:    20:21 CDT
+  Rate:     ~85.9 steps/min (0.7 sec/step)
+
+  Key readings:
+    S00025  Loss=0.65   Acc=0.500  AnsAcc=0.000  HaltAcc=1.000  HW=0.10
+    S00950  Loss=0.64   Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=0.10
+    S01200  Loss=0.93   Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=0.10
+    S02000  Loss=0.57   Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=0.30  ← RAMP 1
+    S03150  Loss=0.18   Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=0.30
+    S04000  (HW ramp 2)                                           HW=1.00  ← KEY TEST
+    S04800  Loss=0.29   Acc=0.667  AnsAcc=1.000  HaltAcc=0.000  HW=1.00  ← HELD
+    S04875  Loss=0.42   Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=1.00
+    S05000  Loss=0.25   Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=1.00
+    S05025  Loss=0.19   Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=1.00
+    S06150  Loss=0.17   Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=1.00
+    S07375  Loss=0.23   Acc=1.000  AnsAcc=1.000  HaltAcc=1.000  HW=1.00
+    S08000  (Phase 3b complete)
+
+  Assessment: HALT muzzle cure worked. AnsAcc held at 1.00 through the
+  HW=1.0 ramp at S04000 — the exact point where Run 2 collapsed. Loss
+  continued declining after the ramp. No loss explosion. VRAM stable at
+  3.32 GB. However: loss values are suspiciously clean in batches. The
+  model may have converged to a degenerate attractor that happens to
+  satisfy AnsAcc on training samples but generalises to nothing.
+
+
+3.3 PHASE 3c — SFT Recovery
+  Duration: 1000 steps | LR: 5e-5 | Batch: 4
+  Started:  20:31 CDT (after 3 crash-fix cycles, see bug log)
+  Ended:    20:38 CDT
+
+  Key readings:
+    S00025  Loss=1.9306  VRAM=3.51GB
+    S00050  Loss=2.0908  VRAM=3.51GB
+    S00300  Loss=1.8644  VRAM=3.51GB
+    S00750  Loss=1.7363  VRAM=3.51GB
+    S00975  Loss=1.6694  VRAM=3.51GB
+    S01000  Loss=1.7241  VRAM=3.31GB  (final checkpoint saved)
+
+  Compare Run 1 Phase 3c: Loss=32-35 throughout (lm_head catastrophically
+  warped by HALT gaming). V2 Phase 3c at Loss=1.7 — lm_head is intact.
+
+  Assessment: SFT recovery successful from a loss perspective. The lm_head
+  was not warped. However this does not help if the upstream loop engine
+  is producing degenerate tokens — the lm_head never sees valid input.
+
+
+================================================================================
+SECTION 4 — INFERENCE BENCHMARK (Phase3b/S01000 checkpoint)
+================================================================================
+
+Device: CUDA | Warmup: 3 runs | Bench: 10 runs | VRAM: 2.83 GB
+
+Prompt length vs latency:
+  SHORT  (18 tok): 173.9 ms | 1.0 loops avg | 150 tok/sec
+  MEDIUM (42 tok): 173.0 ms | 1.0 loops avg | 289 tok/sec
+  LONG   (52 tok): 180.3 ms | 1.0 loops avg | 333 tok/sec
+
+Loop-cost profile (32-tok input, forced exit):
+  MAX_LOOPS=1:  174 ms |  287 tok/sec
+  MAX_LOOPS=2:  175 ms |  572 tok/sec
+  MAX_LOOPS=3:  174 ms |  863 tok/sec
+  MAX_LOOPS=6:  174 ms | 1723 tok/sec
+
+Key insight: Each additional RLF loop adds ~0 ms. Mamba O(1) SSM recurrence
+means the full state is retained in constant VRAM — loop N costs the same
+as loop 1. TPS scales linearly with loop count at fixed wall-clock time.
+Note: All loops returned <HALT> at confidence 0.99+ — model still gaming
+at inference at this early checkpoint even though training muzzle was active.
+
+
+================================================================================
+SECTION 5 — EVAL RESULTS (Final checkpoint, clean scorer)
+================================================================================
+
+5.1 TEST 1: CHAIN ACCURACY (20 problems)
+-----------------------------------------
+Scorer: fuzzy match, empty-string false-positive fixed.
+
+  [1h_01] A=42. What is A?
+    Expected: ['42']  Got: ['' '' '\n' 'sime' 'teasp' '\n']  ❌
+
+  [1h_02] color=Blue. What is color?
+    Expected: ['Blue']  Got: ['' '' 'and' 'typen' 'teasp' 'teasp']  ❌
+
+  [1h_03] x=99. What is x?
+    Expected: ['99']  Got: ['' '' '' 'aleigh' 'aleigh' '']  ❌
+
+  [2h_01] A=42. B=A. What is B?
+    Expected: ['42','42']  Got: ['' '' 'C' 'sime' 'teasp' '<!']  ❌
+
+  [2h_02] X=Moon. Y=X. What is Y?
+    Expected: ['Moon','Moon']  Got: ['' '' 'and' 'sime' 'questionna' 'questionna']  ❌
+
+  [2h_03] sky blue. alpha=77. beta=alpha. What is beta?
+    Expected: ['77','77']  Got: ['' '' 'and' 'sime' 'clonal' 'sector']  ❌
+
+  [3h_01] A=Star. B=A. C=B. What is C?
+    Expected: ['Star','Star','Star']  Got: ['' '' 'and' 'sime' 'teasp' '\n']  ❌
+
+  [3h_02] v1=55. v2=v1. v3=v2. What is v3?
+    Expected: ['55','55','55']  Got: ['' '' 'and' 'maha' 'teasp' 'teasp']  ❌
+
+  [3h_adv_01] zx=Fire+distractors. What is zz?
+    Expected: ['Fire','Fire','Fire']  Got: ['' '' 'and' 'sime' 'questionna' 'questionna']  ❌
+
+  [3h_adv_02] ab=Gold+distractors. What is ef?
+    Expected: ['Gold','Gold','Gold']  Got: ['' '' 'the' 'maha' 'questionna' '\n']  ❌
+
+  [ma_01] qty=6. price=0.50. cost=qty*price. What is cost?
+    Expected: ['3.00']  Got: ['' '' 'and' 'sime' 'endix' '']  ❌ (blank final)
+
+  [ma_02] apples=4. price=1.25. total=apples*price. What is total?
+    Expected: ['5.00']  Got: ['' '' 'and' 'somet' 'clonal' '']  ❌ (blank final)
+
+  [ma_03] students=30. pct=0.60. girls=students*pct. What is girls?
+    Expected: ['18']  Got: ['' '' 'and' 'maha' 'clonal' '']  ❌ (blank final)
+
+  [ma_04] 2-step math. What is total?
+    Expected: ['3.00','3.00','6.00']  Got: ['' '' 'and' 'maha' 'teasp' 'ae']  ❌
+
+  [sq_01..04] Sequence chains (all)
+    All got:  ['' '' 'and' 'sime' 'clonal' '_)']  ❌
+
+  [bf_01] bug-fix: What is the fixed expr?
+    Expected: ['a plus b']  Got: ['' '' 'and' 'maha' 'clonal' '']  ❌ (blank final)
+
+  [bf_02] bug-fix: What is the fix?
+    Expected: ['return a']  Got: ['' '' 'and' 'maha' 'clonal' 'is']  ❌
+
+Category Summary:
+  1-hop             0/3    0%
+  2-hop             0/3    0%
+  3-hop             0/2    0%
+  3-hop-adversarial 0/2    0%
+  math-1step        0/3    0%
+  math-2step        0/1    0%
+  sequence          0/4    0%
+  bug-fix           0/2    0%
+  TOTAL             0/20   0%
+
+Collapse analysis:
+  Collapsed loops: 0/20 = 0%
+  Avg conf stdev:  0.2356
+  → LOW COLLAPSE: loops are generating different tokens each pass.
+    This is NOT the Run 2 HALT-lock failure. It is a different attractor.
+
+
+5.2 TEST 2: SCRATCHPAD ABLATION
+---------------------------------
+  Run A (normal concept_perceptron):    0/5 = 0%
+  Run B (zeroed concept_perceptron):    0/5 = 0%
+  Δ = 0
+  → SCRATCHPAD UNUSED. Both normal and ablated produce same garbage output.
+    The perceptron is generating map tokens but the backbone is ignoring them.
+
+
+5.3 TEST 3: SEMANTIC SHIFT
+---------------------------
+  "The box holds what the bag holds. The bag holds the apple. What does box hold?"
+    Expected: apple   Got: ['' 'The' '"' 'typen' 'teasp' '??']  ❌
+
+  "John's score equals Mary's score. Mary scored 88. What is John's score?"
+    Expected: 88      Got: ['' '' '' 'CURI' 'teasp' 'aeda']  ❌
+
+  "Container B has what A has... A has the key. What does C have?"
+    Expected: key     Got: ['' 'The' 'the' 'somet' 'teasp' 'AtA']  ❌
+
+  "The red jar contains frost... What is in the red jar?"
+    Expected: frost   Got: ['' '' '"' 'typen' 'cryptocur' 'questionna']  ❌
+
+  "Sarah earns twice what Tom earns. Tom=500. What does Sarah earn?"
+    Expected: 1000    Got: ['' '$' '"' 'teasp' 'cryptocur' '??']  ❌
+
+  Semantic shift: 0/5 = 0%
+
+
+5.4 OVERALL VERDICT
+--------------------
+  Chain accuracy:  0%   ❌  (target ≥70%)
+  Scratchpad Δ:    +0   ❌  (target >0)
+  Semantic shift:  0%   ❌  (target ≥60%)
+
+
+================================================================================
+SECTION 6 — ROOT CAUSE ANALYSIS: DEGENERATE ATTRACTOR
+================================================================================
+
+The universal output pattern across all 20 eval prompts:
+  Loop 1: ''     (conf ~0.4–0.7)
+  Loop 2: ''     (conf ~0.4–0.7)
+  Loop 3: 'and'  (conf ~0.3–0.5)
+  Loop 4: 'sime'/'maha'/'typen' (conf ~0.7–0.9)
+  Loop 5: 'clonal'/'teasp'/'questionna' (conf ~0.6–1.0)
+  Loop 6: varies (conf ~0.1–0.9)
+
+This is a CONTENT ATTRACTOR, not a HALT attractor. The model:
+  - Is NOT firing §HALT early (the muzzle worked)
+  - IS generating different tokens each loop (not collapsed)
+  - IS ignoring the prompt entirely (same output for "A=42" and "A=Star")
+  - IS locked to a fixed token vocabulary regardless of input content
+
+MECHANISM:
+The ConceptPerceptron was randomly initialised and trained for only 2000
+Phase 3a steps on 18.9M parameters. The perceptron learned to suppress HALT
+token probability (because that's what the muzzle gradient rewarded) but did
+not converge on meaningful prompt-to-scratchpad mappings. The backbone SSM,
+receiving incoherent scratchpad prefix tokens, settled into the lowest-energy
+output distribution — a loop over a handful of common English tokens.
+
+The AnsAcc=1.00 during Phase 3b training was real on training samples because
+those samples were generated from the same degenerate distribution the model
+had memorised. The distribution did not generalise.
+
+COMPARISON WITH RUN 2:
+  Run 2 failure: HALT attractor (always fire §HALT on Loop 1)
+  V2 failure:    Content attractor (always output garbage token sequence)
+  Shared root:   Insufficient ConceptPerceptron training before Phase 3b unlock
+
+The two failures are essentially the same problem at different points in the
+optimisation landscape. In both cases the model found a local minimum that
+satisfied the training objective without learning the intended behaviour.
+
+
+================================================================================
+SECTION 7 — COMMIT LOG (this session)
+================================================================================
+
+19437aa  fix: rlf_chain_test.py V2 compat + scorer accuracy
+313c566  fix: SFTDataset null-byte line crashes json.loads
+80fdbfd  fix: SFTDataset crashes on blank lines in JSONL
+b920a17  fix: sft_loss used stale V1 API — would have crashed Phase 3c step 1
+4f74bed  fix: HALT suppression mask caused Loss=inf on 1-hop chains
+30364b5  arch: V2 RLF engine — ConceptPerceptron + HALT Muzzle + Lifeline Decay
+
+
+================================================================================
+SECTION 8 — PROPOSED V3 REMEDIATION PLAN
+================================================================================
+
+The V2 diagnosis is clear. The solution requires three changes:
+
+8.1 EXTENDED PHASE 3a (6000 steps, 3× longer)
+  - Freeze: everything except concept_perceptron + bridge
+  - LR: 1e-3
+  - Data: 1-hop variable chains ONLY (unambiguous single-answer supervision)
+  - Goal: Force ConceptPerceptron to learn real prompt→scratchpad mappings
+    before the backbone sees any multi-loop content.
+  - Why 1-hop only: Multi-hop data during warmup lets the model avoid
+    the perceptron by routing through degenerate paths. 1-hop has
+    no ambiguity — the perceptron MUST encode the answer or loss stays high.
+
+8.2 FREEZE lm_head DURING PHASE 3b WARMUP (steps 0–2000)
+  - Current: lm_head is trainable from Phase 3b step 1.
+  - Problem: lm_head learns to map garbage perceptron output to plausible
+    tokens, creating the content attractor.
+  - Fix: Freeze lm_head for first 2000 Phase 3b steps. Perceptron and
+    bridge must produce correct hidden states before lm_head adapts to them.
+
+8.3 LOWER PHASE 3b BASE LR (1e-4 → 5e-5)
+  - Current rate allows fast convergence to attractors.
+  - Slower rate gives perceptron time to establish correct mappings before
+    the LoRA layers lock in their weights around the wrong distribution.
+
+8.4 PHASE 3a DATA AUDIT
+  - Add a per-step loss print for the perceptron output norm.
+  - If norm → 0 during warmup, the perceptron is collapsing to zero map.
+    Add L2 regularisation on the map output to prevent this.
+
+ESTIMATED IMPACT:
+  - Phase 3a: 6000 steps × 0.7 sec = ~70 min (vs 23 min previously)
+  - Phase 3b: 8000 steps × 0.7 sec = ~93 min (same)
+  - Phase 3c: 1000 steps × 0.7 sec = ~12 min (same)
+  - Total: ~3 hours to final V3 checkpoint
+
+SUCCESS CRITERIA (eval thresholds):
+  Chain accuracy:  ≥ 70% ✅ / ≥ 40% ⚠️
+  Scratchpad Δ:    > 1   ✅ / > 0   ⚠️
+  Semantic shift:  ≥ 60% ✅ / ≥ 20% ⚠️
+
+
+================================================================================
+END OF REPORT
+Generated: 2026-04-28T20:47 CDT
+================================================================================
