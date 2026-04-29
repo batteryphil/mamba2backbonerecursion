@@ -176,7 +176,9 @@ def compute_rlf_loss(
         loss, acc, ans_acc, halt_acc = model(
             input_ids, chain_targets, ans_starts
         )
-        return loss, float(acc), float(ans_acc), halt_acc
+        # Pull mem_norm from instance (set by engine forward → concept_perceptron)
+        mem_norm = float(getattr(model, "mem_norm", torch.tensor(0.0)).detach())
+        return loss, float(acc), float(ans_acc), halt_acc, mem_norm
 
     # ── Manual loop unroll with HALT suppression ──────────────────────────
     # Mirror of engine forward() but intercepts logits before CE.
@@ -187,6 +189,8 @@ def compute_rlf_loss(
     res_prompt = res.detach().clone() if res is not None else None
 
     mem   = model.concept_perceptron(x_prompt)
+    # Sync mem_norm on model instance so norm_penalty in the loss reads it
+    model.mem_norm = mem.norm(p=2, dim=-1).mean()
     x_ext = torch.cat([mem, x], dim=1)
     if res is not None:
         res_pad = torch.zeros(B, model.M, model.d_model,
