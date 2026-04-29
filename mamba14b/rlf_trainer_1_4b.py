@@ -88,12 +88,18 @@ class SFTDataset(Dataset):
             for i, line in enumerate(f):
                 if i >= limit:
                     break
-                line = line.strip()
+                # Strip whitespace AND null bytes (line 7906 is all \x00)
+                line = line.replace("\x00", "").strip()
                 if not line:
                     continue
-                obj = json.loads(line)
-                text = f"[USER]\n{obj['prompt']}\n========\n[ANSWER]\n{obj['answer']}"
-                self.samples.append(text)
+                try:
+                    obj = json.loads(line)
+                    if "prompt" not in obj or "answer" not in obj:
+                        continue
+                    text = f"[USER]\n{obj['prompt']}\n========\n[ANSWER]\n{obj['answer']}"
+                    self.samples.append(text)
+                except Exception:
+                    continue  # skip any other malformed lines silently
 
     def __len__(self) -> int:
         """Return number of samples."""
