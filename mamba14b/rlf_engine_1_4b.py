@@ -391,6 +391,10 @@ class RecursiveMamba1_PrefixScratchpad(nn.Module):
         # This runs even if the model halts at Loop 1, so gradients always
         # flow back through the perceptron regardless of HALT position.
         mem     = self.concept_perceptron(x_prompt)            # [B, M, D]
+        # V3 Priority 8.4: Track scratchpad map norm.
+        # Stored on instance so trainer can log it and apply norm_penalty.
+        # If norm → 0, the perceptron is collapsing to zero map (silent death).
+        self.mem_norm = mem.norm(p=2, dim=-1).mean()           # scalar tensor
         x_ext   = torch.cat([mem, x], dim=1)                  # [B, M+T, D]
         # Zero-pad residual for the M new prefix positions
         if res is not None:

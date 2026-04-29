@@ -278,6 +278,7 @@ class RLFDataset(Dataset):
         seq_len: int = 256,
         seed: int = 42,
         adversarial_prob: float = 0.4,
+        phase3a_warmup: bool = False,
     ) -> None:
         """Init dataset.
 
@@ -286,12 +287,21 @@ class RLFDataset(Dataset):
             seq_len:          max token length (truncated from left)
             seed:             random seed for reproducibility
             adversarial_prob: fraction of var-chain samples with distractors
+            phase3a_warmup:   V3 flag — when True forces 100%% 1-hop variable
+                              chains as the strict information-bottleneck
+                              curriculum.  The ConceptPerceptron must encode
+                              the answer directly; multi-hop loops cannot be
+                              used to hide degenerate routing.
         """
-        self.size      = size
-        self.seq_len   = seq_len
-        self.rng       = random.Random(seed)
-        self.adv_prob  = adversarial_prob
-        self.pad_id    = tokenizer.eos_token_id
+        self.size           = size
+        self.seq_len        = seq_len
+        self.rng            = random.Random(seed)
+        self.adv_prob       = adversarial_prob
+        self.phase3a_warmup = phase3a_warmup
+        self.pad_id         = tokenizer.eos_token_id
+
+        if phase3a_warmup:
+            print("[RLFDataset] PHASE 3A WARMUP MODE — 100%% 1-hop variable chains")
 
     def __len__(self) -> int:
         """Return dataset size."""
@@ -307,21 +317,31 @@ class RLFDataset(Dataset):
         """
         self.rng.seed(idx + 314159)
 
-        roll = self.rng.random()
-        if roll < 0.50:
-            # Variable pointer chain
-            hops = self.rng.choice([1, 2, 3])
-            mode = "adversarial" if self.rng.random() < self.adv_prob else "clean"
-            prompt, chain = make_var_chain(self.rng, hops, mode)
-        elif roll < 0.80:
-            # V2 Step-Aligned math chain (forces intermediate loop predictions)
-            prompt, chain = make_math_chain_v2(self.rng)
-        elif roll < 0.95:
-            # Sequence chain
-            prompt, chain = make_sequence_chain(self.rng)
+        if self.phase3a_warmup:
+            # V3 Priority 8.1: Strict 1-hop bottleneck.
+            # Single integer variable → exact answer → §HALT.
+            # Perceptron MUST encode the answer in the scratchpad map;
+            # there is no multi-hop escape route.
+            val    = self.rng.randint(1, 999)
+            v_name = rand_var(self.rng, 3)
+            prompt = f"{v_name}={val}. What is {v_name}?"
+            chain  = [str(val), "§"]
         else:
-            # Bug fix chain
-            prompt, chain = make_bug_chain(self.rng)
+            roll = self.rng.random()
+            if roll < 0.50:
+                # Variable pointer chain (1-3 hop mix)
+                hops = self.rng.choice([1, 2, 3])
+                mode = "adversarial" if self.rng.random() < self.adv_prob else "clean"
+                prompt, chain = make_var_chain(self.rng, hops, mode)
+            elif roll < 0.80:
+                # V2 Step-Aligned math chain
+                prompt, chain = make_math_chain_v2(self.rng)
+            elif roll < 0.95:
+                # Sequence chain
+                prompt, chain = make_sequence_chain(self.rng)
+            else:
+                # Bug fix chain
+                prompt, chain = make_bug_chain(self.rng)
 
         # Tokenize prompt
         input_ids = tokenizer.encode(prompt)

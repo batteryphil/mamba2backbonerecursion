@@ -39,18 +39,21 @@ SFT_DATA     = Path("/home/phil/.gemini/antigravity/scratch/tiny-refinement/"
 LOG_PATH     = Path("/home/phil/.gemini/antigravity/scratch/tiny-refinement/"
                      "rlf_trainer.log")
 
-# ── Phase config ──────────────────────────────────────────────────────────────
-PHASE_CONFIG = {
-    "3a": {"steps": 2000,  "lr_percep": 1e-3,  "lr_bridge": 5e-4, "lr_other": 0.0},
-    "3b": {"steps": 8000,  "lr_percep": 5e-4,  "lr_bridge": 2e-4, "lr_other": 1e-4},
-    "3c": {"steps": 1000,  "lr_percep": 0.0,   "lr_bridge": 0.0,  "lr_other": 1e-5},
-}
-
-LOG_EVERY    = 25
-CKPT_EVERY   = 500
+# ── Training config ──────────────────────────────────────────────────────────
 BATCH_SIZE   = 1
 GRAD_ACCUM   = 8
+LOG_EVERY    = 25
+CKPT_EVERY   = 500
 
+# V3 Phase config
+# Phase 3a: 6000 steps (3× longer than V2) — gives ConceptPerceptron time
+#           to converge on 1-hop bottleneck before Phase 3b unlocks.
+# Phase 3b: LR halved to 5e-5 — slows convergence to attractors.
+PHASE_CONFIG: dict[str, dict] = {
+    "3a": {"steps": 6000, "lr_percep": 1e-3, "lr_bridge": 1e-3, "lr_other": 0.0},
+    "3b": {"steps": 8000, "lr_percep": 5e-5, "lr_bridge": 5e-5, "lr_other": 5e-5},
+    "3c": {"steps": 1000, "lr_percep": 0.0,  "lr_bridge": 0.0,  "lr_other": 5e-5},
+}
 
 def setup_logging(log_path: Path) -> logging.Logger:
     """Configure root logger to write to file and stdout."""
@@ -266,13 +269,23 @@ def compute_rlf_loss(
 
     avg_loss = (torch.stack(step_losses).mean() if step_losses else
                 torch.tensor(0.0, requires_grad=True))
+
+    # V3 Priority 8.4: Norm penalty anchors mem_norm to 1.0.
+    # Prevents ConceptPerceptron from silently collapsing to all-zeros map.
+    # Penalty = 0.1 * (1 - mem_norm)^2, minimum at mem_norm = 1.0.
+    mem_norm_val = getattr(model, "mem_norm", None)
+    if mem_norm_val is not None and mem_norm_val.requires_grad:
+        norm_penalty = 0.1 * ((1.0 - mem_norm_val) ** 2)
+        avg_loss = avg_loss + norm_penalty
+
     avg_acc  = (torch.stack([a.detach() for a in step_accs]).mean()
                 if step_accs else torch.tensor(0.0))
     ans_accs = step_accs[:-1] if len(step_accs) > 1 else step_accs
     ans_acc  = (torch.stack([a.detach() for a in ans_accs]).mean()
                 if ans_accs else avg_acc)
     halt_acc = (sum(halt_accs) / len(halt_accs)) if halt_accs else 0.0
-    return avg_loss, float(avg_acc), float(ans_acc), halt_acc
+    mem_norm = float(mem_norm_val.detach()) if mem_norm_val is not None else 0.0
+    return avg_loss, float(avg_acc), float(ans_acc), halt_acc, mem_norm
 
 
 def sft_loss(
@@ -454,14 +467,27 @@ def run_phase(
         dataset    = SFTDataset(SFT_DATA)
         dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
     else:
+        # V3 Priority 8.1: Phase 3a uses 1-hop only bottleneck curriculum.
+        # Phase 3b uses full V2 multi-hop mix.
         dataset    = RLFDataset(
             size=max(cfg["steps"] * BATCH_SIZE * 2, 15000),
             seq_len=256,
             adversarial_prob=0.4 if phase == "3b" else 0.0,
+            phase3a_warmup=(phase == "3a"),
         )
         dataloader = DataLoader(
             dataset, batch_size=BATCH_SIZE, collate_fn=collate_rlf, shuffle=True
         )
+
+    # V3 Priority 8.2: Freeze lm_head at Phase 3b start.
+    # Prevents lm_head acting as a "garbage translator" while the
+    # ConceptPerceptron is still learning. Unfrozen at step 2000.
+    lm_head_frozen = False
+    if phase == "3b":
+        log.info("\u2744️ Phase 3b: lm_head FROZEN (V3 anti-attractor trap)")
+        for param in model.lm_head.parameters():
+            param.requires_grad = False
+        lm_head_frozen = True
 
     RLF_CKPT_DIR.mkdir(parents=True, exist_ok=True)
     data_iter  = iter(dataloader)
@@ -483,12 +509,26 @@ def run_phase(
         if phase == "3c":
             input_ids = batch.to(DEVICE)
             loss = sft_loss(model, input_ids) / GRAD_ACCUM
-            acc  = halt_acc = ans_acc = 0.0
+            acc  = halt_acc = ans_acc = mem_norm = 0.0
         else:
             input_ids, chain_targets, ans_starts = batch
             input_ids = input_ids.to(DEVICE)
-            # V2: use compute_rlf_loss for HALT suppression + dynamic HW
-            loss, acc, ans_acc, halt_acc = compute_rlf_loss(
+
+            # V3 Priority 8.2: Unfreeze lm_head at Phase 3b step 2000.
+            if phase == "3b" and lm_head_frozen and step >= 2000:
+                log.info("\U0001f525 [V3 TRIGGER] Step 2000 — unfreezing lm_head")
+                for param in model.lm_head.parameters():
+                    param.requires_grad = True
+                # CRITICAL: add newly unfrozen params to active optimizer group
+                optimizer.add_param_group({
+                    "params": list(model.lm_head.parameters()),
+                    "lr": cfg["lr_other"],
+                    "weight_decay": 0.01,
+                })
+                lm_head_frozen = False
+
+            # V3: compute_rlf_loss now returns mem_norm as 5th element
+            loss, acc, ans_acc, halt_acc, mem_norm = compute_rlf_loss(
                 model, input_ids, chain_targets, ans_starts, step
             )
             loss = loss / GRAD_ACCUM
@@ -516,7 +556,8 @@ def run_phase(
             else:
                 log.info(f"[Phase{phase}][S{step:05d}] Loss={avg:.4f} | "
                          f"Acc={float(acc):.3f} | AnsAcc={float(ans_acc):.3f} | "
-                         f"HaltAcc={halt_acc:.3f} | HW={hw:.2f} | VRAM={vram:.2f}GB")
+                         f"HaltAcc={halt_acc:.3f} | HW={hw:.2f} | "
+                         f"mem_norm={mem_norm:.3f} | VRAM={vram:.2f}GB")
 
         if step % CKPT_EVERY == 0 or step == cfg["steps"]:
             save_ckpt(model, step, phase, avg if step % LOG_EVERY != 0
