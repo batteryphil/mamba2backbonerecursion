@@ -148,23 +148,21 @@ def load_rlf_final(ckpt_dir: Path) -> RecursiveMamba1_PrefixScratchpad:
     """Load the trained RLF model for evaluation."""
     model = load_from_sft_checkpoint(str(SFT_CKPT_DIR), DEVICE)
 
+    # V2: load concept_perceptron instead of latent_memory
     for fname, target in [
-        ("latent_memory.pt", None),
-        ("bridge_down.pt",   model.bridge_down),
-        ("bridge_up.pt",     model.bridge_up),
-        ("mamba1_loop.pt",   model.mamba1_loop),
-        ("loop_norm.pt",     model.loop_norm),
-        ("lifeline_gate.pt", None),
-        ("lm_head.pt",       model.lm_head),
+        ("concept_perceptron.pt", model.concept_perceptron),
+        ("bridge_down.pt",        model.bridge_down),
+        ("bridge_up.pt",          model.bridge_up),
+        ("mamba1_loop.pt",        model.mamba1_loop),
+        ("loop_norm.pt",          model.loop_norm),
+        ("lifeline_gate.pt",      None),
+        ("lm_head.pt",            model.lm_head),
     ]:
         fpath = ckpt_dir / fname
         if not fpath.exists():
+            print(f"  [warn] {fname} not found — skipping")
             continue
-        if fname == "latent_memory.pt":
-            model.latent_memory.data.copy_(
-                torch.load(fpath, map_location=DEVICE, weights_only=True)
-            )
-        elif fname == "lifeline_gate.pt":
+        if fname == "lifeline_gate.pt":
             model.lifeline_gate.data.copy_(
                 torch.load(fpath, map_location=DEVICE, weights_only=True)
             )
@@ -201,11 +199,19 @@ def run_chain(
 
 
 def score_chain(output: list[str], expected: list[str]) -> tuple[bool, str]:
-    """Fuzzy-match final output against expected[-1]."""
+    """Fuzzy-match final output against expected[-1].
+
+    Guards against the empty-string false-positive: in Python, '' is a
+    substring of every string, so `out_last in exp_last` is True even when
+    the model output nothing. Require a non-blank token before matching.
+    """
     if not output:
         return False, "empty output"
     exp_last = expected[-1].lower().strip()
     out_last = output[-1].lower().strip()
+    # Both directions must have non-empty content to count as a match
+    if not out_last:
+        return False, f"blank final token, expected {expected[-1]!r}"
     if exp_last in out_last or out_last in exp_last:
         return True, ""
     return False, f"got {output!r}, expected final={expected[-1]!r}"
@@ -311,17 +317,28 @@ def run_ablation(model: RecursiveMamba1_PrefixScratchpad) -> int:
     print("=" * 65)
 
     def count_correct(mem_zeroed: bool) -> int:
-        """Count correct answers with or without scratchpad."""
+        """Count correct answers with or without scratchpad.
+
+        V2 ablation: zero all weights in concept_perceptron.mapper so the
+        perceptron outputs a zero map — equivalent to removing the scratchpad.
+        Saves and restores weights so the model is unchanged after the test.
+        """
+        saved_weights = {}
         if mem_zeroed:
-            saved = model.latent_memory.data.clone()
-            model.latent_memory.data.zero_()
+            for name, param in model.concept_perceptron.named_parameters():
+                saved_weights[name] = param.data.clone()
+                param.data.zero_()
         correct = 0
         for prompt, expected in ABLATION_PROMPTS:
             out, _, _trace = run_chain(model, prompt)
-            if out and expected.lower() in out[-1].lower():
+            # Guard: empty output is always wrong
+            if not out or all(t.strip() == "" for t in out):
+                continue
+            if expected.lower() in out[-1].lower():
                 correct += 1
         if mem_zeroed:
-            model.latent_memory.data.copy_(saved)
+            for name, param in model.concept_perceptron.named_parameters():
+                param.data.copy_(saved_weights[name])
         return correct
 
     n = len(ABLATION_PROMPTS)
