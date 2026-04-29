@@ -608,6 +608,24 @@ def main() -> None:
         log.info(f"{'='*60}")
         run_phase(model, phase, log)
 
+        # ── Phase gate: verify this phase did its job before proceeding ──
+        # Runs phase_gate.py as a subprocess so it gets a clean GPU context.
+        # Exit code 0 = pass, 1 = fail → stop training immediately.
+        if args.phase == "all":
+            import subprocess as _sp
+            log.info(f"Running Phase {phase} gate check...")
+            gate_result = _sp.run(
+                [sys.executable, "-B", "phase_gate.py", "--phase", phase],
+                cwd=str(Path(__file__).parent),
+            )
+            if gate_result.returncode != 0:
+                log.error(
+                    f"❌ Phase {phase} gate FAILED — stopping training. "
+                    f"Review phase_gate output above before retrying Phase {phase}."
+                )
+                sys.exit(1)
+            log.info(f"✅ Phase {phase} gate PASSED — proceeding.")
+
     log.info("All phases complete.")
     final = RLF_CKPT_DIR / "final"
     final.mkdir(exist_ok=True)
