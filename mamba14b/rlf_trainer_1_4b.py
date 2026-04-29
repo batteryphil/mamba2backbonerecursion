@@ -88,6 +88,9 @@ class SFTDataset(Dataset):
             for i, line in enumerate(f):
                 if i >= limit:
                     break
+                line = line.strip()
+                if not line:
+                    continue
                 obj = json.loads(line)
                 text = f"[USER]\n{obj['prompt']}\n========\n[ANSWER]\n{obj['answer']}"
                 self.samples.append(text)
