@@ -397,3 +397,145 @@ if __name__ == "__main__":
             print(f"  Sample {i}: {decoded!r}")
             print(f"  Chain:    {chain}")
         break
+
+
+# ── Phase 0: CoT SFT Dataset ──────────────────────────────────────────────────
+
+def make_cot_chain(rng: random.Random) -> tuple[str, str]:
+    """Generate (prompt, full_reasoning_trace) for variable-binding chains.
+
+    Teaches the model the explicit variable-binding operation before RLF
+    loops are introduced. The structured scaffold (Lookup/Bind/Compute/Answer)
+    gives the model a template to slot values into rather than memorising
+    final answer tokens.
+
+    Returns:
+        (prompt_str, cot_reasoning_str)
+    """
+    roll = rng.random()
+
+    if roll < 0.40:
+        # 1-hop numeric
+        val  = rng.randint(1, 999)
+        v    = rand_var(rng, rng.randint(1, 4))
+        prompt = f"{v}={val}. What is {v}?"
+        cot    = f"Lookup: {v}={val}. Answer: {val}"
+
+    elif roll < 0.55:
+        # 1-hop word
+        word = rand_word(rng)
+        v    = rand_var(rng, rng.randint(1, 4))
+        prompt = f"{v}={word}. What is {v}?"
+        cot    = f"Lookup: {v}={word}. Answer: {word}"
+
+    elif roll < 0.75:
+        # 2-hop
+        val = rng.randint(1, 999)
+        v1  = rand_var(rng, rng.randint(1, 3))
+        v2  = rand_var(rng, rng.randint(1, 3))
+        while v2 == v1:
+            v2 = rand_var(rng, rng.randint(1, 3))
+        prompt = f"{v1}={val}. {v2}={v1}. What is {v2}?"
+        cot    = f"Lookup: {v1}={val}. Bind: {v2}←{v1}={val}. Answer: {val}"
+
+    elif roll < 0.90:
+        # 3-hop
+        val = rng.randint(1, 999)
+        v1  = rand_var(rng, 2)
+        v2  = rand_var(rng, 2)
+        v3  = rand_var(rng, 2)
+        while v2 == v1:
+            v2 = rand_var(rng, 2)
+        while v3 in (v1, v2):
+            v3 = rand_var(rng, 2)
+        prompt = f"{v1}={val}. {v2}={v1}. {v3}={v2}. What is {v3}?"
+        cot    = (f"Lookup: {v1}={val}. "
+                  f"Bind: {v2}←{v1}={val}. "
+                  f"Bind: {v3}←{v2}={val}. "
+                  f"Answer: {val}")
+
+    else:
+        # Math compute
+        qty   = rng.randint(1, 20)
+        price = round(rng.uniform(0.10, 9.99), 2)
+        cost  = round(qty * price, 2)
+        prompt = (f"qty={qty}. price={price:.2f}. "
+                  f"cost=qty*price. What is cost?")
+        cot    = (f"Lookup: qty={qty}, price={price:.2f}. "
+                  f"Compute: cost={qty}×{price:.2f}={cost:.2f}. "
+                  f"Answer: {cost:.2f}")
+
+    return prompt, cot
+
+
+class CoTSFTDataset(Dataset):
+    """Phase 0 SFT dataset: full chain-of-thought reasoning traces.
+
+    Trains the model on (prompt → complete reasoning string) pairs using
+    standard causal LM loss. Teaches the variable-binding scaffold before
+    any RLF loops are introduced, giving the model a reasoning template to
+    slot values into rather than discovering it from scratch under RLF loss.
+    """
+
+    def __init__(
+        self,
+        size:    int = 9000,
+        seq_len: int = 96,
+        seed:    int = 314159,
+    ) -> None:
+        """Build dataset with deterministic seeding.
+
+        Args:
+            size:    number of samples
+            seq_len: max token length (prompt + cot target)
+            seed:    base random seed
+        """
+        self.size    = size
+        self.seq_len = seq_len
+        self.seed    = seed
+        self.rng     = random.Random(seed)
+        self.pad_id  = tokenizer.eos_token_id
+
+    def __len__(self) -> int:
+        """Return dataset size."""
+        return self.size
+
+    def __getitem__(self, idx: int) -> dict:
+        """Tokenise one (prompt, cot) pair with prompt tokens masked (-100).
+
+        Args:
+            idx: sample index
+
+        Returns:
+            dict with 'input_ids' [seq_len] and 'labels' [seq_len].
+            Prompt tokens have label -100 (not supervised).
+            CoT tokens have their true token ID as label.
+        """
+        self.rng.seed(idx + self.seed)
+        prompt, cot = make_cot_chain(self.rng)
+
+        prompt_ids = tokenizer.encode(prompt)
+        full_ids   = tokenizer.encode(prompt + " " + cot)
+
+        # Truncate to seq_len
+        if len(full_ids) > self.seq_len:
+            full_ids = full_ids[:self.seq_len]
+
+        # Mask prompt positions — only supervise the CoT reasoning
+        prompt_len = len(prompt_ids)
+        labels = (
+            [-100] * min(prompt_len, len(full_ids))
+            + full_ids[prompt_len:]
+        )
+        # Ensure labels and input_ids are same length after truncation
+        labels = labels[:len(full_ids)]
+
+        # Pad
+        pad_len  = self.seq_len - len(full_ids)
+        full_ids = full_ids + [self.pad_id] * pad_len
+        labels   = labels   + [-100]       * pad_len
+
+        return {
+            "input_ids": torch.tensor(full_ids, dtype=torch.long),
+            "labels":    torch.tensor(labels,   dtype=torch.long),
+        }

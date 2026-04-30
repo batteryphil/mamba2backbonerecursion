@@ -30,7 +30,7 @@ from rlf_engine_1_4b import (
     HALT_ID,
     DEVICE,
 )
-from rlf_dataset import RLFDataset, collate_rlf
+from rlf_dataset import RLFDataset, collate_rlf, CoTSFTDataset
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 SFT_CKPT_DIR = Path("/hdd_data/latent-spacer-checkpoints/best")   # R3 weights
@@ -46,12 +46,13 @@ GRAD_ACCUM   = 8
 LOG_EVERY    = 25
 CKPT_EVERY   = 500
 
-# V3 Phase config
-# Phase 3a: 6000 steps (3× longer than V2) — gives ConceptPerceptron time
-#           to converge on 1-hop bottleneck before Phase 3b unlocks.
-# Phase 3b: LR halved to 5e-5 — slows convergence to attractors.
+# V4 Phase config
+# Phase 0:  3000 steps CoT SFT — teaches variable-binding scaffold to backbone
+# Phase 3a: 3000 steps (shorter: CoT gives perceptron stronger gradient signal)
+# Phase 3b: lm_head frozen until S02000; lr halved vs V2
 PHASE_CONFIG: dict[str, dict] = {
-    "3a": {"steps": 6000, "lr_percep": 1e-3, "lr_bridge": 1e-3, "lr_other": 0.0},
+    "0":  {"steps": 3000, "lr_percep": 0.0,  "lr_bridge": 0.0,  "lr_other": 1e-4},
+    "3a": {"steps": 3000, "lr_percep": 1e-3, "lr_bridge": 1e-3, "lr_other": 0.0},
     "3b": {"steps": 8000, "lr_percep": 5e-5, "lr_bridge": 5e-5, "lr_other": 5e-5},
     "3c": {"steps": 1000, "lr_percep": 0.0,  "lr_bridge": 0.0,  "lr_other": 5e-5},
 }
@@ -280,10 +281,9 @@ def compute_rlf_loss(
     # Penalty = 0.1 * (1 - mem_norm)^2, minimum at mem_norm = 1.0.
     mem_norm_val = getattr(model, "mem_norm", None)
     if mem_norm_val is not None:
-        # Norm penalty anchors mem_norm to 1.0. Gradient flows through
-        # mem_norm → concept_perceptron weights whenever they require grad.
-        norm_penalty = 0.3 * ((1.0 - mem_norm_val) ** 2)
-        avg_loss = avg_loss + norm_penalty
+        # L2Norm is now baked into ConceptPerceptron (V4).
+        # norm_penalty is no longer needed — log the norm for monitoring only.
+        pass
 
     avg_acc  = (torch.stack([a.detach() for a in step_accs]).mean()
                 if step_accs else torch.tensor(0.0))
@@ -437,7 +437,89 @@ def run_phase(
     """
     cfg = PHASE_CONFIG[phase]
 
-    # Apply freeze protocol
+    # ── Phase 0: CoT SFT — teach variable-binding scaffold ──────────────────
+    if phase == "0":
+        # Perceptron and bridge frozen; lm_head + LoRA train on CoT data.
+        for p in model.concept_perceptron.parameters():
+            p.requires_grad = False
+        for p in (list(model.bridge_down.parameters()) +
+                  list(model.bridge_up.parameters())):
+            p.requires_grad = False
+        # All other params (LoRA + lm_head) stay trainable
+        for name, p in model.named_parameters():
+            if ("concept_perceptron" not in name and
+                    "bridge" not in name and
+                    not p.requires_grad):
+                p.requires_grad = True
+
+        cot_dataset = CoTSFTDataset(size=max(cfg["steps"] * 4, 12000))
+        cot_loader  = DataLoader(
+            cot_dataset, batch_size=4, shuffle=True,
+            drop_last=True, num_workers=0,
+        )
+        optimizer = torch.optim.AdamW(
+            [p for p in model.parameters() if p.requires_grad],
+            lr=cfg["lr_other"], weight_decay=0.01,
+        )
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, T_max=cfg["steps"], eta_min=1e-5
+        )
+
+        log.info(f"Phase 0: {cfg['steps']} steps CoT SFT — "
+                 f"trainable: {sum(p.numel() for p in model.parameters() if p.requires_grad):,}")
+
+        model.train()
+        cot_iter    = iter(cot_loader)
+        global_step = 0
+        optimizer.zero_grad()
+
+        while global_step < cfg["steps"]:
+            try:
+                batch = next(cot_iter)
+            except StopIteration:
+                cot_iter = iter(cot_loader)
+                batch    = next(cot_iter)
+
+            input_ids = batch["input_ids"].to(DEVICE)
+            labels    = batch["labels"].to(DEVICE)
+
+            # Standard causal LM loss through the base backbone + lm_head
+            x, _    = model._encode(input_ids)
+            x_norm  = model.norm_f(x)
+            logits  = model.lm_head(x_norm)          # [B, T, V]
+            loss    = F.cross_entropy(
+                logits.view(-1, logits.size(-1)),
+                labels.view(-1),
+                ignore_index=-100,
+            ) / GRAD_ACCUM
+
+            loss.backward()
+
+            if (global_step + 1) % GRAD_ACCUM == 0:
+                torch.nn.utils.clip_grad_norm_(
+                    [p for p in model.parameters() if p.requires_grad], 1.0
+                )
+                optimizer.step()
+                scheduler.step()
+                optimizer.zero_grad()
+
+            if global_step % LOG_EVERY == 0:
+                log.info(
+                    f"[Phase0][S{global_step:05d}] "
+                    f"Loss={loss.item()*GRAD_ACCUM:.4f} | "
+                    f"LR={scheduler.get_last_lr()[0]:.2e}"
+                )
+
+            if global_step % CKPT_EVERY == 0 and global_step > 0:
+                save_ckpt(model, global_step, "phase0", loss.item())
+
+            global_step += 1
+
+        save_ckpt(model, global_step, "phase0", loss.item())
+        log.info(f"Phase 0 complete at step {global_step}.")
+        return
+
+    # Apply freeze protocol for Phases 3a/3b/3c
     if phase == "3a":
         freeze_for_phase3a(model)
     elif phase == "3b":
@@ -578,7 +660,8 @@ def run_phase(
 def main() -> None:
     """Parse args, load model, run phases."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--phase",  default="all", choices=["3a", "3b", "3c", "all"])
+    parser.add_argument("--phase",  default="all",
+                        choices=["0", "3a", "3b", "3c", "0_3a", "all"])
     parser.add_argument("--resume", action="store_true",
                         help="Resume from latest checkpoint in RLF_CKPT_DIR")
     args = parser.parse_args()
@@ -602,7 +685,12 @@ def main() -> None:
             log.info(f"Resuming from: {latest}")
             load_rlf_components(model, latest)
 
-    phases = ["3a", "3b", "3c"] if args.phase == "all" else [args.phase]
+    if args.phase == "all":
+        phases = ["0", "3a", "3b", "3c"]
+    elif args.phase == "0_3a":
+        phases = ["0", "3a"]
+    else:
+        phases = [args.phase]
     for phase in phases:
         log.info(f"\n{'='*60}")
         log.info(f"  Starting Phase {phase}")

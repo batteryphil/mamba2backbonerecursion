@@ -81,8 +81,10 @@ class ConceptPerceptron(nn.Module):
             nn.GELU(),
             nn.Linear(d_model // 2, prefix_m * d_model, bias=True),
         ).to(torch.bfloat16)
-        # Small init so the perceptron starts near-zero, allowing the backbone
-        # residual to dominate early training (same philosophy as bridge_up=zeros).
+        # Learnable output scale anchored at 1.0.
+        # Combined with F.normalize this bounds the map norm at BOTH
+        # training and inference time — no external norm_penalty needed.
+        self.scale = nn.Parameter(torch.ones(1, dtype=torch.bfloat16))
         for layer in self.mapper:
             if isinstance(layer, nn.Linear):
                 nn.init.normal_(layer.weight, std=0.02)
@@ -95,13 +97,17 @@ class ConceptPerceptron(nn.Module):
             x_prompt: [B, T, D] full backbone hidden states
 
         Returns:
-            [B, prefix_m, D] conceptual map tokens
+            [B, prefix_m, D] conceptual map tokens — L2-normalised per token
+            then scaled by self.scale so the norm is bounded at all times.
         """
-        # Mean-pool over sequence → global context vector [B, D]
         context_vector = x_prompt.mean(dim=1)
-        # Project → [B, prefix_m * D]
         latent_map = self.mapper(context_vector)
-        return latent_map.view(-1, self.prefix_m, x_prompt.size(-1))
+        latent_map = latent_map.view(-1, self.prefix_m, x_prompt.size(-1))
+        # L2-normalise each token vector then scale.
+        # This replaces the external norm_penalty: norm is bounded at inference
+        # without any penalty term, and scale is learned to set the magnitude.
+        latent_map = F.normalize(latent_map, p=2, dim=-1) * self.scale
+        return latent_map
 
 
 # ── 1D RoPE for Loop Index ────────────────────────────────────────────────────
