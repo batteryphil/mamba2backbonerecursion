@@ -52,7 +52,7 @@ CKPT_EVERY   = 500
 # Phase 3b: lm_head frozen until S02000; lr halved vs V2
 PHASE_CONFIG: dict[str, dict] = {
     "0":  {"steps": 3000, "lr_percep": 0.0,  "lr_bridge": 0.0,  "lr_other": 1e-4},
-    "3a": {"steps": 3000, "lr_percep": 1e-3, "lr_bridge": 1e-3, "lr_other": 0.0},
+    "3a": {"steps": 1000, "lr_percep": 1e-3, "lr_bridge": 1e-3, "lr_other": 0.0},
     "3b": {"steps": 8000, "lr_percep": 5e-5, "lr_bridge": 5e-5, "lr_other": 5e-5},
     "3c": {"steps": 1000, "lr_percep": 0.0,  "lr_bridge": 0.0,  "lr_other": 5e-5},
 }
